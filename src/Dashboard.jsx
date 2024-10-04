@@ -45,9 +45,17 @@ function Dashboard({ signOut }) {
             <View padding="1rem">
                 <NavLink to="/users"><FaUsers /> Users</NavLink>
             </View>
-            <View padding="1rem">
-                <NavLink to="/signout" onClick={signOut}><FaSignOutAlt /> Sign Out</NavLink>
-            </View>
+            <Button
+                onClick={signOut}
+                variation="primary"
+                size="large"
+                backgroundColor="var(--amplify-colors-red-60)"
+                color="white"
+                fontWeight="bold"
+                _hover={{ backgroundColor: "var(--amplify-colors-red-80)" }}
+              >
+                <FaSignOutAlt style={{ marginRight: '8px' }} /> Sign Out
+              </Button>
             </View>
           
           {/* Main Content */}
