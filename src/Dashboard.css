@@ -1,0 +1,12 @@
+.amplify-navlink {
+  text-decoration: none;
+  color: var(--amplify-colors-font-interactive);
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.amplify-navlink svg {
+  margin-right: 10px;
+  font-size: 1.2em; /* Adjust this value to change icon size */
+}
