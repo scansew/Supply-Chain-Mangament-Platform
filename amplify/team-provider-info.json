@@ -1,0 +1,20 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-scanandsewapp-staging-71ab4-authRole",
+      "UnauthRoleArn": "arn:aws:iam::637423498269:role/amplify-scanandsewapp-staging-71ab4-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::637423498269:role/amplify-scanandsewapp-staging-71ab4-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-scanandsewapp-staging-71ab4-deployment",
+      "UnauthRoleName": "amplify-scanandsewapp-staging-71ab4-unauthRole",
+      "StackName": "amplify-scanandsewapp-staging-71ab4",
+      "StackId": "arn:aws:cloudformation:us-east-1:637423498269:stack/amplify-scanandsewapp-staging-71ab4/3b1626c0-8240-11ef-9129-0afffe1d5823",
+      "AmplifyAppId": "d2hlus9pns00e4"
+    },
+    "categories": {
+      "auth": {
+        "scanandsewapp": {}
+      }
+    }
+  }
+}
