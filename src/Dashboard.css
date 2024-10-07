@@ -1,0 +1,51 @@
+.amplify-navlink {
+  text-decoration: none;
+  color: var(--amplify-colors-font-interactive);
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.amplify-navlink svg {
+  margin-right: 10px;
+  font-size: 1.2em; /* Adjust this value to change icon size */
+}
+
+.sidebar {
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-link {
+  text-decoration: none;
+  color: var(--amplify-colors-neutral-80);
+  padding: 0.75rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar-link:hover {
+  background-color: var(--amplify-colors-neutral-10);
+  color: var(--amplify-colors-neutral-100);
+}
+
+.sidebar-link.active {
+  background-color: var(--amplify-colors-primary-10);
+  color: var(--amplify-colors-primary-80);
+  font-weight: bold;
+}
+
+.sidebar-icon {
+  color: var(--amplify-colors-neutral-80);
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+  margin-right: 0.5rem;
+}
+
+.sidebar-link:hover .sidebar-icon {
+  color: var(--amplify-colors-neutral-100);
+}
+
+.sidebar-link.active .sidebar-icon {
+  color: var(--amplify-colors-primary-80);
+}
+

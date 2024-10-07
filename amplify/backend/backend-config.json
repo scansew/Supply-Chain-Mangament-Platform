@@ -18,7 +18,9 @@
           "passwordPolicyMinLength": 8
         },
         "signupAttributes": [
-          "PREFERRED_USERNAME"
+          "GIVEN_NAME",
+          "FAMILY_NAME",
+          "PHONE_NUMBER"
         ],
         "socialProviders": [],
         "usernameAttributes": [
@@ -30,6 +32,13 @@
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
+    }
+  },
+  "storage": {
+    "s3scanandsewappstorage442a3489": {
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "S3"
     }
   }
 }

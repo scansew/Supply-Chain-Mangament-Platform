@@ -1,0 +1,12 @@
+{
+  "resourceName": "s3scanandsewappstorage442a3489",
+  "bucketName": "scanandsewapp-storage-442a3489",
+  "policyUUID": "a2a45cac",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "READ",
+    "CREATE_AND_UPDATE",
+    "DELETE"
+  ]
+}

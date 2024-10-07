@@ -3,7 +3,7 @@
   "cognitoConfig": {
     "identityPoolName": "testAuthIdentityPool",
     "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "scananaded581c",
+    "resourceNameTruncated": "scanan7a028ba8",
     "userPoolName": "scanandsewapp",
     "autoVerifiedAttributes": [
       "email"
@@ -25,16 +25,18 @@
       "Requires Uppercase"
     ],
     "requiredAttributes": [
-      "preferred_username"
+      "given_name",
+      "family_name",
+      "phone_number"
     ],
     "aliasAttributes": [],
     "userpoolClientGenerateSecret": false,
     "userpoolClientRefreshTokenValidity": 30,
     "userpoolClientWriteAttributes": [],
     "userpoolClientReadAttributes": [],
-    "userpoolClientLambdaRole": "scananaded581c_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "scanan7a028ba8_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "aded581c",
+    "sharedId": "7a028ba8",
     "resourceName": "scanandsewapp",
     "authSelections": "identityPoolAndUserPool",
     "serviceName": "Cognito",

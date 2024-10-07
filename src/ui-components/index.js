@@ -1,0 +1,9 @@
+/***************************************************************************
+ * The contents of this file were generated with Amplify Studio.           *
+ * Please refrain from making any modifications to this file.              *
+ * Any changes to this file will be overwritten when running amplify pull. *
+ **************************************************************************/
+
+export { default as Frame1171275590 } from "./Frame1171275590";
+export { default as Frame1171275594 } from "./Frame1171275594";
+export { default as studioTheme } from "./studioTheme";
