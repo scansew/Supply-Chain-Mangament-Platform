@@ -159,7 +159,7 @@ function WorkOrder({}) {
                       <FileUploader
                         acceptedFileTypes={["image/*", "videos/*"]}
                         path="public/"
-                        maxFileCount={100}
+                        maxFileCount={2000}
                         onUploadSuccess={handleFileChange}
                         isResumable
                       />
