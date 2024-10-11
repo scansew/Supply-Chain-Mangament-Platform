@@ -7,7 +7,7 @@ import '@aws-amplify/ui-react/styles.css';
 
 import Dashboard from './Dashboard.jsx';  
 
-function App({ signOut, user }) {
+function App() {
 
   return (
     <>

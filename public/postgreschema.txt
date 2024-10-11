@@ -1,0 +1,371 @@
+-- Combined Schema for Supabase
+
+-- Companies Table
+CREATE TABLE Companies (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR NOT NULL,
+    address TEXT NOT NULL,
+    stripe_connect_id VARCHAR NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Users Table
+CREATE TABLE Users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Ensure it matches Supabase Auth user ID
+    username VARCHAR NOT NULL UNIQUE,
+    email VARCHAR NOT NULL UNIQUE,
+    password_hash VARCHAR NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Roles Table
+CREATE TABLE Roles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR NOT NULL,
+    description TEXT
+);
+
+-- UserRoles Table
+CREATE TABLE UserRoles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES Users(id),
+    role_id UUID REFERENCES Roles(id),
+    company_id UUID REFERENCES Companies(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (user_id, role_id, company_id)
+);
+
+-- CompanyRoles Table
+CREATE TABLE CompanyRoles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id UUID REFERENCES Companies(id),
+    role_id UUID REFERENCES Roles(id),
+    approved_by UUID REFERENCES Users(id),
+    approved_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (company_id, role_id)
+);
+
+-- RoleRequests Table
+CREATE TABLE RoleRequests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES Users(id),
+    role_id UUID REFERENCES Roles(id),
+    company_id UUID REFERENCES Companies(id),
+    status VARCHAR NOT NULL CHECK (status IN ('Pending', 'Approved', 'Rejected')),
+    requested_by UUID REFERENCES Users(id),
+    approved_by UUID REFERENCES Users(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Permissions Table
+CREATE TABLE Permissions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    role_id UUID REFERENCES Roles(id),
+    action VARCHAR NOT NULL,
+    description TEXT,
+    UNIQUE (role_id, action)
+);
+
+-- WorkOrders Table
+CREATE TABLE WorkOrders (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    wo_number SERIAL UNIQUE,
+    created_by UUID REFERENCES Users(id),
+    assigned_to UUID REFERENCES Users(id),
+    company_id UUID REFERENCES Companies(id),
+    status VARCHAR NOT NULL CHECK (status IN ('Pending', 'In Progress', 'Completed')),
+    type VARCHAR NOT NULL,
+    details TEXT,
+    material_selection JSONB,
+    estimated_price DECIMAL,
+    msrp DECIMAL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    process VARCHAR NOT NULL,
+    make VARCHAR,
+    model VARCHAR,
+    year INTEGER,
+    crm_client UUID REFERENCES Users(id),
+    raw_images TEXT[],
+    raw_design_images TEXT[],
+    description TEXT,
+    material_price DECIMAL,
+    manufacture_price DECIMAL,
+    raw_3d_model TEXT,
+    design_photos TEXT[],
+    outline_3d_model TEXT,
+    approved_3d_model TEXT,
+    main_2d_pattern TEXT,
+    bill_of_materials JSONB,
+    cnc_2d_pattern TEXT,
+    scan_info JSONB,
+    business_name VARCHAR,
+    attn_name VARCHAR,
+    business_phone VARCHAR,
+    business_shipping_address TEXT,
+    customer_name VARCHAR,
+    customer_drop_shipping_address TEXT,
+    shipping_tracking_info TEXT
+);
+
+-- Files Table
+CREATE TABLE Files (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    work_order_id UUID REFERENCES WorkOrders(id),
+    file_type VARCHAR NOT NULL,
+    url TEXT NOT NULL, -- Path to the file in Supabase Storage (S3)
+    uploaded_by UUID REFERENCES Users(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- AuditLogs Table
+CREATE TABLE AuditLogs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES Users(id),
+    action VARCHAR NOT NULL,
+    details TEXT,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Payments Table
+CREATE TABLE Payments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    work_order_id UUID REFERENCES WorkOrders(id),
+    amount DECIMAL NOT NULL,
+    stripe_payment_id VARCHAR NOT NULL,
+    status VARCHAR NOT NULL CHECK (status IN ('Pending', 'Completed', 'Failed')),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Materials Table
+CREATE TABLE Materials (
+    id SERIAL PRIMARY KEY,
+    material_name VARCHAR(255) NOT NULL,
+    measurements NUMERIC
+);
+
+-- MaterialPricing Table
+CREATE TABLE MaterialPricing (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id UUID REFERENCES Companies(id),
+    material_name VARCHAR(255) NOT NULL,
+    price_per_yard DECIMAL NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Miscellaneous Table
+CREATE TABLE Miscellaneous (
+    id SERIAL PRIMARY KEY,
+    misc_name VARCHAR(255) NOT NULL,
+    quantity NUMERIC
+);
+
+-- Ratchets Table
+CREATE TABLE Ratchets (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    number NUMERIC,
+    webbing NUMERIC,
+    binding NUMERIC,
+    other_a NUMERIC,
+    other_b NUMERIC
+);
+
+-- Buckles Table
+CREATE TABLE Buckles (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    number NUMERIC,
+    webbing NUMERIC,
+    binding NUMERIC,
+    other_a NUMERIC,
+    other_b NUMERIC
+);
+
+-- D_Rings Table
+CREATE TABLE D_Rings (
+    id SERIAL PRIMARY KEY,
+    d_ring_total NUMERIC,
+    name VARCHAR(255) NOT NULL,
+    number NUMERIC,
+    webbing NUMERIC,
+    strap NUMERIC
+);
+
+-- ReleaseBuckles Table
+CREATE TABLE ReleaseBuckles (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    number NUMERIC
+);
+
+-- Zippers Table
+CREATE TABLE Zippers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    size NUMERIC,
+    number NUMERIC
+);
+
+-- ZipperChains Table
+CREATE TABLE ZipperChains (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    quantity NUMERIC,
+    measurements NUMERIC
+);
+
+-- Edges Table
+CREATE TABLE Edges (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    quantity NUMERIC
+);
+
+-- Totals Table
+CREATE TABLE Totals (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    quantity NUMERIC
+);
+
+-- Insert example data
+INSERT INTO Materials (material_name, measurements) VALUES
+('A Material Main', 0),
+('B Material RFCM', 0),
+('C Material', 0),
+('D Material', 0),
+('E Material', 0),
+('F Material', 0);
+
+INSERT INTO Miscellaneous (misc_name, quantity) VALUES
+('Vent', 0),
+('Pole', 0),
+('A Other', 0),
+('B Other', 0),
+('C Other', 0);
+
+INSERT INTO Ratchets (name, number, webbing, binding, other_a, other_b) VALUES
+('Ratchet', 0, 0, 0, 0, 0);
+
+INSERT INTO Buckles (name, number, webbing, binding, other_a, other_b) VALUES
+('Buckles', 0, 0, 0, 0, 0);
+
+INSERT INTO D_Rings (d_ring_total, name, number, webbing, strap) VALUES
+(0, 'D-Ring 1"', 0, 0, 0);
+
+INSERT INTO ReleaseBuckles (name, number) VALUES
+('Release Buckle', 0);
+
+INSERT INTO Zippers (name, size, number) VALUES
+('Zipper Separating', 24, 0),
+('Zipper Separating', 30, 0),
+('Zipper Separating', 36, 0),
+('Zipper Separating', 40, 0),
+('Zipper Separating', 48, 0),
+('Zipper Separating', 60, 0),
+('Zipper Separating', 72, 0),
+('Zipper Separating', 84, 0),
+('Zipper Separating', 96, 0),
+('Zipper Separating', 108, 0),
+('Zipper Separating', 120, 0);
+
+INSERT INTO ZipperChains (name, quantity, measurements) VALUES
+('A Chain', 0, 0),
+('B Chain', 0, 0),
+('C Chain', 0, 0),
+('D Chain', 0, 0),
+('E Chain', 0, 0),
+('F Chain', 0, 0);
+
+INSERT INTO Edges (name, quantity) VALUES
+('Webbing 1"', 0),
+('Binding', 0),
+('Snaps', 0),
+('Twist Buckles', 0),
+('Shock Cord Clip', 0),
+('Bungie Cord', 0),
+('Rope', 0),
+('A Option', 0),
+('B Option', 0),
+('C Option', 0);
+
+INSERT INTO Totals (name, quantity) VALUES
+('Webbing 1"', 0),
+('Binding', 0),
+('Chain Zipper', 0);
+
+-- Indexes for performance improvement
+CREATE INDEX idx_users_email ON Users (email);
+CREATE INDEX idx_workorders_company_id ON WorkOrders (company_id);
+CREATE INDEX idx_userroles_user_id ON UserRoles (user_id);
+CREATE INDEX idx_userroles_company_id ON UserRoles (company_id);
+CREATE INDEX idx_role_requests_status ON RoleRequests (status);
+
+-- Functions and Triggers for updated_at timestamp
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+   NEW.updated_at = NOW();
+   RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER update_users_updated_at
+BEFORE UPDATE ON Users
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_companies_updated_at
+BEFORE UPDATE ON Companies
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_roles_updated_at
+BEFORE UPDATE ON Roles
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_userroles_updated_at
+BEFORE UPDATE ON UserRoles
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_companyroles_updated_at
+BEFORE UPDATE ON CompanyRoles
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_rolerequests_updated_at
+BEFORE UPDATE ON RoleRequests
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_workorders_updated_at
+BEFORE UPDATE ON WorkOrders
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_files_updated_at
+BEFORE UPDATE ON Files
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_auditlogs_updated_at
+BEFORE UPDATE ON AuditLogs
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_payments_updated_at
+BEFORE UPDATE ON Payments
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+

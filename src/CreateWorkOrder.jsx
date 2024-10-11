@@ -5,13 +5,8 @@ import {
   Grid,
   Collection,
   View,
-  Flex,
-  Badge,
-  Divider,
-  Heading,
   Text,
   Button,
-  Image,
 } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { FileUploader, StorageImage } from "@aws-amplify/ui-react-storage";
@@ -24,12 +19,153 @@ import {
   TableRow,
 } from "@aws-amplify/ui-react";
 
-import {
-  Frame1171275594 
- } from './ui-components';
+import { Frame1171275594 } from "./ui-components";
 // import './WO.css';
+import { generateClient } from "aws-amplify/api";
+import { listCompanies } from "./graphql/queries";
+import { createCompany,createUser,createWorkOrder, createWorkOrderCounter,incrementCounter } from './graphql/mutations';
 
 function WorkOrder({}) {
+  const client = generateClient();
+  useEffect(() => {
+    generateWorkOrderNumber();
+    // createNewCompany();
+    // fetchCompanies();
+    // createNewWOCounter();
+    // createNewWorkOrder();
+    // fetchWorkOrders();
+
+    // createNewUser();
+    // fetchUsers();
+  }, []);
+
+  const fetchCompanies = async () => {
+    try {
+      const companyData = await client.graphql({
+        query: listCompanies,
+      });
+      console.log("companies:", companyData.data.listCompanies.items);
+      return companyData.data.listCompanies.items;
+    } catch (err) {
+      console.log("error fetching companies", err);
+    }
+  };
+  async function createNewWOCounter() {
+    try {
+      const counterDetails = {
+        counterName: "workOrderNumber",
+        currentValue: 1100,
+      };
+      const input = {
+        input: counterDetails,
+        // Add condition if needed
+        // condition: { /* ... */ }
+      };
+
+      const newCounter = await client.graphql({
+        query: createWorkOrderCounter,
+        variables: input,
+      });
+    } catch (error) {
+      console.error("Error creating WO Counter:", error);
+    }
+  }
+  async function createNewCompany() {
+    try {
+      const companyDetails = {
+        name: "Acme Inc.",
+        address: "123 Main St, Anytown USA",
+        stripeConnectId: "acct_123456789",
+      };
+      const input = {
+        input: companyDetails,
+        // Add condition if needed
+        // condition: { /* ... */ }
+      };
+
+      const newCompany = await client.graphql({
+        query: createCompany,
+        variables: input,
+      });
+    } catch (error) {
+      console.error("Error creating company:", error);
+    }
+  }
+  async function generateWorkOrderNumber() {
+    try {
+      const result = await client.graphql({
+        query: incrementCounter,
+        variables: { counterName: "workOrderNumber" }
+      });
+      
+      const newWorkOrderNumber = result.data.incrementCounter;
+      console.log('New work order number:', newWorkOrderNumber);
+      return newWorkOrderNumber;
+    } catch (error) {
+      console.error('Error generating work order number:', error);
+      throw error;
+    }
+  }
+  async function createNewWorkOrder() {
+    const updWONumber = await generateWorkOrderNumber();
+    try {
+      const workOrderDetails = {
+        type: "Boat",
+        status: "PENDING",
+        woNumber: updWONumber,
+        createdById: "d2c63597-621c-4ee6-9ed3-02dd82a5feda",
+        assignedToId: "d2c63597-621c-4ee6-9ed3-02dd82a5feda",
+        companyId: "c76be88d-e565-40b5-9ffa-31c686d8fc98",
+        process: "true",
+        // Add other fields as per your schema
+      };
+  
+      const input = {
+        input: workOrderDetails,
+        // Add condition if needed
+        // condition: { /* ... */ }
+      };
+  
+      const newWorkOrder = await client.graphql({
+        query: createWorkOrder,
+        variables: input,
+      });
+  
+      console.log("New work order created:", newWorkOrder.data.createWorkOrder);
+      return newWorkOrder.data.createWorkOrder;
+    } catch (error) {
+      console.error("Error creating work order:", error);
+      throw error;
+    }
+  }
+
+  async function createNewUser() {
+    try {
+      const userDetails = {
+        username: "johndoe",
+        email: "john.doe@example.com",
+        passwordHash: "John",
+      };
+  
+      const input = {
+        input: userDetails,
+        // Add condition if needed
+        // condition: { /* ... */ }
+      };
+  
+      const newUser = await client.graphql({
+        query: createUser,
+        variables: input,
+      });
+  
+      console.log("New user created:", newUser.data.createUser);
+      return newUser.data.createUser;
+    } catch (error) {
+      console.error("Error creating user:", error);
+      throw error;
+    }
+  }
+  //files
   const [files, setFiles] = useState([]);
 
   const handleFileChange = async (e) => {
@@ -43,10 +179,8 @@ function WorkOrder({}) {
     fetchImages();
   }, []);
 
-  console.log(images);
   async function fetchImages() {
     try {
-      console.log("here");
       const imageList = await list({
         path: "public/",
         options: {
@@ -110,30 +244,31 @@ function WorkOrder({}) {
       badges: ["Waterfront", "Verified"],
     },
     {
-      title: "Milford - Room #2",
+      title: "Milford - Room #21",
       badges: ["Mountain", "Verified"],
     },
     {
-      title: "Milford - Room #2",
+      title: "Milford - Room #22",
       badges: ["Mountain", "Verified"],
     },
     {
-      title: "Milford - Room #2",
+      title: "Milford - Room #23",
       badges: ["Mountain", "Verified"],
     },
     {
-      title: "Milford - Room #2",
+      title: "Milford - Room #42",
       badges: ["Mountain", "Verified"],
     },
     {
-      title: "Milford - Room #2",
+      title: "Milford - Room #52",
       badges: ["Mountain", "Verified"],
     },
   ];
 
   return (
-    <div>
-      <Grid templateColumns="1fr 4fr" columnGap="0.5rem">
+    <>
+      {/* {fetchCompanies} */}
+      <Grid templateColumns="1fr 4fr" columnGap="1rem">
         <Card columnStart="1" columnEnd="2" variation="outlined">
           <Collection
             items={items}
@@ -142,134 +277,127 @@ function WorkOrder({}) {
             gap="20px"
             wrap="nowrap"
           >
-            {(item, index) => (
-               
-               <Frame1171275594 />
-            )}
+            {(item, index) => <Frame1171275594 key={item.title || index} />}
           </Collection>
         </Card>
         <Card columnStart="2" columnEnd="-1">
-          <div className="accordion-container">
-            <Accordion
-              items={[
-                {
-                  trigger: "Original Videos/Images",
-                  content: (
-                    <View>
-                      <FileUploader
-                        acceptedFileTypes={["image/*", "videos/*"]}
-                        path="public/"
-                        maxFileCount={100}
-                        onUploadSuccess={handleFileChange}
-                        isResumable
-                      />
+          <Accordion
+            items={[
+              {
+                key: "original-videos-images",
+                trigger: "Original Videos/Images",
+                content: (
+                  <View>
+                    <FileUploader
+                      acceptedFileTypes={["image/*", "videos/*"]}
+                      path="public/"
+                      maxFileCount={100}
+                      onUploadSuccess={handleFileChange}
+                      isResumable
+                    />
 
-                      {files.length > 0 && (
-                        <Text>Selected files: {files.length}</Text>
-                      )}
-                      <Table>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell as="th">Preview</TableCell>
-                            <TableCell as="th">File Name</TableCell>
-                            <TableCell as="th">Size</TableCell>
-                            <TableCell as="th">Last Modified</TableCell>
-                            <TableCell as="th">Actions</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {images.map((image) => (
-                            <TableRow key={image.path}>
-                              <TableCell>
-                                <View
-                                  width="100px"
-                                  height="100px"
-                                  overflow="hidden"
-                                >
-                                  <StorageImage
-                                    path={image.path}
-                                    alt={image.path}
-                                    width="100%"
-                                    height="100%"
-                                  />
-                                </View>
-                              </TableCell>
-                              <TableCell>{image.path}</TableCell>
-                              <TableCell>
-                                {image.size
-                                  ? `${(image.size / 1024).toFixed(2)} KB`
-                                  : "N/A"}
-                              </TableCell>
-                              <TableCell>
-                                {image.lastModified
-                                  ? new Date(
-                                      image.lastModified
-                                    ).toLocaleString()
-                                  : "N/A"}
-                              </TableCell>
-                              <TableCell>
-                                <Button
-                                  onClick={() => handleDelete(image.path)}
-                                  marginRight="5px"
-                                >
-                                  Delete
-                                </Button>
-                                <Button
-                                  onClick={() => handleDownload(image.path)}
-                                  variation="primary"
-                                >
-                                  Download
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </View>
-                  ),
-                },
-                {
-                  trigger: "Main 2D Pattern",
-                  content: (
-                    <View>
-                      <FileUploader
-                        acceptedFileTypes={["image/*",'application/pdf']}
-                        path="public/"
-                        maxFileCount={100}
-                        onUploadSuccess={handleFileChange}
-                        isResumable
-                      />
+                    {files.length > 0 && (
+                      <Text>Selected files: {files.length}</Text>
+                    )}
+                  </View>
+                ),
+              },
+              {
+                key: "main-2d-pattern",
+                trigger: "Main 2D Pattern",
+                content: (
+                  <View>
+                    <FileUploader
+                      acceptedFileTypes={["image/*", "application/pdf"]}
+                      path="public/"
+                      maxFileCount={100}
+                      onUploadSuccess={handleFileChange}
+                      isResumable
+                    />
 
-                      {files.length > 0 && (
-                        <Text>Selected files: {files.length}</Text>
-                      )}
-                    </View>
-                  ),
-                },
-                {
-                  trigger: "CNC 2D Pattern",
-                  content: (
-                    <View>
-                      <FileUploader
-                        acceptedFileTypes={["*.project","*.dxf"]}
-                        path="public/"
-                        maxFileCount={100}
-                        onUploadSuccess={handleFileChange}
-                        isResumable
-                      />
+                    {files.length > 0 && (
+                      <Text>Selected files: {files.length}</Text>
+                    )}
+                  </View>
+                ),
+              },
+              {
+                key: "cnc-2d-pattern",
+                trigger: "CNC 2D Pattern",
+                content: (
+                  <View>
+                    <FileUploader
+                      acceptedFileTypes={["*.project", "*.dxf"]}
+                      path="public/"
+                      maxFileCount={100}
+                      onUploadSuccess={handleFileChange}
+                      isResumable
+                    />
 
-                      {files.length > 0 && (
-                        <Text>Selected files: {files.length}</Text>
-                      )}
+                    {files.length > 0 && (
+                      <Text>Selected files: {files.length}</Text>
+                    )}
+                  </View>
+                ),
+              },
+            ]}
+          />
+
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell as="th">Preview</TableCell>
+                <TableCell as="th">File Name</TableCell>
+                <TableCell as="th">Size</TableCell>
+                <TableCell as="th">Last Modified</TableCell>
+                <TableCell as="th">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {images.map((image) => (
+                <TableRow key={image.path}>
+                  <TableCell>
+                    <View width="100px" height="100px" overflow="hidden">
+                      <StorageImage
+                        path={image.path}
+                        alt={image.path}
+                        width="100%"
+                        height="100%"
+                      />
                     </View>
-                  ),
-                },
-              ]}
-            />
-          </div>
+                  </TableCell>
+                  <TableCell>{image.path}</TableCell>
+                  <TableCell>
+                    {image.size
+                      ? `${(image.size / 1024).toFixed(2)} KB`
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    {image.lastModified
+                      ? new Date(image.lastModified).toLocaleString()
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      onClick={() => handleDelete(image.path)}
+                      marginRight="5px"
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      onClick={() => handleDownload(image.path)}
+                      variation="primary"
+                    >
+                      Download
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </Card>
       </Grid>
-    </div>
+    </>
   );
 }
 export default WorkOrder;

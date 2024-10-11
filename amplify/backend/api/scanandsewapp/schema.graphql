@@ -1,0 +1,244 @@
+# This "input" configures a global authorization rule to enable public access to
+# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
+input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
+
+type Company @model {
+  id: ID! @primaryKey
+  name: String!
+  address: String!
+  stripeConnectId: String!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  users: [User] @hasMany(indexName: "byCompany", fields: ["id"])
+  workOrders: [WorkOrder] @hasMany(indexName: "byCompany", fields: ["id"])
+  materialPricings: [MaterialPricing] @hasMany(indexName: "byCompany", fields: ["id"])
+  userRoles: [UserRole] @hasMany(indexName: "byCompany", fields: ["id"]) 
+}
+
+type User @model {
+  id: ID! @primaryKey
+  username: String! @index(name: "byUsername", sortKeyFields: ["id"])
+  email: String! @index(name: "byEmail", sortKeyFields: ["id"])
+  passwordHash: String!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  roles: [UserRole] @hasMany(indexName: "byUser", fields: ["id"])
+  workOrdersCreated: [WorkOrder] @hasMany(indexName: "byCreator", fields: ["id"])
+  workOrdersAssigned: [WorkOrder] @hasMany(indexName: "byAssignee", fields: ["id"])
+  filesUploaded: [File] @hasMany(indexName: "byUploader", fields: ["id"])
+  auditLogs: [AuditLog] @hasMany(indexName: "byUser", fields: ["id"])
+  companyId: ID @index(name: "byCompany")
+}
+
+type Role @model {
+  id: ID! @primaryKey
+  name: String!
+  description: String
+  permissions: [Permission] @hasMany(indexName: "byRole", fields: ["id"])
+  userRoles: [UserRole] @hasMany(indexName: "byRole", fields: ["id"])
+}
+
+type UserRole @model {
+  id: ID! @primaryKey
+  userId: ID! @index(name: "byUser")
+  roleId: ID! @index(name: "byRole")
+  companyId: ID! @index(name: "byCompany")
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  user: User @belongsTo(fields: ["userId"])
+  role: Role @belongsTo(fields: ["roleId"])
+  company: Company @belongsTo(fields: ["companyId"])
+}
+
+type Permission @model {
+  id: ID! @primaryKey
+  roleId: ID! @index(name: "byRole")
+  action: String!
+  description: String
+  role: Role @belongsTo(fields: ["roleId"])
+}
+
+enum WorkOrderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+type WorkOrder @model {
+  id: ID! @primaryKey
+  woNumber: Int 
+  createdById: ID! @index(name: "byCreator")
+  assignedToId: ID! @index(name: "byAssignee")
+  companyId: ID! @index(name: "byCompany")
+  status: WorkOrderStatus!
+  type: String!
+  details: String
+  materialSelection: AWSJSON
+  estimatedPrice: Float
+  msrp: Float
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  process: String!
+  make: String
+  model: String
+  year: Int
+  crmClientId: ID
+  rawImages: [String]
+  rawDesignImages: [String]
+  description: String
+  materialPrice: Float
+  manufacturePrice: Float
+  raw3dModel: String
+  designPhotos: [String]
+  outline3dModel: String
+  approved3dModel: String
+  main2dPattern: String
+  billOfMaterials: AWSJSON
+  cnc2dPattern: String
+  scanInfo: AWSJSON
+  businessName: String
+  attnName: String
+  businessPhone: String
+  businessShippingAddress: String
+  customerName: String
+  customerDropShippingAddress: String
+  shippingTrackingInfo: String
+  createdBy: User @belongsTo(fields: ["createdById"])
+  assignedTo: User @belongsTo(fields: ["assignedToId"])
+  company: Company @belongsTo(fields: ["companyId"])
+  crmClient: User @belongsTo(fields: ["crmClientId"])
+  files: [File] @hasMany(indexName: "byWorkOrder", fields: ["id"])
+  payments: [Payment] @hasMany(indexName: "byWorkOrder", fields: ["id"])
+}
+
+type File @model {
+  id: ID! @primaryKey
+  workOrderId: ID! @index(name: "byWorkOrder")
+  fileType: String!
+  url: String!
+  uploadedById: ID! @index(name: "byUploader")
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  workOrder: WorkOrder @belongsTo(fields: ["workOrderId"])
+  uploadedBy: User @belongsTo(fields: ["uploadedById"])
+}
+
+type AuditLog @model {
+  id: ID! @primaryKey
+  userId: ID! @index(name: "byUser")
+  action: String!
+  details: String
+  createdAt: AWSDateTime
+  user: User @belongsTo(fields: ["userId"])
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+type Payment @model {
+  id: ID! @primaryKey
+  workOrderId: ID! @index(name: "byWorkOrder")
+  amount: Float!
+  stripePaymentId: String!
+  status: PaymentStatus!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  workOrder: WorkOrder @belongsTo(fields: ["workOrderId"])
+}
+
+type Material @model {
+  id: ID! @primaryKey
+  materialName: String!
+  measurements: Float
+}
+
+type MaterialPricing @model {
+  id: ID! @primaryKey
+  companyId: ID! @index(name: "byCompany")
+  materialName: String!
+  pricePerYard: Float!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  company: Company @belongsTo(fields: ["companyId"])
+}
+
+type Miscellaneous @model {
+  id: ID! @primaryKey
+  miscName: String!
+  quantity: Float
+}
+
+type Ratchet @model {
+  id: ID! @primaryKey
+  name: String!
+  number: Float
+  webbing: Float
+  binding: Float
+  otherA: Float
+  otherB: Float
+}
+
+type Buckle @model {
+  id: ID! @primaryKey
+  name: String!
+  number: Float
+  webbing: Float
+  binding: Float
+  otherA: Float
+  otherB: Float
+}
+
+type DRing @model {
+  id: ID! @primaryKey
+  dRingTotal: Float
+  name: String!
+  number: Float
+  webbing: Float
+  strap: Float
+}
+
+type ReleaseBuckle @model {
+  id: ID! @primaryKey
+  name: String!
+  number: Float
+}
+
+type Zipper @model {
+  id: ID! @primaryKey
+  name: String!
+  size: Float
+  number: Float
+}
+
+type ZipperChain @model {
+  id: ID! @primaryKey
+  name: String!
+  quantity: Float
+  measurements: Float
+}
+
+type Edge @model {
+  id: ID! @primaryKey
+  name: String!
+  quantity: Float
+}
+
+type Total @model {
+  id: ID! @primaryKey
+  name: String!
+  quantity: Float
+}
+
+type WorkOrderCounter @model {
+  id: ID! @primaryKey
+  counterName: String! @index(name: "byCounterName")
+  currentValue: Int!
+}
+
+type Mutation {
+  incrementCounter(counterName: String!): Int! @function(name: "IncrementCounter")
+}
+

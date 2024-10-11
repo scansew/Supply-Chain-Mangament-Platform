@@ -64,7 +64,7 @@ function Dashboard({ signOut }) {
         {/* Sidebar */}
         <View
           backgroundColor="var(--amplify-colors-white)"
-          borderRight="1px solid var(--amplify-colors-neutral-20)"
+          borderright="1px solid var(--amplify-colors-neutral-20)"
           padding="1rem"
           className="sidebar"
         >
