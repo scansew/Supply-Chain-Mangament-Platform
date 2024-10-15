@@ -1,56 +1,72 @@
-import { useState, useEffect } from 'react';
-import '@aws-amplify/ui-react/styles.css';
-
+import React, { useState, useEffect } from 'react';
+import { generateClient } from 'aws-amplify/api';
+import { listCompanies } from './graphql/queries';
 import {
-    Table,
-    TableCell,
-    TableBody,
-    TableHead,
-    TableRow,
-  } from '@aws-amplify/ui-react';
+  Table,
+  TableCell,
+  TableBody,
+  TableHead,
+  TableRow,
+  Loader,
+} from '@aws-amplify/ui-react';
 
-function Companies({}) {
-  const [count, setCount] = useState(0)
+const client = generateClient();
+
+function Companies() {
+  const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
+
+  async function fetchCompanies() {
+    try {
+      const companiesData = await client.graphql({
+        query: listCompanies
+      });
+      setCompanies(companiesData.data.listCompanies.items);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching companies:', err);
+      setError('An error occurred while fetching companies.');
+      setLoading(false);
+    }
+  }
+
+  if (loading) return <Loader variation="linear" />;
+  if (error) return <div>{error}</div>;
 
   return (
-    <>
-      
-<Table
-  caption=""
-  highlightOnHover={true}
-  variation="striped">
-  <TableHead>
-    <TableRow>
-      <TableCell as="th">Name</TableCell>
-      <TableCell as="th">Role</TableCell>
-      <TableCell as="th">Email</TableCell>
-      <TableCell as="th">Assign New Role</TableCell>
-    </TableRow>
-  </TableHead>
-  <TableBody>
-    <TableRow>
-      <TableCell>Orange</TableCell>
-      <TableCell>Nectarine</TableCell>
-      <TableCell>Raspberry</TableCell>
-      <TableCell>Raspberry</TableCell>
-    </TableRow>
-    <TableRow>
-      <TableCell>Grapefruit</TableCell>
-      <TableCell>Apricot</TableCell>
-      <TableCell>Raspberry</TableCell>
-      <TableCell>Blueberry</TableCell>
-    </TableRow>
-    <TableRow>
-      <TableCell>Lime</TableCell>
-      <TableCell>Peach</TableCell>
-      <TableCell>Raspberry</TableCell>
-      <TableCell>Strawberry</TableCell>
-    </TableRow>
-  </TableBody>
-</Table>
-  
-    </>
-  )
+    <div className="companies-container">
+      <h1>Companies</h1>
+      <Table
+        caption=""
+        highlightOnHover={true}
+        variation="striped"
+      >
+        <TableHead>
+          <TableRow>
+            <TableCell as="th">Name</TableCell>
+            <TableCell as="th">Address</TableCell>
+            <TableCell as="th">Phone</TableCell>
+            <TableCell as="th">Email</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {companies.map((company) => (
+            <TableRow key={company.id}>
+              <TableCell>{company.name}</TableCell>
+              <TableCell>{company.address}</TableCell>
+              <TableCell>{company.phone}</TableCell>
+              <TableCell>{company.email}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
 }
 
 export default Companies;

@@ -78,7 +78,7 @@ type WorkOrder @model {
   msrp: Float
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
-  process: String!
+  process: String
   make: String
   model: String
   year: Int

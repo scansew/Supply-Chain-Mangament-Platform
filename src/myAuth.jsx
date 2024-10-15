@@ -75,9 +75,9 @@ function MyAuth(){
     }
     
     return (
-        <div>
-      <h2>Welcome, {userAttributes.given_name}</h2>
-        </div>
+      <span>
+      {userAttributes.given_name}
+      </span>
     )
     }
     
