@@ -69,7 +69,7 @@ export default function UserUpdateForm(props) {
   const validations = {
     username: [{ type: "Required" }],
     email: [{ type: "Required" }],
-    passwordHash: [{ type: "Required" }],
+    passwordHash: [],
     createdAt: [],
     updatedAt: [],
   };
@@ -118,7 +118,7 @@ export default function UserUpdateForm(props) {
         let modelFields = {
           username,
           email,
-          passwordHash,
+          passwordHash: passwordHash ?? null,
           createdAt: createdAt ?? null,
           updatedAt: updatedAt ?? null,
         };
@@ -230,7 +230,7 @@ export default function UserUpdateForm(props) {
       ></TextField>
       <TextField
         label="Password hash"
-        isRequired={true}
+        isRequired={false}
         isReadOnly={false}
         value={passwordHash}
         onChange={(e) => {

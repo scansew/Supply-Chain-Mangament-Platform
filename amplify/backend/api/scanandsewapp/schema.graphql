@@ -19,7 +19,7 @@ type User @model {
   id: ID! @primaryKey
   username: String! @index(name: "byUsername", sortKeyFields: ["id"])
   email: String! @index(name: "byEmail", sortKeyFields: ["id"])
-  passwordHash: String!
+  passwordHash: String
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
   roles: [UserRole] @hasMany(indexName: "byUser", fields: ["id"])

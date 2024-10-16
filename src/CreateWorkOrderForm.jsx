@@ -4,7 +4,18 @@ import { createWorkOrder } from "./graphql/mutations";
 import { listUsers, listCompanies } from "./graphql/queries";
 import { incrementCounter } from "./graphql/mutations";
 import "./WOForm.css";
-import CreateWOFiles from "./UploadImages";
+import FileUploader3 from "./FileUploader3";
+import { list, remove, getUrl } from "aws-amplify/storage";
+// import { StorageImage } from "@aws-amplify/ui-react-storage";
+import {
+  View,
+  Button,
+  Table,
+  TableCell,
+  TableBody,
+  TableHead,
+  TableRow,
+} from "@aws-amplify/ui-react";
 
 const CreateWorkOrderForm = () => {
   const client = generateClient();
@@ -32,6 +43,87 @@ const CreateWorkOrderForm = () => {
     customerDropShippingAddress: "",
     files: [],
   });
+  const [files, setFiles] = useState([]);
+
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [displayedFiles, setDisplayedFiles] = useState([]);
+
+  useEffect(() => {
+    fetchS3Files();
+    setFormState((prevState) => ({ ...prevState, files }));
+  }, []);
+
+  const handleUploadSuccess = async (fileKeys) => {
+    console.log("Files synced successfully:", fileKeys);
+    await fetchS3Files();
+    setFormState((prevState) => ({ ...prevState, files }));
+  };
+  const fetchS3Files = async () => {
+    setFiles("");
+    setIsLoading(true);
+    setError(null);
+    try {
+      const fetchedFiles = await list({
+        path: "public/",
+        options: { listAll: true },
+      });
+      setFiles(fetchedFiles.items);
+      setFormState((prevState) => ({ ...prevState, files }));
+      setDisplayedFiles(fetchedFiles.items);
+      console.log("Updateing table", fetchedFiles.items);
+    } catch (error) {
+      console.error("Error fetching files:", error);
+      setError("Failed to fetch files. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  async function handleDelete(key) {
+    try {
+      await remove({
+        path: key,
+      });
+      fetchS3Files();
+    } catch (error) {
+      console.error("Error deleting image:", error);
+    }
+  }
+
+  async function handleDownload(key) {
+    try {
+      const getUrlResult = await getUrl({
+        path: key,
+        options: {
+          validateObjectExistence: true,
+          expiresIn: 3600, // URL will be valid for 1 hour
+        },
+      });
+      // Fetch the image as a blob
+      const response = await fetch(getUrlResult.url);
+      const blob = await response.blob();
+
+      // Create a temporary URL for the blob
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      // Create a temporary anchor element to trigger the download
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = key.split("/").pop(); // Set the download filename to the last part of the key
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+
+      console.log("Download URL:", getUrlResult.url);
+      console.log("URL expires at:", getUrlResult.expiresAt);
+    } catch (error) {
+      console.error("Error generating download URL:", error);
+    }
+  }
 
   const toggleForm = (event) => {
     if (event && event.target.className === "work-order-form-wrapper") {
@@ -39,10 +131,6 @@ const CreateWorkOrderForm = () => {
     } else {
       setShowForm(!showForm);
     }
-  };
-
-  const handleFilesChange = (files) => {
-    setFormState((prevState) => ({ ...prevState, files }));
   };
 
   useEffect(() => {
@@ -115,7 +203,7 @@ const CreateWorkOrderForm = () => {
         files: formState.files.map((file) => file.path),
       };
       const input = {
-        input: workOrder
+        input: workOrder,
       };
       await client.graphql({
         query: createWorkOrder,
@@ -168,8 +256,52 @@ const CreateWorkOrderForm = () => {
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label htmlFor="files">Upload Image Files</label>
-
-                <CreateWOFiles onFilesChange={handleFilesChange} />
+                <FileUploader3 onUploadSuccess={handleUploadSuccess} />
+                <h2>Files on the Cloud</h2>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell as="th">File Name</TableCell>
+                      <TableCell as="th">Size</TableCell>
+                      <TableCell as="th">Last Modified</TableCell>
+                      <TableCell as="th">Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {displayedFiles.map((image) => (
+                      <TableRow key={image.path}>
+                        <TableCell>{image.path}</TableCell>
+                        <TableCell>
+                          {image.size
+                            ? `${(image.size / (1024 * 1024)).toFixed(2)} MB`
+                            : "N/A"}
+                        </TableCell>
+                        <TableCell>
+                          {image.lastModified
+                            ? new Date(image.lastModified).toLocaleString()
+                            : "N/A"}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            onClick={() => handleDelete(image.path)}
+                            marginRight="5px"
+                          >
+                            Delete
+                          </Button>
+                          <Button
+                            onClick={() => handleDownload(image.path)}
+                            variation="primary"
+                          >
+                            Download
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <Button onClick={() => fetchS3Files()} marginTop="1rem">
+                  Refresh Files
+                </Button>
               </div>
 
               <div className="form-group">

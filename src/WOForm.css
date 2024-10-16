@@ -50,8 +50,8 @@
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  max-width: 500px;
+  width: 90%; /* Increased from 100% */
+  max-width: 800px; /* Increased from 500px */
   max-height: calc(100vh - 100px); /* Adjust max height to account for header and some padding */
   overflow-y: auto;
   overflow-x: hidden;
@@ -171,8 +171,8 @@
 /* Responsive styles */
 @media (max-width: 600px) {
   .work-order-form {
-    max-width: none;
     width: 100%;
+    max-width: none;
     height: calc(100% - 80px); /* Adjust height to account for header */
     max-height: none;
     border-radius: 0;

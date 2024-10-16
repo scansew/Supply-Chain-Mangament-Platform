@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Accordion, View, Text, Button } from "@aws-amplify/ui-react";
+import {
+  Accordion,
+  View,
+  Text,
+  Button,
+  withAuthenticator,
+} from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { FileUploader, StorageImage } from "@aws-amplify/ui-react-storage";
 import { list, remove, getUrl } from "aws-amplify/storage";
@@ -10,20 +16,78 @@ import {
   TableHead,
   TableRow,
 } from "@aws-amplify/ui-react";
+import { createFile } from "./graphql/mutations";
+import { generateClient } from "aws-amplify/api";
+const client = generateClient();
 
-function CreateWOFiles({ onFilesChange  }) {
-  //files
+function CreateWOFiles({ onFilesChange, user }) {
+  function getFileType(extension) {
+    const mimeTypes = {
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      png: "image/png",
+      gif: "image/gif",
+      mp4: "video/mp4",
+      mov: "video/quicktime",
+      zip: "application/zip",
+      rar: "application/x-rar-compressed",
+      "7z": "application/x-7z-compressed",
+      // Add more mappings as needed
+    };
+    return mimeTypes[extension] || "application/octet-stream";
+  }
+
   const [files, setFiles] = useState([]);
-
-  const handleFileChange = async (e) => {
-    await fetchImages();
-  };
-
   const [images, setImages] = useState([]);
 
-  useEffect(() => {
-    fetchImages();
-  }, []);
+  const handleFileChange = async (event) => {
+    setFiles(event);
+
+    console.log("Upload event:", event);
+
+    if (event && event.key) {
+      console.log("Uploaded file key:", event.key);
+
+      // Extract file name and extension from the key
+      const fileName = event.key.split("/").pop();
+      const fileExtension = fileName.split(".").pop().toLowerCase();
+
+      // Infer file type from extension
+      const fileType = getFileType(fileExtension);
+      console.log("Inferred file and file type:", event.key, fileExtension);
+
+      // You can now use fileType in your createNewFile function or elsewhere
+      await createNewFile(event, fileName, fileType);
+      await fetchImages();
+    }
+  };
+
+  async function createNewFile(event, fileName, fileType) {
+    console.log("user is : ", user);
+    try {
+      const fileDetails = {
+        workOrderId: "SOME_WORK_ORDER_ID", // You need to provide this
+        fileType: fileType, // Use the file's MIME type
+        url: event, // The S3 URL of the uploaded file
+        uploadedBy: user.username, // You need to provide the current user's identifier
+      };
+
+      const input = {
+        input: fileDetails,
+      };
+
+      const newFile = await client.graphql({
+        query: createFile,
+        variables: input,
+      });
+
+      console.log("New file created:", newFile.data.createFile);
+      return newFile.data.createFile;
+    } catch (error) {
+      console.error("Error creating file:", error);
+      throw error;
+    }
+  }
 
   async function fetchImages() {
     try {
@@ -35,7 +99,10 @@ function CreateWOFiles({ onFilesChange  }) {
       });
       setImages(imageList.items);
       onFilesChange(imageList.items);
-      console.log("Images:", imageList.items.map((file) => file.path));
+      console.log(
+        "Images:",
+        imageList.items.map((file) => file)
+      );
     } catch (error) {
       console.error("Error fetching images:", error);
     }
@@ -85,6 +152,7 @@ function CreateWOFiles({ onFilesChange  }) {
       console.error("Error generating download URL:", error);
     }
   }
+
   return (
     <div>
       <View>
@@ -159,4 +227,4 @@ function CreateWOFiles({ onFilesChange  }) {
   );
 }
 
-export default CreateWOFiles;
+export default withAuthenticator(CreateWOFiles);
