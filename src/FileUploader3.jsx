@@ -96,6 +96,17 @@ const FileUploader3 = ({ onUploadSuccess }) => {
               contentType: file.type,
               useAccelerateEndpoint: true, // Enable transfer acceleration
               onProgress: (progress) => handleProgress(file.name, progress),
+              metadata: {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*", // Be cautious with this in production
+              },
+              customPrefix: {
+                public: "",
+              },
+              headers: {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*", // Be cautious with this in production
+              },
             },
           });
 
