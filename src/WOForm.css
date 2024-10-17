@@ -51,8 +51,10 @@
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   width: 90%; /* Increased from 100% */
-  max-width: 800px; /* Increased from 500px */
-  max-height: calc(100vh - 100px); /* Adjust max height to account for header and some padding */
+  /*max-width: 800px; /* Increased from 500px */
+  max-height: calc(
+    100vh - 100px
+  ); /* Adjust max height to account for header and some padding */
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -212,3 +214,21 @@
     font-size: 18px;
   }
 }
+
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.file-card {
+  min-width: 0;
+  transition: all 0.3s ease;
+}
+
+.file-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
