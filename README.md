@@ -4,5 +4,7 @@
 ## amplify pull
 ## npm run dev
 
+## npm install
+## npm run dev
 
 ### edit work order while changing environment of amplify
