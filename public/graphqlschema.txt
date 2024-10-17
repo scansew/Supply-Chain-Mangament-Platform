@@ -1,0 +1,178 @@
+# This "input" configures a global authorization rule to enable public access to
+# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
+input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
+
+type Company  @model{
+  id: ID!
+  name: String!
+  address: String!
+  stripeConnectId: String!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  users: [User]
+  workOrders: [WorkOrder]
+}
+
+type User  @model{
+  id: ID!
+  username: String!
+  email: String!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  roles: [UserRole]
+  createdWorkOrders: [WorkOrder]
+  assignedWorkOrders: [WorkOrder]
+}
+
+type Role  @model{
+  id: ID!
+  name: String!
+  description: String
+  permissions: [Permission]
+  users: [UserRole]
+}
+
+type UserRole  @model{
+  id: ID!
+  user: User!
+  role: Role!
+  company: Company!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type Permission  @model{
+  id: ID!
+  role: Role!
+  action: String!
+  description: String
+}
+
+type WorkOrder  @model{
+  id: ID!
+  woNumber: Int!
+  createdBy: User!
+  assignedTo: User
+  company: Company!
+  status: WorkOrderStatus!
+  type: String!
+  details: String
+  materialSelection: AWSJSON
+  estimatedPrice: Float
+  msrp: Float
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  process: String!
+  make: String
+  model: String
+  year: Int
+  crmClient: User
+  rawImages: [String]
+  rawDesignImages: [String]
+  description: String
+  materialPrice: Float
+  manufacturePrice: Float
+  raw3dModel: String
+  designPhotos: [String]
+  outline3dModel: String
+  approved3dModel: String
+  main2dPattern: String
+  billOfMaterials: AWSJSON
+  cnc2dPattern: String
+  scanInfo: AWSJSON
+  businessName: String
+  attnName: String
+  businessPhone: String
+  businessShippingAddress: String
+  customerName: String
+  customerDropShippingAddress: String
+  shippingTrackingInfo: String
+  files: [File]
+  payments: [Payment]
+}
+
+enum WorkOrderStatus  {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+type File  @model{
+  id: ID!
+  workOrder: WorkOrder!
+  fileType: String!
+  url: String!
+  uploadedBy: User!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type Payment  @model{
+  id: ID!
+  workOrder: WorkOrder!
+  amount: Float!
+  stripePaymentId: String!
+  status: PaymentStatus!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+enum PaymentStatus  {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+type MaterialPricing  @model{
+  id: ID!
+  company: Company!
+  materialName: String!
+  pricePerYard: Float!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type Query {
+  getCompany(id: ID!): Company
+  getUser(id: ID!): User
+  getRole(id: ID!): Role
+  getWorkOrder(id: ID!): WorkOrder
+  listCompanies: [Company]
+  listUsers: [User]
+  listRoles: [Role]
+  listWorkOrders: [WorkOrder]
+  listMaterialPricings(companyId: ID!): [MaterialPricing]
+}
+
+type Mutation {
+  createCompany(name: String!, address: String!, stripeConnectId: String!): Company
+  updateCompany(id: ID!, name: String, address: String, stripeConnectId: String): Company
+  createUser(username: String!, email: String!, password: String!): User
+  updateUser(id: ID!, username: String, email: String): User
+  createRole(name: String!, description: String): Role
+  updateRole(id: ID!, name: String, description: String): Role
+  createWorkOrder(
+    companyId: ID!,
+    createdById: ID!,
+    assignedToId: ID,
+    type: String!,
+    details: String,
+    status: WorkOrderStatus!
+  ): WorkOrder
+  updateWorkOrder(
+    id: ID!,
+    assignedToId: ID,
+    status: WorkOrderStatus,
+    details: String
+  ): WorkOrder
+  createMaterialPricing(
+    companyId: ID!,
+    materialName: String!,
+    pricePerYard: Float!
+  ): MaterialPricing
+  updateMaterialPricing(
+    id: ID!,
+    materialName: String,
+    pricePerYard: Float
+  ): MaterialPricing
+}

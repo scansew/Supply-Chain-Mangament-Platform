@@ -38,6 +38,16 @@
       },
       "storage": {
         "s3scanandsewappstorage442a3489": {}
+      },
+      "api": {
+        "scanandsewapp": {}
+      }
+    }
+  },
+  "dev": {
+    "categories": {
+      "auth": {
+        "scanandsewapp": {}
       }
     }
   }

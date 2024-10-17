@@ -35,7 +35,7 @@ function MyAuth(){
   if (error) return <div>Error: {error.message}</div>;
   if (!userAttributes) return <div>No user attributes found. Please sign in.</div>;
 
-  console.log('User attributes:', userAttributes);
+  // console.log('User attributes:', userAttributes);
 
     async function handleSignUp({ username, password, email }) {
         try {
@@ -75,9 +75,9 @@ function MyAuth(){
     }
     
     return (
-        <div>
-      <h2>Welcome, {userAttributes.given_name}</h2>
-        </div>
+      <span>
+      {userAttributes.given_name}
+      </span>
     )
     }
     

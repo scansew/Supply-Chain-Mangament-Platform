@@ -1,4 +1,22 @@
 {
+  "api": {
+    "scanandsewapp": {
+      "dependsOn": [],
+      "output": {
+        "authConfig": {
+          "additionalAuthenticationProviders": [],
+          "defaultAuthentication": {
+            "apiKeyConfig": {
+              "apiKeyExpirationDays": 7
+            },
+            "authenticationType": "API_KEY"
+          }
+        }
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "AppSync"
+    }
+  },
   "auth": {
     "scanandsewapp": {
       "customAuth": false,
@@ -34,6 +52,7 @@
       "service": "Cognito"
     }
   },
+  "function": {},
   "storage": {
     "s3scanandsewappstorage442a3489": {
       "dependsOn": [],

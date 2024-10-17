@@ -1,56 +1,72 @@
-import { useState, useEffect } from 'react';
-import '@aws-amplify/ui-react/styles.css';
-
+import React, { useState, useEffect } from 'react';
+import { generateClient } from 'aws-amplify/api';
+import { listUsers } from './graphql/queries';
 import {
-    Table,
-    TableCell,
-    TableBody,
-    TableHead,
-    TableRow,
-  } from '@aws-amplify/ui-react';
+  Table,
+  TableCell,
+  TableBody,
+  TableHead,
+  TableRow,
+  Loader,
+} from '@aws-amplify/ui-react';
 
-function Users({}) {
-  const [count, setCount] = useState(0)
+const client = generateClient();
+
+function Users() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  async function fetchUsers() {
+    try {
+      const usersData = await client.graphql({
+        query: listUsers
+      });
+      setUsers(usersData.data.listUsers.items);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      setError('An error occurred while fetching users.');
+      setLoading(false);
+    }
+  }
+
+  if (loading) return <Loader variation="linear" />;
+  if (error) return <div>{error}</div>;
 
   return (
-    <>
-      
-<Table
-  caption=""
-  highlightOnHover={true}
-  variation="striped">
-  <TableHead>
-    <TableRow>
-      <TableCell as="th">Name</TableCell>
-      <TableCell as="th">Role</TableCell>
-      <TableCell as="th">Email</TableCell>
-      <TableCell as="th">Assign New Role</TableCell>
-    </TableRow>
-  </TableHead>
-  <TableBody>
-    <TableRow>
-      <TableCell>Orange</TableCell>
-      <TableCell>Nectarine</TableCell>
-      <TableCell>Raspberry</TableCell>
-      <TableCell>Raspberry</TableCell>
-    </TableRow>
-    <TableRow>
-      <TableCell>Grapefruit</TableCell>
-      <TableCell>Apricot</TableCell>
-      <TableCell>Raspberry</TableCell>
-      <TableCell>Blueberry</TableCell>
-    </TableRow>
-    <TableRow>
-      <TableCell>Lime</TableCell>
-      <TableCell>Peach</TableCell>
-      <TableCell>Raspberry</TableCell>
-      <TableCell>Strawberry</TableCell>
-    </TableRow>
-  </TableBody>
-</Table>
-  
-    </>
-  )
+    <div className="users-container">
+      <h1>Users</h1>
+      <Table
+        caption=""
+        highlightOnHover={true}
+        variation="striped"
+      >
+        <TableHead>
+          <TableRow>
+            <TableCell as="th">Name</TableCell>
+            <TableCell as="th">Email</TableCell>
+            <TableCell as="th">Role</TableCell>
+            <TableCell as="th">Company</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {users.map((user) => (
+            <TableRow key={user.id}>
+              <TableCell>{user.name}</TableCell>
+              <TableCell>{user.email}</TableCell>
+              <TableCell>{user.role}</TableCell>
+              <TableCell>{user.company ? user.company.name : 'N/A'}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
 }
 
 export default Users;
