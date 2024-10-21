@@ -9,13 +9,11 @@ import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
-import { getWorkOrderCounter } from "../graphql/queries";
-import { updateWorkOrderCounter } from "../graphql/mutations";
+import { createWorkOrderNumber } from "../graphql/mutations";
 const client = generateClient();
-export default function WorkOrderCounterUpdateForm(props) {
+export default function WorkOrderNumberCreateForm(props) {
   const {
-    counterName: counterNameProp,
-    workOrderCounter: workOrderCounterModelProp,
+    clearOnSuccess = true,
     onSuccess,
     onError,
     onSubmit,
@@ -36,31 +34,10 @@ export default function WorkOrderCounterUpdateForm(props) {
   );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    const cleanValues = workOrderCounterRecord
-      ? { ...initialValues, ...workOrderCounterRecord }
-      : initialValues;
-    setCounterName(cleanValues.counterName);
-    setCurrentValue(cleanValues.currentValue);
+    setCounterName(initialValues.counterName);
+    setCurrentValue(initialValues.currentValue);
     setErrors({});
   };
-  const [workOrderCounterRecord, setWorkOrderCounterRecord] = React.useState(
-    workOrderCounterModelProp
-  );
-  React.useEffect(() => {
-    const queryData = async () => {
-      const record = counterNameProp
-        ? (
-            await client.graphql({
-              query: getWorkOrderCounter.replaceAll("__typename", ""),
-              variables: { counterName: counterNameProp },
-            })
-          )?.data?.getWorkOrderCounter
-        : workOrderCounterModelProp;
-      setWorkOrderCounterRecord(record);
-    };
-    queryData();
-  }, [counterNameProp, workOrderCounterModelProp]);
-  React.useEffect(resetStateValues, [workOrderCounterRecord]);
   const validations = {
     counterName: [{ type: "Required" }],
     currentValue: [{ type: "Required" }],
@@ -123,16 +100,18 @@ export default function WorkOrderCounterUpdateForm(props) {
             }
           });
           await client.graphql({
-            query: updateWorkOrderCounter.replaceAll("__typename", ""),
+            query: createWorkOrderNumber.replaceAll("__typename", ""),
             variables: {
               input: {
-                counterName: workOrderCounterRecord.counterName,
                 ...modelFields,
               },
             },
           });
           if (onSuccess) {
             onSuccess(modelFields);
+          }
+          if (clearOnSuccess) {
+            resetStateValues();
           }
         } catch (err) {
           if (onError) {
@@ -141,13 +120,13 @@ export default function WorkOrderCounterUpdateForm(props) {
           }
         }
       }}
-      {...getOverrideProps(overrides, "WorkOrderCounterUpdateForm")}
+      {...getOverrideProps(overrides, "WorkOrderNumberCreateForm")}
       {...rest}
     >
       <TextField
         label="Counter name"
         isRequired={true}
-        isReadOnly={true}
+        isReadOnly={false}
         value={counterName}
         onChange={(e) => {
           let { value } = e.target;
@@ -203,14 +182,13 @@ export default function WorkOrderCounterUpdateForm(props) {
         {...getOverrideProps(overrides, "CTAFlex")}
       >
         <Button
-          children="Reset"
+          children="Clear"
           type="reset"
           onClick={(event) => {
             event.preventDefault();
             resetStateValues();
           }}
-          isDisabled={!(counterNameProp || workOrderCounterModelProp)}
-          {...getOverrideProps(overrides, "ResetButton")}
+          {...getOverrideProps(overrides, "ClearButton")}
         ></Button>
         <Flex
           gap="15px"
@@ -220,10 +198,7 @@ export default function WorkOrderCounterUpdateForm(props) {
             children="Submit"
             type="submit"
             variation="primary"
-            isDisabled={
-              !(counterNameProp || workOrderCounterModelProp) ||
-              Object.values(errors).some((e) => e?.hasError)
-            }
+            isDisabled={Object.values(errors).some((e) => e?.hasError)}
             {...getOverrideProps(overrides, "SubmitButton")}
           ></Button>
         </Flex>

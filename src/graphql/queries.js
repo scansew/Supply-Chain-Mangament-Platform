@@ -1153,9 +1153,8 @@ export const listTotals = /* GraphQL */ `
   }
 `;
 export const getWorkOrderCounter = /* GraphQL */ `
-  query GetWorkOrderCounter($id: ID!) {
-    getWorkOrderCounter(id: $id) {
-      id
+  query GetWorkOrderCounter($counterName: String!) {
+    getWorkOrderCounter(counterName: $counterName) {
       counterName
       currentValue
       createdAt
@@ -1166,21 +1165,20 @@ export const getWorkOrderCounter = /* GraphQL */ `
 `;
 export const listWorkOrderCounters = /* GraphQL */ `
   query ListWorkOrderCounters(
-    $id: ID
+    $counterName: String
     $filter: ModelWorkOrderCounterFilterInput
     $limit: Int
     $nextToken: String
     $sortDirection: ModelSortDirection
   ) {
     listWorkOrderCounters(
-      id: $id
+      counterName: $counterName
       filter: $filter
       limit: $limit
       nextToken: $nextToken
       sortDirection: $sortDirection
     ) {
       items {
-        id
         counterName
         currentValue
         createdAt
@@ -1724,34 +1722,6 @@ export const materialPricingsByCompanyId = /* GraphQL */ `
         companyId
         materialName
         pricePerYard
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const workOrderCountersByCounterName = /* GraphQL */ `
-  query WorkOrderCountersByCounterName(
-    $counterName: String!
-    $sortDirection: ModelSortDirection
-    $filter: ModelWorkOrderCounterFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    workOrderCountersByCounterName(
-      counterName: $counterName
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        counterName
-        currentValue
         createdAt
         updatedAt
         __typename

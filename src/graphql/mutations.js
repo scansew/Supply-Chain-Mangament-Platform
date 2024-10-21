@@ -1794,7 +1794,6 @@ export const createWorkOrderCounter = /* GraphQL */ `
     $condition: ModelWorkOrderCounterConditionInput
   ) {
     createWorkOrderCounter(input: $input, condition: $condition) {
-      id
       counterName
       currentValue
       createdAt
@@ -1809,7 +1808,6 @@ export const updateWorkOrderCounter = /* GraphQL */ `
     $condition: ModelWorkOrderCounterConditionInput
   ) {
     updateWorkOrderCounter(input: $input, condition: $condition) {
-      id
       counterName
       currentValue
       createdAt
@@ -1824,7 +1822,6 @@ export const deleteWorkOrderCounter = /* GraphQL */ `
     $condition: ModelWorkOrderCounterConditionInput
   ) {
     deleteWorkOrderCounter(input: $input, condition: $condition) {
-      id
       counterName
       currentValue
       createdAt

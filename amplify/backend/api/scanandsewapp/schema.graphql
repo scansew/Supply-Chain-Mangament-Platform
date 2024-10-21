@@ -233,12 +233,11 @@ type Total @model {
 }
 
 type WorkOrderCounter @model {
-  id: ID! @primaryKey
-  counterName: String! @index(name: "byCounterName")
+  counterName: String! @primaryKey
   currentValue: Int!
 }
 
 type Mutation {
-  incrementCounter(counterName: String!): Int! @function(name: "IncrementCounter")
+  incrementCounter(counterName: String!): Int!
 }
 

@@ -1644,7 +1644,6 @@ export const onCreateWorkOrderCounter = /* GraphQL */ `
     $filter: ModelSubscriptionWorkOrderCounterFilterInput
   ) {
     onCreateWorkOrderCounter(filter: $filter) {
-      id
       counterName
       currentValue
       createdAt
@@ -1658,7 +1657,6 @@ export const onUpdateWorkOrderCounter = /* GraphQL */ `
     $filter: ModelSubscriptionWorkOrderCounterFilterInput
   ) {
     onUpdateWorkOrderCounter(filter: $filter) {
-      id
       counterName
       currentValue
       createdAt
@@ -1672,7 +1670,6 @@ export const onDeleteWorkOrderCounter = /* GraphQL */ `
     $filter: ModelSubscriptionWorkOrderCounterFilterInput
   ) {
     onDeleteWorkOrderCounter(filter: $filter) {
-      id
       counterName
       currentValue
       createdAt

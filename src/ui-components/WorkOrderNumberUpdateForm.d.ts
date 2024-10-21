@@ -21,29 +21,29 @@ export declare type ValidationResponse = {
     errorMessage?: string;
 };
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
-export declare type WorkOrderCounterUpdateFormInputValues = {
+export declare type WorkOrderNumberUpdateFormInputValues = {
     counterName?: string;
     currentValue?: number;
 };
-export declare type WorkOrderCounterUpdateFormValidationValues = {
+export declare type WorkOrderNumberUpdateFormValidationValues = {
     counterName?: ValidationFunction<string>;
     currentValue?: ValidationFunction<number>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
-export declare type WorkOrderCounterUpdateFormOverridesProps = {
-    WorkOrderCounterUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
+export declare type WorkOrderNumberUpdateFormOverridesProps = {
+    WorkOrderNumberUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
     counterName?: PrimitiveOverrideProps<TextFieldProps>;
     currentValue?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
-export declare type WorkOrderCounterUpdateFormProps = React.PropsWithChildren<{
-    overrides?: WorkOrderCounterUpdateFormOverridesProps | undefined | null;
+export declare type WorkOrderNumberUpdateFormProps = React.PropsWithChildren<{
+    overrides?: WorkOrderNumberUpdateFormOverridesProps | undefined | null;
 } & {
     counterName?: string;
-    workOrderCounter?: any;
-    onSubmit?: (fields: WorkOrderCounterUpdateFormInputValues) => WorkOrderCounterUpdateFormInputValues;
-    onSuccess?: (fields: WorkOrderCounterUpdateFormInputValues) => void;
-    onError?: (fields: WorkOrderCounterUpdateFormInputValues, errorMessage: string) => void;
-    onChange?: (fields: WorkOrderCounterUpdateFormInputValues) => WorkOrderCounterUpdateFormInputValues;
-    onValidate?: WorkOrderCounterUpdateFormValidationValues;
+    workOrderNumber?: any;
+    onSubmit?: (fields: WorkOrderNumberUpdateFormInputValues) => WorkOrderNumberUpdateFormInputValues;
+    onSuccess?: (fields: WorkOrderNumberUpdateFormInputValues) => void;
+    onError?: (fields: WorkOrderNumberUpdateFormInputValues, errorMessage: string) => void;
+    onChange?: (fields: WorkOrderNumberUpdateFormInputValues) => WorkOrderNumberUpdateFormInputValues;
+    onValidate?: WorkOrderNumberUpdateFormValidationValues;
 } & React.CSSProperties>;
-export default function WorkOrderCounterUpdateForm(props: WorkOrderCounterUpdateFormProps): React.ReactElement;
+export default function WorkOrderNumberUpdateForm(props: WorkOrderNumberUpdateFormProps): React.ReactElement;

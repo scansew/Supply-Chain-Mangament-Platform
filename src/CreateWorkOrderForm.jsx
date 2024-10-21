@@ -6,7 +6,19 @@ import { incrementCounter } from "./graphql/mutations";
 import "./WOForm.css";
 import FileUploader3 from "./FileUploader3";
 import { list, remove, getUrl } from "aws-amplify/storage";
-// import { StorageImage } from "@aws-amplify/ui-react-storage";
+import {
+  MdRefresh,
+  MdInsertDriveFile,
+  MdDownload,
+  MdDelete,
+  MdExpandMore,
+  MdExpandLess,
+  MdCloudDownload,
+  MdDeleteSweep,
+} from "react-icons/md";
+
+import styles from "./WOForm.module.css";
+
 import {
   View,
   Button,
@@ -48,10 +60,14 @@ const CreateWorkOrderForm = () => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [displayedFiles, setDisplayedFiles] = useState([]);
+  const [showFiles, setShowFiles] = useState(true);
 
   useEffect(() => {
     fetchS3Files();
-    setFormState((prevState) => ({ ...prevState, files }));
+    // setFormState((prevState) => ({ ...prevState, files }));
+    fetchUsers();
+    fetchCompanies();
+    generateWorkOrderNumber();
   }, []);
 
   const handleUploadSuccess = async (fileKeys) => {
@@ -71,7 +87,7 @@ const CreateWorkOrderForm = () => {
       setFiles(fetchedFiles.items);
       setFormState((prevState) => ({ ...prevState, files }));
       setDisplayedFiles(fetchedFiles.items);
-      console.log("Updateing table", fetchedFiles.items);
+      console.log("Updating table", fetchedFiles.items);
     } catch (error) {
       console.error("Error fetching files:", error);
       setError("Failed to fetch files. Please try again later.");
@@ -133,10 +149,7 @@ const CreateWorkOrderForm = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-    fetchCompanies();
-  }, []);
+  useEffect(() => {}, []);
 
   const fetchCompanies = async () => {
     try {
@@ -170,8 +183,11 @@ const CreateWorkOrderForm = () => {
       });
 
       const newWorkOrderNumber = result.data.incrementCounter;
-      console.log("New work order number:", newWorkOrderNumber);
-      return newWorkOrderNumber;
+      setFormState((prevState) => ({
+        ...prevState,
+        woNumber: newWorkOrderNumber,
+      }));
+      console.log("New work order number:", form);
     } catch (error) {
       console.error("Error generating work order number:", error);
       throw error;
@@ -237,6 +253,9 @@ const CreateWorkOrderForm = () => {
       alert("Error creating work order. Please try again.");
     }
   }
+  const toggleFileList = () => {
+    setShowFiles(!showFiles);
+  };
 
   return (
     <div className="work-order-container">
@@ -249,16 +268,81 @@ const CreateWorkOrderForm = () => {
           <div className="work-order-form" onClick={(e) => e.stopPropagation()}>
             <div className="form-header">
               <h2>Create New Work Order</h2>
-              <button onClick={() => toggleForm()} className="close-button">
+              <Button onClick={() => toggleForm()} className="close-button">
                 &times;
-              </button>
+              </Button>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label htmlFor="files">Upload Image Files</label>
                 <FileUploader3 onUploadSuccess={handleUploadSuccess} />
-                <h2>Files on the Cloud</h2>
-                <Table>
+
+                <div className={styles.container}>
+                  <div className={styles.header}>
+                    <label>Uploaded Files</label>
+                    <div className={styles.headerActions}>
+                      <Button variation="primary" onClick={fetchS3Files}>
+                        <MdRefresh className={styles.actionIcon} />
+                        Refresh
+                      </Button>
+                      <Button
+                        variation="primary"
+                        disabled={displayedFiles.length === 0}
+                      >
+                        <MdCloudDownload className={styles.actionIcon} />
+                        Download All
+                      </Button>
+                      <Button
+                        variation="warning"
+                        disabled={displayedFiles.length === 0}
+                      >
+                        <MdDeleteSweep className={styles.actionIcon} />
+                        Delete All
+                      </Button>
+                      <Button variation="info" onClick={toggleFileList}>
+                        {showFiles ? <MdExpandLess /> : <MdExpandMore />}
+                        {showFiles ? "Hide" : "Show"}
+                      </Button>
+                    </div>
+                  </div>
+                  <p className={styles.totalFiles}>
+                    {displayedFiles.length} file(s) attached to work order
+                  </p>
+                  {showFiles && displayedFiles.length > 0 && (
+                    <div>
+                      <ul className={styles.fileList}>
+                        {displayedFiles.map((file, index) => (
+                          <li key={index} className={styles.fileItem}>
+                            <MdInsertDriveFile className={styles.fileIcon} />
+                            <span className={styles.fileName}>{file.path}</span>
+                            <div className={styles.fileActions}>
+                              <Button
+                                className={styles.actionButton}
+                                onClick={() => handleDownload(file.path)}
+                                title="Download"
+                              >
+                                <MdDownload />
+                              </Button>
+                              <Button
+                                className={styles.actionButton}
+                                onClick={() => handleDelete(file.path)}
+                                title="Delete"
+                              >
+                                <MdDelete />
+                              </Button>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {showFiles && displayedFiles.length === 0 && (
+                    <div className={styles.noFiles}>No files uploaded yet</div>
+                  )}
+                </div>
+              </div>
+              {/* <Table>
                   <TableHead>
                     <TableRow>
                       <TableCell as="th">File Name</TableCell>
@@ -298,14 +382,10 @@ const CreateWorkOrderForm = () => {
                       </TableRow>
                     ))}
                   </TableBody>
-                </Table>
-                <Button onClick={() => fetchS3Files()} marginTop="1rem">
-                  Refresh Files
-                </Button>
-              </div>
-
+                </Table> */}
+              {/*
               <div className="form-group">
-                <label htmlFor="createdById">Created By</label>
+                 <label htmlFor="createdById">Created By</label>
                 <select
                   id="createdById"
                   value={formState.createdById}
@@ -319,8 +399,8 @@ const CreateWorkOrderForm = () => {
                     </option>
                   ))}
                 </select>
-              </div>
-              <div className="form-group">
+              </div> */}
+              {/* <div className="form-group">
                 <label htmlFor="assignedToId">Assigned To</label>
                 <select
                   id="assignedToId"
@@ -335,8 +415,8 @@ const CreateWorkOrderForm = () => {
                     </option>
                   ))}
                 </select>
-              </div>
-              <div className="form-group">
+              </div> */}
+              {/* <div className="form-group">
                 <label htmlFor="companyId">Company</label>
                 <select
                   id="companyId"
@@ -351,8 +431,8 @@ const CreateWorkOrderForm = () => {
                     </option>
                   ))}
                 </select>
-              </div>
-              <div className="form-group">
+              </div> */}
+              {/* <div className="form-group">
                 <label htmlFor="status">Status</label>
                 <select
                   id="status"
@@ -364,7 +444,7 @@ const CreateWorkOrderForm = () => {
                   <option value="IN_PROGRESS">In Progress</option>
                   <option value="COMPLETED">Completed</option>
                 </select>
-              </div>
+              </div> */}
               <div className="form-group">
                 <label htmlFor="type">Type</label>
                 <input
@@ -384,7 +464,7 @@ const CreateWorkOrderForm = () => {
                   required
                 />
               </div>
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label htmlFor="process">Process</label>
                 <input
                   id="process"
@@ -393,7 +473,7 @@ const CreateWorkOrderForm = () => {
                   onChange={(e) => setInput("process", e.target.value)}
                   required
                 />
-              </div>
+              </div> */}
               <div className="form-group">
                 <label htmlFor="make">Make</label>
                 <input
@@ -481,7 +561,6 @@ const CreateWorkOrderForm = () => {
                   }
                 />
               </div>
-
               <button type="submit" className="submit-button">
                 Create Work Order
               </button>
