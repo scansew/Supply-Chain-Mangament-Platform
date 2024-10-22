@@ -1,0 +1,97 @@
+/* Files */
+
+.container {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  margin-top: 1rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.headerActions {
+  display: flex;
+  gap: 8px;
+}
+.title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.fileList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background-color: #f7fafc;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.fileIcon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  color: #4a5568;
+}
+
+.fileName {
+  flex-grow: 1;
+}
+
+.fileActions {
+  display: flex;
+  gap: 8px;
+}
+
+.noFiles {
+  text-align: center;
+  padding: 16px;
+  background-color: #f7fafc;
+  border-radius: 4px;
+  color: #718096;
+}
+
+.totalFiles {
+  font-size: 0.875rem;
+  color: #4a5568;
+  margin-top: 16px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #4a5568;
+  transition: color 0.2s;
+}
+
+.actionButton:hover {
+  color: #2c5282;
+}
+.orText {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem 10rem;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  /* display: inline-block; */
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+}

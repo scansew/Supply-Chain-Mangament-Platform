@@ -1,37 +1,38 @@
 import { Card, Flex, Collection } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
-import { Frame1171275590} from "./ui-components";
-
-function AllWorkOrders({}) {
+// import { Frame1171275590} from "./ui-components";
+import CreateWorkOrderForm from "./CreateWorkOrderForm";
+function AllWorkOrders() {
   const items = [
     {
-      title: "Milford - Room #1",
+      title: "Milford - WO #1",
       badges: ["Waterfront", "Verified"],
     },
     {
-      title: "Milford - Room #2",
+      title: "Milford - WO #2",
       badges: ["Mountain", "Verified"],
     },
     {
-      title: "Milford - Room #2",
+      title: "Milford - WO #22",
       badges: ["Mountain", "Verified"],
     },
     {
-      title: "Milford - Room #2",
+      title: "Milford - WO #23",
       badges: ["Mountain", "Verified"],
     },
     {
-      title: "Milford - Room #2",
+      title: "Milford - WO #24",
       badges: ["Mountain", "Verified"],
     },
     {
-      title: "Milford - Room #2",
+      title: "Milford - WO #52",
       badges: ["Mountain", "Verified"],
     },
   ];
-
   return (
     <div>
+      <CreateWorkOrderForm />
+
       <Flex
         direction="row"
         justifyContent="flex-start"
@@ -49,11 +50,11 @@ function AllWorkOrders({}) {
             gap="20px"
             wrap="nowrap"
           >
-            {(item, index) => <Frame1171275590 />}
+            {(item, index) => <div key={index}>{item.title}</div>}
           </Collection>
         </Card>
 
-        <Card  variation="outlined">
+        <Card variation="outlined">
           <h3>In Progress</h3>
           <Collection
             items={items}
@@ -62,7 +63,7 @@ function AllWorkOrders({}) {
             gap="20px"
             wrap="nowrap"
           >
-            {(item, index) => <Frame1171275590 />}
+            {(item, index) => <div key={index}>{item.title}</div>}
           </Collection>
         </Card>
 
@@ -75,7 +76,7 @@ function AllWorkOrders({}) {
             gap="20px"
             wrap="nowrap"
           >
-            {(item, index) => <Frame1171275590 />}
+            {(item, index) => <div key={index}>{item.title}</div>}
           </Collection>
         </Card>
 
@@ -89,7 +90,7 @@ function AllWorkOrders({}) {
             gap="20px"
             wrap="nowrap"
           >
-            {(item, index) => <Frame1171275590 />}
+            {(item, index) => <div key={index}>{item.title}</div>}
           </Collection>
         </Card>
       </Flex>

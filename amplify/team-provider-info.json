@@ -1,14 +1,14 @@
 {
-  "dev": {
+  "main": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-scanandsewapp-dev-08037-authRole",
-      "UnauthRoleArn": "arn:aws:iam::637423498269:role/amplify-scanandsewapp-dev-08037-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::637423498269:role/amplify-scanandsewapp-dev-08037-authRole",
+      "AuthRoleName": "amplify-scanandsewapp-main-ecc7b-authRole",
+      "UnauthRoleArn": "arn:aws:iam::637423498269:role/amplify-scanandsewapp-main-ecc7b-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::637423498269:role/amplify-scanandsewapp-main-ecc7b-authRole",
       "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-scanandsewapp-dev-08037-deployment",
-      "UnauthRoleName": "amplify-scanandsewapp-dev-08037-unauthRole",
-      "StackName": "amplify-scanandsewapp-dev-08037",
-      "StackId": "arn:aws:cloudformation:us-east-1:637423498269:stack/amplify-scanandsewapp-dev-08037/08fcae00-82ba-11ef-8dcd-0affec0c6ff5",
+      "DeploymentBucketName": "amplify-scanandsewapp-main-ecc7b-deployment",
+      "UnauthRoleName": "amplify-scanandsewapp-main-ecc7b-unauthRole",
+      "StackName": "amplify-scanandsewapp-main-ecc7b",
+      "StackId": "arn:aws:cloudformation:us-east-1:637423498269:stack/amplify-scanandsewapp-main-ecc7b/6cd78210-84b3-11ef-8c6f-0e64ea499a17",
       "AmplifyAppId": "d2hlus9pns00e4"
     },
     "categories": {
@@ -19,6 +19,14 @@
         "s3scanandsewappstorage442a3489": {}
       }
     }
+  },
+  "dev": {
+    "categories": {
+      "auth": {
+        "scanandsewapp": {}
+      }
+    },
+    "awscloudformation": {}
   },
   "staging": {
     "awscloudformation": {
@@ -38,16 +46,30 @@
       },
       "storage": {
         "s3scanandsewappstorage442a3489": {}
-      },
-      "api": {
-        "scanandsewapp": {}
       }
     }
   },
-  "dev": {
+  "deve": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-scanandsewapp-deve-f0bf1-authRole",
+      "UnauthRoleArn": "arn:aws:iam::637423498269:role/amplify-scanandsewapp-deve-f0bf1-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::637423498269:role/amplify-scanandsewapp-deve-f0bf1-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-scanandsewapp-deve-f0bf1-deployment",
+      "UnauthRoleName": "amplify-scanandsewapp-deve-f0bf1-unauthRole",
+      "StackName": "amplify-scanandsewapp-deve-f0bf1",
+      "StackId": "arn:aws:cloudformation:us-east-1:637423498269:stack/amplify-scanandsewapp-deve-f0bf1/36dab3c0-8d74-11ef-926c-128a2131de0f",
+      "AmplifyAppId": "d2hlus9pns00e4"
+    },
     "categories": {
       "auth": {
         "scanandsewapp": {}
+      },
+      "api": {
+        "scanandsewapp": {}
+      },
+      "storage": {
+        "s3scanandsewappstorage442a3489": {}
       }
     }
   }

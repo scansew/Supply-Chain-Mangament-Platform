@@ -18,6 +18,10 @@ export const getCompany = /* GraphQL */ `
         nextToken
         __typename
       }
+      CNCWorkOrders {
+        nextToken
+        __typename
+      }
       materialPricings {
         nextToken
         __typename
@@ -298,6 +302,7 @@ export const getWorkOrder = /* GraphQL */ `
       createdById
       assignedToId
       companyId
+      CNCId
       status
       type
       details
@@ -360,6 +365,15 @@ export const getWorkOrder = /* GraphQL */ `
         updatedAt
         __typename
       }
+      CNCCompany {
+        id
+        name
+        address
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
       crmClient {
         id
         username
@@ -403,6 +417,7 @@ export const listWorkOrders = /* GraphQL */ `
         createdById
         assignedToId
         companyId
+        CNCId
         status
         type
         details
@@ -459,6 +474,7 @@ export const getFile = /* GraphQL */ `
         createdById
         assignedToId
         companyId
+        CNCId
         status
         type
         details
@@ -606,6 +622,7 @@ export const getPayment = /* GraphQL */ `
         createdById
         assignedToId
         companyId
+        CNCId
         status
         type
         details
@@ -1153,9 +1170,8 @@ export const listTotals = /* GraphQL */ `
   }
 `;
 export const getWorkOrderCounter = /* GraphQL */ `
-  query GetWorkOrderCounter($id: ID!) {
-    getWorkOrderCounter(id: $id) {
-      id
+  query GetWorkOrderCounter($counterName: String!) {
+    getWorkOrderCounter(counterName: $counterName) {
       counterName
       currentValue
       createdAt
@@ -1166,21 +1182,20 @@ export const getWorkOrderCounter = /* GraphQL */ `
 `;
 export const listWorkOrderCounters = /* GraphQL */ `
   query ListWorkOrderCounters(
-    $id: ID
+    $counterName: String
     $filter: ModelWorkOrderCounterFilterInput
     $limit: Int
     $nextToken: String
     $sortDirection: ModelSortDirection
   ) {
     listWorkOrderCounters(
-      id: $id
+      counterName: $counterName
       filter: $filter
       limit: $limit
       nextToken: $nextToken
       sortDirection: $sortDirection
     ) {
       items {
-        id
         counterName
         currentValue
         createdAt
@@ -1423,6 +1438,7 @@ export const workOrdersByCreatedById = /* GraphQL */ `
         createdById
         assignedToId
         companyId
+        CNCId
         status
         type
         details
@@ -1484,6 +1500,7 @@ export const workOrdersByAssignedToId = /* GraphQL */ `
         createdById
         assignedToId
         companyId
+        CNCId
         status
         type
         details
@@ -1545,6 +1562,69 @@ export const workOrdersByCompanyId = /* GraphQL */ `
         createdById
         assignedToId
         companyId
+        CNCId
+        status
+        type
+        details
+        materialSelection
+        estimatedPrice
+        msrp
+        createdAt
+        updatedAt
+        process
+        make
+        model
+        year
+        crmClientId
+        rawImages
+        rawDesignImages
+        description
+        materialPrice
+        manufacturePrice
+        raw3dModel
+        designPhotos
+        outline3dModel
+        approved3dModel
+        main2dPattern
+        billOfMaterials
+        cnc2dPattern
+        scanInfo
+        businessName
+        attnName
+        businessPhone
+        businessShippingAddress
+        customerName
+        customerDropShippingAddress
+        shippingTrackingInfo
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const workOrdersByCNCId = /* GraphQL */ `
+  query WorkOrdersByCNCId(
+    $CNCId: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelWorkOrderFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    workOrdersByCNCId(
+      CNCId: $CNCId
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        woNumber
+        createdById
+        assignedToId
+        companyId
+        CNCId
         status
         type
         details
@@ -1724,34 +1804,6 @@ export const materialPricingsByCompanyId = /* GraphQL */ `
         companyId
         materialName
         pricePerYard
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const workOrderCountersByCounterName = /* GraphQL */ `
-  query WorkOrderCountersByCounterName(
-    $counterName: String!
-    $sortDirection: ModelSortDirection
-    $filter: ModelWorkOrderCounterFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    workOrderCountersByCounterName(
-      counterName: $counterName
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        counterName
-        currentValue
         createdAt
         updatedAt
         __typename

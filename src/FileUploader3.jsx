@@ -11,6 +11,7 @@ import {
 } from "@aws-amplify/ui-react";
 import { uploadData } from "aws-amplify/storage";
 import { MdCloudUpload, MdCheckCircle, MdError } from "react-icons/md";
+import { filesByUploadedById } from "./graphql/queries";
 
 const FileUploader3 = ({ onUploadSuccess }) => {
   const [files, setFiles] = useState([]);
@@ -22,17 +23,6 @@ const FileUploader3 = ({ onUploadSuccess }) => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
 
-  // useEffect(() => {
-  //   if (files.length > 0 && successUploads.length === files.length) {
-  //     setAllUploadsComplete(true);
-  //     if (allUploadsComplete) {
-  //       onUploadSuccess(successUploads);
-  //     }
-  //   } else {
-  //     setAllUploadsComplete(false);
-  //   }
-  // }, [files, successUploads]);
-
   const handleProgress = useCallback((fileName, progress) => {
     const percent = (progress.transferredBytes / progress.totalBytes) * 100;
     setUploadProgress((prev) => ({
@@ -42,6 +32,10 @@ const FileUploader3 = ({ onUploadSuccess }) => {
   }, []);
 
   const handleFileChange = (event) => {
+    if (event.target.files.length > 2000) {
+      alert("You can only upload 2000 files at a time");
+      return;
+    }
     const selectedFiles = Array.from(event.target.files);
     setFiles(selectedFiles);
     const initialProgress = selectedFiles.reduce((acc, file) => {
@@ -96,6 +90,17 @@ const FileUploader3 = ({ onUploadSuccess }) => {
               contentType: file.type,
               useAccelerateEndpoint: true, // Enable transfer acceleration
               onProgress: (progress) => handleProgress(file.name, progress),
+              metadata: {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*", // Be cautious with this in production
+              },
+              customPrefix: {
+                public: "",
+              },
+              headers: {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*", // Be cautious with this in production
+              },
             },
           });
 
@@ -145,12 +150,25 @@ const FileUploader3 = ({ onUploadSuccess }) => {
     await uploadFiles(failedUploads);
   };
 
+  const calculateTotalProgress = () => {
+    const totalBytes = files.reduce((acc, file) => acc + file.size, 0);
+    const uploadedBytes = files.reduce((acc, file) => {
+      const fileProgress = uploadProgress[file.name] || 0;
+      return acc + (file.size * fileProgress) / 100;
+    }, 0);
+
+    if (totalBytes === 0) return 0;
+    return Math.round((uploadedBytes / totalBytes) * 100);
+  };
+
   return (
     <Card variation="elevated" padding="1.5rem">
+      <label>Upload Image Files</label>
+
       <Flex direction="column" gap="1rem">
         <View
           as="div"
-          padding="2rem"
+          padding="3rem"
           backgroundColor={
             isDragging ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.05)"
           }
@@ -180,14 +198,6 @@ const FileUploader3 = ({ onUploadSuccess }) => {
         </View>
 
         <Flex justifyContent="space-between" alignItems="center">
-          <Button
-            onClick={() => uploadFiles(files)}
-            disabled={uploading || files.length === 0}
-            variation="primary"
-          >
-            {uploading ? "Uploading..." : "Upload Files"}
-          </Button>
-
           {failedUploads.length > 0 && (
             <Button
               onClick={() => reuploadFailedFiles()}
@@ -197,7 +207,6 @@ const FileUploader3 = ({ onUploadSuccess }) => {
               Retry Failed Uploads
             </Button>
           )}
-          {uploading && <Badge variation="info">Uploading file(s)</Badge>}
 
           {failedUploads.length === 0 &&
             successUploads.length === files.length && (
@@ -205,8 +214,34 @@ const FileUploader3 = ({ onUploadSuccess }) => {
                 All files have been successfully uploaded!
               </Badge>
             )}
+          {uploading && (
+            <div>
+              <Badge variation="info">Uploading file(s).</Badge>
+            </div>
+          )}
         </Flex>
-        {files.length > 0 && (
+        {successUploads.length < files.length && files.length > 0 && (
+          <Card>
+            <p>{files.length} file(s) selected for upload </p>
+            <View height="4px" backgroundColor="lightgray">
+              <View
+                backgroundColor="#00a8cc"
+                height="100%"
+                width={`${calculateTotalProgress()}%`}
+                style={{ transition: "width 0.3s ease-in-out" }}
+              />
+            </View>
+            {files.length > 0 && calculateTotalProgress()}% done
+          </Card>
+        )}
+        <Button
+          onClick={() => uploadFiles(files)}
+          disabled={uploading || files.length === 0}
+          variation="primary"
+        >
+          {uploading ? "Uploading..." : "Upload Files"}
+        </Button>
+        {/* {files.length > 0 && (
           <Card>
             <Heading level={5}>Selected Files</Heading>
             <View className="file-grid">
@@ -240,7 +275,7 @@ const FileUploader3 = ({ onUploadSuccess }) => {
               ))}
             </View>
           </Card>
-        )}
+        )} */}
       </Flex>
     </Card>
   );

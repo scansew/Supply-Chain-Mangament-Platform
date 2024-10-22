@@ -4,27 +4,10 @@
 .work-order-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  min-height: calc(100vh - 60px); /* Subtract header height */
-  padding: 80px 20px 20px; /* Add top padding to account for header */
+  align-items: right;
+  /*min-height: calc(100vh - 60px); /* Subtract header height */
+  padding: 20px 20px 20px; /* Add top padding to account for header */
   box-sizing: border-box;
-}
-
-/* Button to open the form */
-.create-work-order-button {
-  margin-bottom: 20px;
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.create-work-order-button:hover {
-  background-color: #45a049;
 }
 
 /* Form wrapper (overlay) */
@@ -51,12 +34,27 @@
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   width: 90%; /* Increased from 100% */
-  /*max-width: 800px; /* Increased from 500px */
+  max-width: 1200px; /* Increased from 500px */
   max-height: calc(
     100vh - 100px
   ); /* Adjust max height to account for header and some padding */
   overflow-y: auto;
   overflow-x: hidden;
+}
+.work-order-form-columns {
+  display: flex;
+  gap: 20px;
+}
+
+.work-order-form-left,
+.work-order-form-right {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .work-order-form-columns {
+    flex-direction: column;
+  }
 }
 
 /* Form header */
@@ -231,4 +229,87 @@
   transform: translateY(-3px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+/* Files */
+.container {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  margin-top: 1rem;
+}
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.refreshButton {
+  display: flex;
+  align-items: center;
+  background-color: #3182ce;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.refreshButton:hover {
+  background-color: #2c5282;
+}
+
+.refreshIcon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+.fileList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background-color: #f7fafc;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.fileIcon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  color: #4a5568;
+}
+
+.noFiles {
+  text-align: center;
+  padding: 16px;
+  background-color: #f7fafc;
+  border-radius: 4px;
+  color: #718096;
+}
+
+.totalFiles {
+  font-size: 0.875rem;
+  color: #4a5568;
+  margin-top: 16px;
+}
+.required-field::after {
+  content: '*';
+  color: red;
+  margin-left: 3px;
+}

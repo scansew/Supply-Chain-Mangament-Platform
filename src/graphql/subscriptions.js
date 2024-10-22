@@ -18,6 +18,10 @@ export const onCreateCompany = /* GraphQL */ `
         nextToken
         __typename
       }
+      CNCWorkOrders {
+        nextToken
+        __typename
+      }
       materialPricings {
         nextToken
         __typename
@@ -47,6 +51,10 @@ export const onUpdateCompany = /* GraphQL */ `
         nextToken
         __typename
       }
+      CNCWorkOrders {
+        nextToken
+        __typename
+      }
       materialPricings {
         nextToken
         __typename
@@ -73,6 +81,10 @@ export const onDeleteCompany = /* GraphQL */ `
         __typename
       }
       workOrders {
+        nextToken
+        __typename
+      }
+      CNCWorkOrders {
         nextToken
         __typename
       }
@@ -449,6 +461,7 @@ export const onCreateWorkOrder = /* GraphQL */ `
       createdById
       assignedToId
       companyId
+      CNCId
       status
       type
       details
@@ -503,6 +516,15 @@ export const onCreateWorkOrder = /* GraphQL */ `
         __typename
       }
       company {
+        id
+        name
+        address
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      CNCCompany {
         id
         name
         address
@@ -543,6 +565,7 @@ export const onUpdateWorkOrder = /* GraphQL */ `
       createdById
       assignedToId
       companyId
+      CNCId
       status
       type
       details
@@ -605,6 +628,15 @@ export const onUpdateWorkOrder = /* GraphQL */ `
         updatedAt
         __typename
       }
+      CNCCompany {
+        id
+        name
+        address
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
       crmClient {
         id
         username
@@ -637,6 +669,7 @@ export const onDeleteWorkOrder = /* GraphQL */ `
       createdById
       assignedToId
       companyId
+      CNCId
       status
       type
       details
@@ -691,6 +724,15 @@ export const onDeleteWorkOrder = /* GraphQL */ `
         __typename
       }
       company {
+        id
+        name
+        address
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      CNCCompany {
         id
         name
         address
@@ -737,6 +779,7 @@ export const onCreateFile = /* GraphQL */ `
         createdById
         assignedToId
         companyId
+        CNCId
         status
         type
         details
@@ -802,6 +845,7 @@ export const onUpdateFile = /* GraphQL */ `
         createdById
         assignedToId
         companyId
+        CNCId
         status
         type
         details
@@ -867,6 +911,7 @@ export const onDeleteFile = /* GraphQL */ `
         createdById
         assignedToId
         companyId
+        CNCId
         status
         type
         details
@@ -1001,6 +1046,7 @@ export const onCreatePayment = /* GraphQL */ `
         createdById
         assignedToId
         companyId
+        CNCId
         status
         type
         details
@@ -1056,6 +1102,7 @@ export const onUpdatePayment = /* GraphQL */ `
         createdById
         assignedToId
         companyId
+        CNCId
         status
         type
         details
@@ -1111,6 +1158,7 @@ export const onDeletePayment = /* GraphQL */ `
         createdById
         assignedToId
         companyId
+        CNCId
         status
         type
         details
@@ -1644,7 +1692,6 @@ export const onCreateWorkOrderCounter = /* GraphQL */ `
     $filter: ModelSubscriptionWorkOrderCounterFilterInput
   ) {
     onCreateWorkOrderCounter(filter: $filter) {
-      id
       counterName
       currentValue
       createdAt
@@ -1658,7 +1705,6 @@ export const onUpdateWorkOrderCounter = /* GraphQL */ `
     $filter: ModelSubscriptionWorkOrderCounterFilterInput
   ) {
     onUpdateWorkOrderCounter(filter: $filter) {
-      id
       counterName
       currentValue
       createdAt
@@ -1672,7 +1718,6 @@ export const onDeleteWorkOrderCounter = /* GraphQL */ `
     $filter: ModelSubscriptionWorkOrderCounterFilterInput
   ) {
     onDeleteWorkOrderCounter(filter: $filter) {
-      id
       counterName
       currentValue
       createdAt
