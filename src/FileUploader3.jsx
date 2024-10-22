@@ -11,6 +11,7 @@ import {
 } from "@aws-amplify/ui-react";
 import { uploadData } from "aws-amplify/storage";
 import { MdCloudUpload, MdCheckCircle, MdError } from "react-icons/md";
+import { filesByUploadedById } from "./graphql/queries";
 
 const FileUploader3 = ({ onUploadSuccess }) => {
   const [files, setFiles] = useState([]);
@@ -31,6 +32,10 @@ const FileUploader3 = ({ onUploadSuccess }) => {
   }, []);
 
   const handleFileChange = (event) => {
+    if (event.target.files.length > 2000) {
+      alert("You can only upload 2000 files at a time");
+      return;
+    }
     const selectedFiles = Array.from(event.target.files);
     setFiles(selectedFiles);
     const initialProgress = selectedFiles.reduce((acc, file) => {
@@ -158,10 +163,12 @@ const FileUploader3 = ({ onUploadSuccess }) => {
 
   return (
     <Card variation="elevated" padding="1.5rem">
+      <label>Upload Image Files</label>
+
       <Flex direction="column" gap="1rem">
         <View
           as="div"
-          padding="2rem"
+          padding="3rem"
           backgroundColor={
             isDragging ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.05)"
           }

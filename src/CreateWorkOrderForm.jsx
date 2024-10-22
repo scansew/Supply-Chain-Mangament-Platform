@@ -16,6 +16,7 @@ import {
   MdCloudDownload,
   MdDeleteSweep,
 } from "react-icons/md";
+import { Card, Heading } from "@aws-amplify/ui-react";
 
 import styles from "./WOForm.module.css";
 
@@ -35,6 +36,11 @@ const CreateWorkOrderForm = () => {
   const [showForm, setShowForm] = useState(false);
   const [users, setUsers] = useState([]);
   const [companies, setCompanies] = useState([]);
+  const [files, setFiles] = useState([]);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [displayedFiles, setDisplayedFiles] = useState([]);
+  const [showFiles, setShowFiles] = useState(true);
   const [formState, setFormState] = useState({
     woNumber: "N/A",
     createdById: "",
@@ -55,12 +61,6 @@ const CreateWorkOrderForm = () => {
     customerDropShippingAddress: "",
     files: [],
   });
-  const [files, setFiles] = useState([]);
-
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [displayedFiles, setDisplayedFiles] = useState([]);
-  const [showFiles, setShowFiles] = useState(true);
 
   // useEffect(() => {
   //   // setFormState((prevState) => ({ ...prevState, files }));
@@ -71,6 +71,7 @@ const CreateWorkOrderForm = () => {
     await fetchS3Files();
     setFormState((prevState) => ({ ...prevState, files }));
   };
+
   const fetchS3Files = async () => {
     setFiles("");
     setIsLoading(true);
@@ -297,117 +298,9 @@ const CreateWorkOrderForm = () => {
               </Button>
             </div>
             <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label htmlFor="files">Upload Image Files</label>
-                <FileUploader3 onUploadSuccess={handleUploadSuccess} />
-
-                <div className={styles.container}>
-                  <div className={styles.header}>
-                    <label>Uploaded Files</label>
-                    <div className={styles.headerActions}>
-                      <Button variation="primary" onClick={fetchS3Files}>
-                        <MdRefresh className={styles.actionIcon} />
-                        Refresh
-                      </Button>
-                      <Button
-                        variation="primary"
-                        disabled={displayedFiles.length === 0}
-                      >
-                        <MdCloudDownload className={styles.actionIcon} />
-                        Download All
-                      </Button>
-                      <Button
-                        variation="warning"
-                        disabled={displayedFiles.length === 0}
-                      >
-                        <MdDeleteSweep className={styles.actionIcon} />
-                        Delete All
-                      </Button>
-                      <Button variation="info" onClick={toggleFileList}>
-                        {showFiles ? <MdExpandLess /> : <MdExpandMore />}
-                        {showFiles ? "Hide" : "Show"}
-                      </Button>
-                    </div>
-                  </div>
-                  <p className={styles.totalFiles}>
-                    {displayedFiles.length} file(s) attached to work order
-                  </p>
-                  {showFiles && displayedFiles.length > 0 && (
-                    <div>
-                      <ul className={styles.fileList}>
-                        {displayedFiles.map((file, index) => (
-                          <li key={index} className={styles.fileItem}>
-                            <MdInsertDriveFile className={styles.fileIcon} />
-                            <span className={styles.fileName}>{file.path}</span>
-                            <div className={styles.fileActions}>
-                              <Button
-                                className={styles.actionButton}
-                                onClick={() => handleDownload(file.path)}
-                                title="Download"
-                              >
-                                <MdDownload />
-                              </Button>
-                              <Button
-                                className={styles.actionButton}
-                                onClick={() => handleDelete(file.path)}
-                                title="Delete"
-                              >
-                                <MdDelete />
-                              </Button>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {showFiles && displayedFiles.length === 0 && (
-                    <div className={styles.noFiles}>No files uploaded yet</div>
-                  )}
-                </div>
-              </div>
-              {/* <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell as="th">File Name</TableCell>
-                      <TableCell as="th">Size</TableCell>
-                      <TableCell as="th">Last Modified</TableCell>
-                      <TableCell as="th">Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {displayedFiles.map((image) => (
-                      <TableRow key={image.path}>
-                        <TableCell>{image.path}</TableCell>
-                        <TableCell>
-                          {image.size
-                            ? `${(image.size / (1024 * 1024)).toFixed(2)} MB`
-                            : "N/A"}
-                        </TableCell>
-                        <TableCell>
-                          {image.lastModified
-                            ? new Date(image.lastModified).toLocaleString()
-                            : "N/A"}
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            onClick={() => handleDelete(image.path)}
-                            marginRight="5px"
-                          >
-                            Delete
-                          </Button>
-                          <Button
-                            onClick={() => handleDownload(image.path)}
-                            variation="primary"
-                          >
-                            Download
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table> */}
-              {/*
+              <div className="work-order-form-columns">
+                <div className="work-order-form-left">
+                  {/*
               <div className="form-group">
                  <label htmlFor="createdById">Created By</label>
                 <select
@@ -424,7 +317,7 @@ const CreateWorkOrderForm = () => {
                   ))}
                 </select>
               </div> */}
-              {/* <div className="form-group">
+                  {/* <div className="form-group">
                 <label htmlFor="assignedToId">Assigned To</label>
                 <select
                   id="assignedToId"
@@ -440,7 +333,7 @@ const CreateWorkOrderForm = () => {
                   ))}
                 </select>
               </div> */}
-              {/* <div className="form-group">
+                  {/* <div className="form-group">
                 <label htmlFor="companyId">Company</label>
                 <select
                   id="companyId"
@@ -456,7 +349,7 @@ const CreateWorkOrderForm = () => {
                   ))}
                 </select>
               </div> */}
-              {/* <div className="form-group">
+                  {/* <div className="form-group">
                 <label htmlFor="status">Status</label>
                 <select
                   id="status"
@@ -469,26 +362,35 @@ const CreateWorkOrderForm = () => {
                   <option value="COMPLETED">Completed</option>
                 </select>
               </div> */}
-              <div className="form-group">
-                <label htmlFor="type">Type</label>
-                <input
-                  id="type"
-                  type="text"
-                  value={formState.type}
-                  onChange={(e) => setInput("type", e.target.value)}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="details">Details</label>
-                <textarea
-                  id="details"
-                  value={formState.details}
-                  onChange={(e) => setInput("details", e.target.value)}
-                  required
-                />
-              </div>
-              {/* <div className="form-group">
+                  <Card variation="elevated" style={{ marginBottom: "20px" }}>
+                    <Heading level={5}>General Details</Heading>
+                    <div className="form-group">
+                      <label htmlFor="type" className="required-field">
+                        WO Type
+                      </label>
+                      <select
+                        id="type"
+                        value={formState.companyId}
+                        onChange={(e) => setInput("type", e.target.value)}
+                        required
+                      >
+                        <option value="Cover">Cover</option>
+                        <option value="Skirts">Skirts</option>
+                        <option value="Rachets">Skirts</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="details">Details</label>
+                      <textarea
+                        id="details"
+                        value={formState.details}
+                        onChange={(e) => setInput("details", e.target.value)}
+                        required
+                      />
+                    </div>
+                  </Card>
+
+                  {/* <div className="form-group">
                 <label htmlFor="process">Process</label>
                 <input
                   id="process"
@@ -498,96 +400,245 @@ const CreateWorkOrderForm = () => {
                   required
                 />
               </div> */}
-              <div className="form-group">
-                <label htmlFor="make">Make</label>
-                <input
-                  id="make"
-                  type="text"
-                  value={formState.make}
-                  onChange={(e) => setInput("make", e.target.value)}
-                />
+                  <Card variation="elevated" style={{ marginBottom: "20px" }}>
+                    <Heading level={5}>Vehicle Information</Heading>
+                    <div className="form-group">
+                      <label htmlFor="make" className="required-field">
+                        Make
+                      </label>
+                      <input
+                        id="make"
+                        type="text"
+                        value={formState.make}
+                        onChange={(e) => setInput("make", e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="model" className="required-field">
+                        Model
+                      </label>
+                      <input
+                        id="model"
+                        type="text"
+                        value={formState.model}
+                        onChange={(e) => setInput("model", e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="year" className="required-field">
+                        Year
+                      </label>
+                      <input
+                        id="year"
+                        type="number"
+                        value={formState.year}
+                        onChange={(e) =>
+                          setInput("year", parseInt(e.target.value))
+                        }
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="description">Description</label>
+                      <textarea
+                        id="description"
+                        value={formState.details}
+                        onChange={(e) =>
+                          setInput("description", e.target.value)
+                        }
+                        required
+                      />
+                    </div>
+                  </Card>
+                  <Card variation="elevated" style={{ marginBottom: "20px" }}>
+                    <Heading level={5}>CNC/WCNC Information</Heading>
+                    <div className="form-group">
+                      <label htmlFor="CNCId" className="required-field">
+                        CNC Company
+                      </label>
+                      <select
+                        id="companyId"
+                        value={formState.companyId}
+                        onChange={(e) => setInput("CNCId", e.target.value)}
+                        required
+                      >
+                        <option value="">Select CNC Company</option>
+                        {companies.map((company) => (
+                          <option key={company.id} value={company.id}>
+                            {company.name}
+                          </option>
+                        ))}
+                      </select>
+                      <span className={styles.orText}>OR</span>
+                      <label htmlFor="businessName">Business Name</label>
+                      <input
+                        id="businessName"
+                        type="text"
+                        value={formState.businessName}
+                        onChange={(e) =>
+                          setInput("businessName", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="attnName">Attention Name</label>
+                      <input
+                        id="attnName"
+                        type="text"
+                        value={formState.attnName}
+                        onChange={(e) => setInput("attnName", e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="businessPhone">Business Phone</label>
+                      <input
+                        id="businessPhone"
+                        type="tel"
+                        value={formState.businessPhone}
+                        onChange={(e) =>
+                          setInput("businessPhone", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="businessShippingAddress">
+                        Business Shipping Address
+                      </label>
+                      <textarea
+                        id="businessShippingAddress"
+                        value={formState.businessShippingAddress}
+                        onChange={(e) =>
+                          setInput("businessShippingAddress", e.target.value)
+                        }
+                      />
+                    </div>
+                  </Card>
+                  <Card variation="elevated" style={{ marginBottom: "20px" }}>
+                    <Heading level={5}>Customer Information</Heading>
+                    <div className="form-group">
+                      <label htmlFor="customerName" className="required-field">
+                        Customer Name
+                      </label>
+                      <input
+                        id="customerName"
+                        type="text"
+                        value={formState.customerName}
+                        onChange={(e) =>
+                          setInput("customerName", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label
+                        htmlFor="customerDropShippingAddress"
+                        className="required-field"
+                      >
+                        Customer Drop Shipping Address
+                      </label>
+                      <textarea
+                        id="customerDropShippingAddress"
+                        value={formState.customerDropShippingAddress}
+                        onChange={(e) =>
+                          setInput(
+                            "customerDropShippingAddress",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </div>
+                  </Card>
+
+                  <Button type="submit" variation="primary">
+                    Create Work Order
+                  </Button>
+                </div>
+
+                <div className="work-order-form-right">
+                  <div className="form-group">
+                    <FileUploader3 onUploadSuccess={handleUploadSuccess} />
+
+                    <Card variation="elevated" style={{ marginTop: "20px" }}>
+                      <div className={styles.header}>
+                        <label>Uploaded Files</label>
+                        <div className={styles.headerActions}>
+                          <Button
+                            variation="primary"
+                            onClick={fetchS3Files}
+                            size="small"
+                          >
+                            <MdRefresh className={styles.actionIcon} />
+                            Refresh
+                          </Button>
+                          <Button
+                            variation="primary"
+                            size="small"
+                            disabled={displayedFiles.length === 0}
+                          >
+                            <MdCloudDownload className={styles.actionIcon} />
+                            Download
+                          </Button>
+                          <Button
+                            variation="warning"
+                            size="small"
+                            disabled={displayedFiles.length === 0}
+                          >
+                            <MdDeleteSweep className={styles.actionIcon} />
+                            Delete
+                          </Button>
+                          <Button
+                            variation="info"
+                            onClick={toggleFileList}
+                            size="small"
+                          >
+                            {showFiles ? <MdExpandLess /> : <MdExpandMore />}
+                            {showFiles ? "Hide" : "Show"}
+                          </Button>
+                        </div>
+                      </div>
+                      <p className={styles.totalFiles}>
+                        {displayedFiles.length} file(s) attached to work order
+                      </p>
+                      {showFiles && displayedFiles.length > 0 && (
+                        <div>
+                          <ul className={styles.fileList}>
+                            {displayedFiles.map((file, index) => (
+                              <li key={index} className={styles.fileItem}>
+                                <MdInsertDriveFile
+                                  className={styles.fileIcon}
+                                />
+                                <span className={styles.fileName}>
+                                  {file.path}
+                                </span>
+                                <div className={styles.fileActions}>
+                                  <Button
+                                    className={styles.actionButton}
+                                    onClick={() => handleDownload(file.path)}
+                                    title="Download"
+                                  >
+                                    <MdDownload />
+                                  </Button>
+                                  <Button
+                                    className={styles.actionButton}
+                                    onClick={() => handleDelete(file.path)}
+                                    title="Delete"
+                                  >
+                                    <MdDelete />
+                                  </Button>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {showFiles && displayedFiles.length === 0 && (
+                        <div className={styles.noFiles}>
+                          No files uploaded yet
+                        </div>
+                      )}
+                    </Card>
+                  </div>
+                </div>
               </div>
-              <div className="form-group">
-                <label htmlFor="model">Model</label>
-                <input
-                  id="model"
-                  type="text"
-                  value={formState.model}
-                  onChange={(e) => setInput("model", e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="year">Year</label>
-                <input
-                  id="year"
-                  type="number"
-                  value={formState.year}
-                  onChange={(e) => setInput("year", parseInt(e.target.value))}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="businessName">Business Name</label>
-                <input
-                  id="businessName"
-                  type="text"
-                  value={formState.businessName}
-                  onChange={(e) => setInput("businessName", e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="attnName">Attention Name</label>
-                <input
-                  id="attnName"
-                  type="text"
-                  value={formState.attnName}
-                  onChange={(e) => setInput("attnName", e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="businessPhone">Business Phone</label>
-                <input
-                  id="businessPhone"
-                  type="tel"
-                  value={formState.businessPhone}
-                  onChange={(e) => setInput("businessPhone", e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="businessShippingAddress">
-                  Business Shipping Address
-                </label>
-                <textarea
-                  id="businessShippingAddress"
-                  value={formState.businessShippingAddress}
-                  onChange={(e) =>
-                    setInput("businessShippingAddress", e.target.value)
-                  }
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="customerName">Customer Name</label>
-                <input
-                  id="customerName"
-                  type="text"
-                  value={formState.customerName}
-                  onChange={(e) => setInput("customerName", e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="customerDropShippingAddress">
-                  Customer Drop Shipping Address
-                </label>
-                <textarea
-                  id="customerDropShippingAddress"
-                  value={formState.customerDropShippingAddress}
-                  onChange={(e) =>
-                    setInput("customerDropShippingAddress", e.target.value)
-                  }
-                />
-              </div>
-              <Button type="submit" variation="primary">
-                Create Work Order
-              </Button>
             </form>
           </div>
         </div>

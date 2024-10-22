@@ -34,12 +34,27 @@
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   width: 90%; /* Increased from 100% */
-  max-width: 800px; /* Increased from 500px */
+  max-width: 1200px; /* Increased from 500px */
   max-height: calc(
     100vh - 100px
   ); /* Adjust max height to account for header and some padding */
   overflow-y: auto;
   overflow-x: hidden;
+}
+.work-order-form-columns {
+  display: flex;
+  gap: 20px;
+}
+
+.work-order-form-left,
+.work-order-form-right {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .work-order-form-columns {
+    flex-direction: column;
+  }
 }
 
 /* Form header */
@@ -292,4 +307,9 @@
   font-size: 0.875rem;
   color: #4a5568;
   margin-top: 16px;
+}
+.required-field::after {
+  content: '*';
+  color: red;
+  margin-left: 3px;
 }
