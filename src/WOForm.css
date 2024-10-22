@@ -4,27 +4,10 @@
 .work-order-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  min-height: calc(100vh - 60px); /* Subtract header height */
-  padding: 80px 20px 20px; /* Add top padding to account for header */
+  align-items: right;
+  /*min-height: calc(100vh - 60px); /* Subtract header height */
+  padding: 20px 20px 20px; /* Add top padding to account for header */
   box-sizing: border-box;
-}
-
-/* Button to open the form */
-.create-work-order-button {
-  margin-bottom: 20px;
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.create-work-order-button:hover {
-  background-color: #45a049;
 }
 
 /* Form wrapper (overlay) */

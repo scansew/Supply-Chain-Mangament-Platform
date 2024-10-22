@@ -36,7 +36,7 @@ const CreateWorkOrderForm = () => {
   const [users, setUsers] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [formState, setFormState] = useState({
-    woNumber: "",
+    woNumber: "N/A",
     createdById: "",
     assignedToId: "",
     companyId: "",
@@ -62,13 +62,9 @@ const CreateWorkOrderForm = () => {
   const [displayedFiles, setDisplayedFiles] = useState([]);
   const [showFiles, setShowFiles] = useState(true);
 
-  useEffect(() => {
-    fetchS3Files();
-    // setFormState((prevState) => ({ ...prevState, files }));
-    fetchUsers();
-    fetchCompanies();
-    generateWorkOrderNumber();
-  }, []);
+  // useEffect(() => {
+  //   // setFormState((prevState) => ({ ...prevState, files }));
+  // }, []);
 
   const handleUploadSuccess = async (fileKeys) => {
     console.log("Files synced successfully:", fileKeys);
@@ -87,7 +83,7 @@ const CreateWorkOrderForm = () => {
       setFiles(fetchedFiles.items);
       setFormState((prevState) => ({ ...prevState, files }));
       setDisplayedFiles(fetchedFiles.items);
-      console.log("Updating table", fetchedFiles.items);
+      // console.log("Updating table", fetchedFiles.items);
     } catch (error) {
       console.error("Error fetching files:", error);
       setError("Failed to fetch files. Please try again later.");
@@ -143,13 +139,37 @@ const CreateWorkOrderForm = () => {
 
   const toggleForm = (event) => {
     if (event && event.target.className === "work-order-form-wrapper") {
+      setFormState({
+        woNumber: "",
+        createdById: "",
+        assignedToId: "",
+        companyId: "",
+        status: "PENDING",
+        type: "",
+        details: "",
+        process: "",
+        make: "",
+        model: "",
+        year: "",
+        businessName: "",
+        attnName: "",
+        businessPhone: "",
+        businessShippingAddress: "",
+        customerName: "",
+        customerDropShippingAddress: "",
+        files: [],
+      });
       setShowForm(false);
     } else {
+      if (showForm === false) {
+        generateWorkOrderNumber();
+        fetchUsers();
+        fetchCompanies();
+        fetchS3Files();
+      }
       setShowForm(!showForm);
     }
   };
-
-  useEffect(() => {}, []);
 
   const fetchCompanies = async () => {
     try {
@@ -187,7 +207,7 @@ const CreateWorkOrderForm = () => {
         ...prevState,
         woNumber: newWorkOrderNumber,
       }));
-      console.log("New work order number:", form);
+      console.log("New work order number:", newWorkOrderNumber);
     } catch (error) {
       console.error("Error generating work order number:", error);
       throw error;
@@ -259,15 +279,19 @@ const CreateWorkOrderForm = () => {
 
   return (
     <div className="work-order-container">
-      <button onClick={() => toggleForm()} className="create-work-order-button">
+      <Button
+        onClick={() => toggleForm()}
+        variation="primary"
+        className="create-work-order-button"
+      >
         Create New Work Order
-      </button>
+      </Button>
 
       {showForm && (
         <div className="work-order-form-wrapper" onClick={toggleForm}>
           <div className="work-order-form" onClick={(e) => e.stopPropagation()}>
             <div className="form-header">
-              <h2>Create New Work Order</h2>
+              <h2>Create New Work Order {formState.woNumber}</h2>
               <Button onClick={() => toggleForm()} className="close-button">
                 &times;
               </Button>
@@ -561,9 +585,9 @@ const CreateWorkOrderForm = () => {
                   }
                 />
               </div>
-              <button type="submit" className="submit-button">
+              <Button type="submit" variation="primary">
                 Create Work Order
-              </button>
+              </Button>
             </form>
           </div>
         </div>

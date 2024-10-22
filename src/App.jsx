@@ -1,27 +1,38 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, NavLink } from "react-router-dom";
-import { FaHome, FaClipboardList, FaBuilding, FaUsers, FaSignOutAlt, FaBars } from "react-icons/fa";
-import { 
-  withAuthenticator, 
-  Image, 
-  Button, 
+import React, { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  NavLink,
+} from "react-router-dom";
+import {
+  FaHome,
+  FaClipboardList,
+  FaBuilding,
+  FaUsers,
+  FaSignOutAlt,
+  FaBars,
+} from "react-icons/fa";
+import {
+  withAuthenticator,
+  Image,
+  Button,
   Text,
   Grid,
   View,
-  Flex
+  Flex,
 } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import "./App.css";
 
 // Import your components
 import Dashboard from "./Dashboard";
-import CreateWorkOrderForm from "./CreateWorkOrderForm";
 import Companies from "./Companies";
 import AllWorkOrders from "./AllWorkOrders";
 import Users from "./Users";
 
 // Import your logo
-import logo from './assets/scansewlogo.png';
+import logo from "./assets/scansewlogo.png";
 
 function App({ signOut, user }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -37,8 +48,15 @@ function App({ signOut, user }) {
         templateRows="auto 1fr auto"
         height="100vh"
       >
-        <View columnSpan={{ base: 1, large: 2 }} backgroundColor="var(--amplify-colors-background-secondary)">
-          <Flex justifyContent="space-between" alignItems="center" padding="1rem">
+        <View
+          columnSpan={{ base: 1, large: 2 }}
+          backgroundColor="var(--amplify-colors-background-secondary)"
+        >
+          <Flex
+            justifyContent="space-between"
+            alignItems="center"
+            padding="1rem"
+          >
             <Image src={logo} alt="Company Logo" width="150px" />
             <Button className="menu-toggle" onClick={toggleSidebar}>
               <FaBars />
@@ -47,7 +65,7 @@ function App({ signOut, user }) {
         </View>
 
         <View
-          className={`sidebar ${sidebarOpen ? 'open' : ''}`}
+          className={`sidebar ${sidebarOpen ? "open" : ""}`}
           backgroundColor="var(--amplify-colors-background-primary)"
           padding="1rem"
         >
@@ -55,39 +73,62 @@ function App({ signOut, user }) {
             <Text variation="primary" fontWeight="bold" marginBottom="1rem">
               Welcome, {user.username}
             </Text>
-            <NavLink to="/" end className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+            <NavLink
+              to="/"
+              end
+              className="sidebar-link"
+              onClick={() => setSidebarOpen(false)}
+            >
               <FaHome className="sidebar-icon" /> <span>Home</span>
             </NavLink>
-            <NavLink to="/createworkorder" className="sidebar-link" onClick={() => setSidebarOpen(false)}>
-              <FaClipboardList className="sidebar-icon" /> <span>Create Work Order</span>
+            <NavLink
+              to="/workorders"
+              className="sidebar-link"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <FaClipboardList className="sidebar-icon" />{" "}
+              <span>Work Orders</span>
             </NavLink>
-            <NavLink to="/allworkorders" className="sidebar-link" onClick={() => setSidebarOpen(false)}>
-              <FaClipboardList className="sidebar-icon" /> <span>All Work Orders</span>
-            </NavLink>
-            <NavLink to="/companies" className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+            <NavLink
+              to="/companies"
+              className="sidebar-link"
+              onClick={() => setSidebarOpen(false)}
+            >
               <FaBuilding className="sidebar-icon" /> <span>Companies</span>
             </NavLink>
-            <NavLink to="/users" className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+            <NavLink
+              to="/users"
+              className="sidebar-link"
+              onClick={() => setSidebarOpen(false)}
+            >
               <FaUsers className="sidebar-icon" /> <span>Users</span>
             </NavLink>
-            <Button onClick={signOut} marginTop="auto">
+            <Button onClick={signOut} variation="warning" marginTop="auto">
               <FaSignOutAlt className="sidebar-icon" /> <span>Sign Out</span>
             </Button>
           </Flex>
         </View>
 
-        <View padding="2rem" backgroundColor="var(--amplify-colors-background-tertiary)">
+        <View
+          padding="2rem"
+          backgroundColor="var(--amplify-colors-background-tertiary)"
+        >
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/createworkorder" element={<CreateWorkOrderForm />} />
-            <Route path="/allworkorders" element={<AllWorkOrders />} />
+            <Route path="/workorders" element={<AllWorkOrders />} />
             <Route path="/companies" element={<Companies />} />
             <Route path="/users" element={<Users />} />
           </Routes>
         </View>
 
-        <View columnSpan={{ base: 1, large: 2 }} backgroundColor="var(--amplify-colors-background-secondary)" padding="1rem">
-          <Text textAlign="center">&copy; 2023 Your Company Name. All rights reserved.</Text>
+        <View
+          columnSpan={{ base: 1, large: 2 }}
+          backgroundColor="var(--amplify-colors-background-secondary)"
+          padding="1rem"
+        >
+          <Text textAlign="center">
+            &copy; 2023 Scan and Sew. All rights reserved.
+          </Text>
         </View>
       </Grid>
     </Router>

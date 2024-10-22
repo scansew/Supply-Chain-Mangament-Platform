@@ -1,8 +1,8 @@
 import { Card, Flex, Collection } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 // import { Frame1171275590} from "./ui-components";
-
-function AllWorkOrders({}) {
+import CreateWorkOrderForm from "./CreateWorkOrderForm";
+function AllWorkOrders() {
   const items = [
     {
       title: "Milford - WO #1",
@@ -29,9 +29,10 @@ function AllWorkOrders({}) {
       badges: ["Mountain", "Verified"],
     },
   ];
-
   return (
     <div>
+      <CreateWorkOrderForm />
+
       <Flex
         direction="row"
         justifyContent="flex-start"
@@ -49,7 +50,7 @@ function AllWorkOrders({}) {
             gap="20px"
             wrap="nowrap"
           >
-            {(item, index) => <div>{item.title}</div>}
+            {(item, index) => <div key={index}>{item.title}</div>}
           </Collection>
         </Card>
 
@@ -62,7 +63,7 @@ function AllWorkOrders({}) {
             gap="20px"
             wrap="nowrap"
           >
-            {(item, index) => <div>{item.title}</div>}
+            {(item, index) => <div key={index}>{item.title}</div>}
           </Collection>
         </Card>
 
@@ -75,7 +76,7 @@ function AllWorkOrders({}) {
             gap="20px"
             wrap="nowrap"
           >
-            {(item, index) => <div>{item.title}</div>}
+            {(item, index) => <div key={index}>{item.title}</div>}
           </Collection>
         </Card>
 
@@ -89,7 +90,7 @@ function AllWorkOrders({}) {
             gap="20px"
             wrap="nowrap"
           >
-            {(item, index) => <div>{item.title}</div>}
+            {(item, index) => <div key={index}>{item.title}</div>}
           </Collection>
         </Card>
       </Flex>
