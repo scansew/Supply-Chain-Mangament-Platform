@@ -69,9 +69,13 @@ enum WorkOrderStatus {
   COMPLETED
 }
 enum WorkOrderType {
-  Cover
-  Skirts
-  Rachets
+Ratchet_Mooring
+Ratchet_Travel
+Ratchet_Winter_Storage
+Snap_or_hardware_Full
+Snap_or_hardware_separate_bow_and_cockpit
+RV_Skirt
+Boat_Seat_Covers
 }
 
 type WorkOrder @model {
