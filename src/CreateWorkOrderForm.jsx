@@ -61,6 +61,15 @@ const CreateWorkOrderForm = () => {
     customerDropShippingAddress: "",
     files: [],
   });
+  const workOrderTypes = [
+    "Ratchet_Mooring",
+    "Ratchet_Travel",
+    "Ratchet_Winter_Storage",
+    "Snap_or_hardware_Full",
+    "Snap_or_hardware_separate_bow_and_cockpit",
+    "RV_Skirt",
+    "Boat_Seat_Covers",
+  ];
 
   // useEffect(() => {
   //   // setFormState((prevState) => ({ ...prevState, files }));
@@ -365,20 +374,22 @@ const CreateWorkOrderForm = () => {
                   <Card variation="elevated" style={{ marginBottom: "20px" }}>
                     <Heading level={5}>General Details</Heading>
                     <div className="form-group">
-                      <label htmlFor="type" className="required-field">
-                        WO Type
-                      </label>
+                      <label htmlFor="type">Work Order Type</label>
                       <select
                         id="type"
-                        value={formState.companyId}
+                        value={formState.type}
                         onChange={(e) => setInput("type", e.target.value)}
                         required
                       >
-                        <option value="Cover">Cover</option>
-                        <option value="Skirts">Skirts</option>
-                        <option value="Rachets">Skirts</option>
+                        <option value="">Select Work Order Type</option>
+                        {workOrderTypes.map((type) => (
+                          <option key={type} value={type}>
+                            {type.replace(/_/g, " ")}
+                          </option>
+                        ))}
                       </select>
                     </div>
+
                     <div className="form-group">
                       <label htmlFor="details">Details</label>
                       <textarea

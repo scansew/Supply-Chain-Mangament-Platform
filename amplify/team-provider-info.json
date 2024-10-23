@@ -1,25 +1,4 @@
 {
-  "main": {
-    "awscloudformation": {
-      "AuthRoleName": "amplify-scanandsewapp-main-ecc7b-authRole",
-      "UnauthRoleArn": "arn:aws:iam::637423498269:role/amplify-scanandsewapp-main-ecc7b-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::637423498269:role/amplify-scanandsewapp-main-ecc7b-authRole",
-      "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-scanandsewapp-main-ecc7b-deployment",
-      "UnauthRoleName": "amplify-scanandsewapp-main-ecc7b-unauthRole",
-      "StackName": "amplify-scanandsewapp-main-ecc7b",
-      "StackId": "arn:aws:cloudformation:us-east-1:637423498269:stack/amplify-scanandsewapp-main-ecc7b/6cd78210-84b3-11ef-8c6f-0e64ea499a17",
-      "AmplifyAppId": "d2hlus9pns00e4"
-    },
-    "categories": {
-      "auth": {
-        "scanandsewapp": {}
-      },
-      "storage": {
-        "s3scanandsewappstorage442a3489": {}
-      }
-    }
-  },
   "dev": {
     "categories": {
       "auth": {
@@ -27,27 +6,6 @@
       }
     },
     "awscloudformation": {}
-  },
-  "staging": {
-    "awscloudformation": {
-      "AuthRoleName": "amplify-scanandsewapp-staging-71ab4-authRole",
-      "UnauthRoleArn": "arn:aws:iam::637423498269:role/amplify-scanandsewapp-staging-71ab4-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::637423498269:role/amplify-scanandsewapp-staging-71ab4-authRole",
-      "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-scanandsewapp-staging-71ab4-deployment",
-      "UnauthRoleName": "amplify-scanandsewapp-staging-71ab4-unauthRole",
-      "StackName": "amplify-scanandsewapp-staging-71ab4",
-      "StackId": "arn:aws:cloudformation:us-east-1:637423498269:stack/amplify-scanandsewapp-staging-71ab4/3b1626c0-8240-11ef-9129-0afffe1d5823",
-      "AmplifyAppId": "d2hlus9pns00e4"
-    },
-    "categories": {
-      "auth": {
-        "scanandsewapp": {}
-      },
-      "storage": {
-        "s3scanandsewappstorage442a3489": {}
-      }
-    }
   },
   "deve": {
     "awscloudformation": {
@@ -59,11 +17,50 @@
       "UnauthRoleName": "amplify-scanandsewapp-deve-f0bf1-unauthRole",
       "StackName": "amplify-scanandsewapp-deve-f0bf1",
       "StackId": "arn:aws:cloudformation:us-east-1:637423498269:stack/amplify-scanandsewapp-deve-f0bf1/36dab3c0-8d74-11ef-926c-128a2131de0f",
-      "AmplifyAppId": "d2hlus9pns00e4"
+      "AmplifyAppId": "d2hlus9pns00e4",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-scanandsewapp-deve-f0bf1-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
     },
     "categories": {
       "auth": {
         "scanandsewapp": {}
+      },
+      "api": {
+        "scanandsewapp": {}
+      },
+      "storage": {
+        "s3scanandsewappstorage442a3489": {}
+      },
+      "function": {
+        "scanandsewapp": {},
+        "scanandsewappPostConfirmation": {
+          "deploymentBucketName": "amplify-scanandsewapp-deve-f0bf1-deployment",
+          "s3Key": "amplify-builds/scanandsewappPostConfirmation-75696f4d465862585446-build.zip"
+        }
+      }
+    }
+  },
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-scanandsewapp-staging-10b4d-authRole",
+      "UnauthRoleArn": "arn:aws:iam::637423498269:role/amplify-scanandsewapp-staging-10b4d-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::637423498269:role/amplify-scanandsewapp-staging-10b4d-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-scanandsewapp-staging-10b4d-deployment",
+      "UnauthRoleName": "amplify-scanandsewapp-staging-10b4d-unauthRole",
+      "StackName": "amplify-scanandsewapp-staging-10b4d",
+      "StackId": "arn:aws:cloudformation:us-east-1:637423498269:stack/amplify-scanandsewapp-staging-10b4d/1dedd5c0-9172-11ef-bd4c-0affe24e4d95",
+      "AmplifyAppId": "d2hlus9pns00e4",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-scanandsewapp-staging-10b4d-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
+    },
+    "categories": {
+      "auth": {
+        "scanandsewapp": {}
+      },
+      "function": {
+        "scanandsewappPostConfirmation": {
+          "deploymentBucketName": "amplify-scanandsewapp-staging-10b4d-deployment",
+          "s3Key": "amplify-builds/scanandsewappPostConfirmation-6f4269524f424f54454c-build.zip"
+        }
       },
       "api": {
         "scanandsewapp": {}
