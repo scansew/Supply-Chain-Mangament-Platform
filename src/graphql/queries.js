@@ -1,6 +1,42 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getUserByUsername = /* GraphQL */ `
+  query GetUserByUsername($username: String!) {
+    getUserByUsername(username: $username) {
+      id
+      username
+      email
+      family_name
+      given_name
+      passwordHash
+      createdAt
+      updatedAt
+      roles {
+        nextToken
+        __typename
+      }
+      workOrdersCreated {
+        nextToken
+        __typename
+      }
+      workOrdersAssigned {
+        nextToken
+        __typename
+      }
+      filesUploaded {
+        nextToken
+        __typename
+      }
+      auditLogs {
+        nextToken
+        __typename
+      }
+      companyId
+      __typename
+    }
+  }
+`;
 export const getCompany = /* GraphQL */ `
   query GetCompany($id: ID!) {
     getCompany(id: $id) {
@@ -69,6 +105,8 @@ export const getUser = /* GraphQL */ `
       id
       username
       email
+      family_name
+      given_name
       passwordHash
       createdAt
       updatedAt
@@ -116,6 +154,8 @@ export const listUsers = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -188,6 +228,8 @@ export const getUserRole = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -340,6 +382,8 @@ export const getWorkOrder = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -350,6 +394,8 @@ export const getWorkOrder = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -378,6 +424,8 @@ export const getWorkOrder = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -514,6 +562,8 @@ export const getFile = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -566,6 +616,8 @@ export const getAuditLog = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -1228,6 +1280,8 @@ export const usersByUsernameAndId = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -1260,6 +1314,8 @@ export const usersByEmailAndId = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -1290,6 +1346,8 @@ export const usersByCompanyId = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt

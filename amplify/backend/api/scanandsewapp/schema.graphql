@@ -22,6 +22,8 @@ type User @model {
   id: ID! @primaryKey
   username: String! @index(name: "byUsername", sortKeyFields: ["id"])
   email: String! @index(name: "byEmail", sortKeyFields: ["id"])
+  family_name: String
+  given_name: String
   passwordHash: String
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
@@ -68,6 +70,8 @@ enum WorkOrderStatus {
   IN_PROGRESS
   COMPLETED
 }
+
+
 enum WorkOrderType {
 Ratchet_Mooring
 Ratchet_Travel
@@ -255,4 +259,7 @@ type WorkOrderCounter @model {
 
 type Mutation {
   incrementCounter(counterName: String!): Int!
+}
+type Query {
+  getUserByUsername(username: String!): User
 }

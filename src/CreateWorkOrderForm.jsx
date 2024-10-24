@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
+
 import { generateClient } from "aws-amplify/api";
 import { createWorkOrder } from "./graphql/mutations";
-import { listUsers, listCompanies } from "./graphql/queries";
+import { listUsers, listCompanies, getUserByUsername } from "./graphql/queries";
 import { incrementCounter } from "./graphql/mutations";
-import "./WOForm.css";
-import FileUploader3 from "./FileUploader3";
 import { list, remove, getUrl } from "aws-amplify/storage";
+import { fetchAuthSession } from "@aws-amplify/auth";
+
+import FileUploader3 from "./FileUploader3";
+import DB from "./DB";
+
+import "./WOForm.css";
 import {
   MdRefresh,
   MdInsertDriveFile,
@@ -17,9 +22,7 @@ import {
   MdDeleteSweep,
 } from "react-icons/md";
 import { Card, Heading } from "@aws-amplify/ui-react";
-
 import styles from "./WOForm.module.css";
-
 import {
   View,
   Button,
@@ -30,7 +33,7 @@ import {
   TableRow,
 } from "@aws-amplify/ui-react";
 
-const CreateWorkOrderForm = () => {
+const CreateWorkOrderForm = ({ SSuser }) => {
   const client = generateClient();
 
   const [showForm, setShowForm] = useState(false);
@@ -71,9 +74,10 @@ const CreateWorkOrderForm = () => {
     "Boat_Seat_Covers",
   ];
 
-  // useEffect(() => {
-  //   // setFormState((prevState) => ({ ...prevState, files }));
-  // }, []);
+  useEffect(() => {
+    // fetchUser();
+    console.log("SSuser is", SSuser);
+  }, []);
 
   const handleUploadSuccess = async (fileKeys) => {
     console.log("Files synced successfully:", fileKeys);
@@ -86,9 +90,14 @@ const CreateWorkOrderForm = () => {
     setIsLoading(true);
     setError(null);
     try {
+      const key = `companies/${SSuser.companyId}/${formState.woNumber}`;
+
       const fetchedFiles = await list({
-        path: "public/",
-        options: { listAll: true },
+        path: key,
+        options: {
+          accessLevel: "public",
+          listAll: true,
+        },
       });
       setFiles(fetchedFiles.items);
       setFormState((prevState) => ({ ...prevState, files }));
@@ -147,7 +156,7 @@ const CreateWorkOrderForm = () => {
     }
   }
 
-  const toggleForm = (event) => {
+  const toggleForm = async (event) => {
     if (event && event.target.className === "work-order-form-wrapper") {
       setFormState({
         woNumber: "",
@@ -172,10 +181,10 @@ const CreateWorkOrderForm = () => {
       setShowForm(false);
     } else {
       if (showForm === false) {
-        generateWorkOrderNumber();
-        fetchUsers();
-        fetchCompanies();
-        fetchS3Files();
+        await generateWorkOrderNumber();
+        // fetchUsers();
+        await fetchCompanies();
+        await fetchS3Files();
       }
       setShowForm(!showForm);
     }
@@ -289,6 +298,7 @@ const CreateWorkOrderForm = () => {
 
   return (
     <div className="work-order-container">
+      {/* <DB /> */}
       <Button
         onClick={() => toggleForm()}
         variation="primary"
@@ -301,7 +311,7 @@ const CreateWorkOrderForm = () => {
         <div className="work-order-form-wrapper" onClick={toggleForm}>
           <div className="work-order-form" onClick={(e) => e.stopPropagation()}>
             <div className="form-header">
-              <h2>Create New Work Order {formState.woNumber}</h2>
+              <h2>Create Work Order {formState.woNumber}</h2>
               <Button onClick={() => toggleForm()} className="close-button">
                 &times;
               </Button>
@@ -565,7 +575,11 @@ const CreateWorkOrderForm = () => {
 
                 <div className="work-order-form-right">
                   <div className="form-group">
-                    <FileUploader3 onUploadSuccess={handleUploadSuccess} />
+                    <FileUploader3
+                      onUploadSuccess={handleUploadSuccess}
+                      workorderNumber={formState.woNumber}
+                      SSuser={SSuser}
+                    />
 
                     <Card variation="elevated" style={{ marginTop: "20px" }}>
                       <div className={styles.header}>

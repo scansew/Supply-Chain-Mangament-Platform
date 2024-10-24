@@ -24,6 +24,8 @@ export declare type ValidationFunction<T> = (value: T, validationResponse: Valid
 export declare type UserCreateFormInputValues = {
     username?: string;
     email?: string;
+    family_name?: string;
+    given_name?: string;
     passwordHash?: string;
     createdAt?: string;
     updatedAt?: string;
@@ -31,6 +33,8 @@ export declare type UserCreateFormInputValues = {
 export declare type UserCreateFormValidationValues = {
     username?: ValidationFunction<string>;
     email?: ValidationFunction<string>;
+    family_name?: ValidationFunction<string>;
+    given_name?: ValidationFunction<string>;
     passwordHash?: ValidationFunction<string>;
     createdAt?: ValidationFunction<string>;
     updatedAt?: ValidationFunction<string>;
@@ -40,6 +44,8 @@ export declare type UserCreateFormOverridesProps = {
     UserCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
     username?: PrimitiveOverrideProps<TextFieldProps>;
     email?: PrimitiveOverrideProps<TextFieldProps>;
+    family_name?: PrimitiveOverrideProps<TextFieldProps>;
+    given_name?: PrimitiveOverrideProps<TextFieldProps>;
     passwordHash?: PrimitiveOverrideProps<TextFieldProps>;
     createdAt?: PrimitiveOverrideProps<TextFieldProps>;
     updatedAt?: PrimitiveOverrideProps<TextFieldProps>;

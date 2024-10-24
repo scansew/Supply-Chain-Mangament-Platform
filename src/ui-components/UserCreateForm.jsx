@@ -25,12 +25,18 @@ export default function UserCreateForm(props) {
   const initialValues = {
     username: "",
     email: "",
+    family_name: "",
+    given_name: "",
     passwordHash: "",
     createdAt: "",
     updatedAt: "",
   };
   const [username, setUsername] = React.useState(initialValues.username);
   const [email, setEmail] = React.useState(initialValues.email);
+  const [family_name, setFamily_name] = React.useState(
+    initialValues.family_name
+  );
+  const [given_name, setGiven_name] = React.useState(initialValues.given_name);
   const [passwordHash, setPasswordHash] = React.useState(
     initialValues.passwordHash
   );
@@ -40,6 +46,8 @@ export default function UserCreateForm(props) {
   const resetStateValues = () => {
     setUsername(initialValues.username);
     setEmail(initialValues.email);
+    setFamily_name(initialValues.family_name);
+    setGiven_name(initialValues.given_name);
     setPasswordHash(initialValues.passwordHash);
     setCreatedAt(initialValues.createdAt);
     setUpdatedAt(initialValues.updatedAt);
@@ -48,6 +56,8 @@ export default function UserCreateForm(props) {
   const validations = {
     username: [{ type: "Required" }],
     email: [{ type: "Required" }],
+    family_name: [],
+    given_name: [],
     passwordHash: [],
     createdAt: [],
     updatedAt: [],
@@ -97,6 +107,8 @@ export default function UserCreateForm(props) {
         let modelFields = {
           username,
           email,
+          family_name,
+          given_name,
           passwordHash,
           createdAt,
           updatedAt,
@@ -164,6 +176,8 @@ export default function UserCreateForm(props) {
             const modelFields = {
               username: value,
               email,
+              family_name,
+              given_name,
               passwordHash,
               createdAt,
               updatedAt,
@@ -192,6 +206,8 @@ export default function UserCreateForm(props) {
             const modelFields = {
               username,
               email: value,
+              family_name,
+              given_name,
               passwordHash,
               createdAt,
               updatedAt,
@@ -210,6 +226,66 @@ export default function UserCreateForm(props) {
         {...getOverrideProps(overrides, "email")}
       ></TextField>
       <TextField
+        label="Family name"
+        isRequired={false}
+        isReadOnly={false}
+        value={family_name}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              username,
+              email,
+              family_name: value,
+              given_name,
+              passwordHash,
+              createdAt,
+              updatedAt,
+            };
+            const result = onChange(modelFields);
+            value = result?.family_name ?? value;
+          }
+          if (errors.family_name?.hasError) {
+            runValidationTasks("family_name", value);
+          }
+          setFamily_name(value);
+        }}
+        onBlur={() => runValidationTasks("family_name", family_name)}
+        errorMessage={errors.family_name?.errorMessage}
+        hasError={errors.family_name?.hasError}
+        {...getOverrideProps(overrides, "family_name")}
+      ></TextField>
+      <TextField
+        label="Given name"
+        isRequired={false}
+        isReadOnly={false}
+        value={given_name}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              username,
+              email,
+              family_name,
+              given_name: value,
+              passwordHash,
+              createdAt,
+              updatedAt,
+            };
+            const result = onChange(modelFields);
+            value = result?.given_name ?? value;
+          }
+          if (errors.given_name?.hasError) {
+            runValidationTasks("given_name", value);
+          }
+          setGiven_name(value);
+        }}
+        onBlur={() => runValidationTasks("given_name", given_name)}
+        errorMessage={errors.given_name?.errorMessage}
+        hasError={errors.given_name?.hasError}
+        {...getOverrideProps(overrides, "given_name")}
+      ></TextField>
+      <TextField
         label="Password hash"
         isRequired={false}
         isReadOnly={false}
@@ -220,6 +296,8 @@ export default function UserCreateForm(props) {
             const modelFields = {
               username,
               email,
+              family_name,
+              given_name,
               passwordHash: value,
               createdAt,
               updatedAt,
@@ -250,6 +328,8 @@ export default function UserCreateForm(props) {
             const modelFields = {
               username,
               email,
+              family_name,
+              given_name,
               passwordHash,
               createdAt: value,
               updatedAt,
@@ -280,6 +360,8 @@ export default function UserCreateForm(props) {
             const modelFields = {
               username,
               email,
+              family_name,
+              given_name,
               passwordHash,
               createdAt,
               updatedAt: value,
