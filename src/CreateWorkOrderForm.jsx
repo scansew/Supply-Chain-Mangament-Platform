@@ -5,7 +5,6 @@ import { createWorkOrder } from "./graphql/mutations";
 import { listUsers, listCompanies, getUserByUsername } from "./graphql/queries";
 import { incrementCounter } from "./graphql/mutations";
 import { list, remove, getUrl } from "aws-amplify/storage";
-import { fetchAuthSession } from "@aws-amplify/auth";
 
 import FileUploader3 from "./FileUploader3";
 import DB from "./DB";
@@ -33,6 +32,7 @@ import {
   TableRow,
 } from "@aws-amplify/ui-react";
 
+import { fetchAuthSession } from "@aws-amplify/auth";
 const CreateWorkOrderForm = ({ SSuser }) => {
   const client = generateClient();
 
@@ -49,6 +49,7 @@ const CreateWorkOrderForm = ({ SSuser }) => {
     createdById: "",
     assignedToId: "",
     companyId: "",
+    CNCId: "",
     status: "PENDING",
     type: "",
     details: "",
@@ -90,19 +91,26 @@ const CreateWorkOrderForm = ({ SSuser }) => {
     setIsLoading(true);
     setError(null);
     try {
-      const key = `companies/${SSuser.companyId}/${formState.woNumber}`;
+      // Fetch auth session
+      const session = await fetchAuthSession();
+
+      // Extract Identity Pool ID and Identity ID
+      const identityPoolId = session.identityPoolId;
+      const identityId = session.identityId;
+      console.log("Identity Pool ID:", identityId);
+      const key = `private/${identityId}/companies/${SSuser.companyId}/${formState.woNumber}`;
 
       const fetchedFiles = await list({
         path: key,
         options: {
-          accessLevel: "public",
+          accessLevel: "private",
           listAll: true,
         },
       });
       setFiles(fetchedFiles.items);
       setFormState((prevState) => ({ ...prevState, files }));
       setDisplayedFiles(fetchedFiles.items);
-      // console.log("Updating table", fetchedFiles.items);
+      console.log("Updating table", fetchedFiles.items);
     } catch (error) {
       console.error("Error fetching files:", error);
       setError("Failed to fetch files. Please try again later.");
@@ -159,10 +167,11 @@ const CreateWorkOrderForm = ({ SSuser }) => {
   const toggleForm = async (event) => {
     if (event && event.target.className === "work-order-form-wrapper") {
       setFormState({
-        woNumber: "",
+        woNumber: "N/A",
         createdById: "",
         assignedToId: "",
         companyId: "",
+        CNCId: "",
         status: "PENDING",
         type: "",
         details: "",
@@ -181,7 +190,14 @@ const CreateWorkOrderForm = ({ SSuser }) => {
       setShowForm(false);
     } else {
       if (showForm === false) {
-        await generateWorkOrderNumber();
+        const newWorkOrderNumber = await generateWorkOrderNumber();
+        setFormState((prevState) => ({
+          ...prevState,
+          woNumber: newWorkOrderNumber,
+          createdById: SSuser.id,
+          assignedToId: SSuser.id,
+          companyId: SSuser.companyId,
+        }));
         // fetchUsers();
         await fetchCompanies();
         await fetchS3Files();
@@ -222,11 +238,9 @@ const CreateWorkOrderForm = ({ SSuser }) => {
       });
 
       const newWorkOrderNumber = result.data.incrementCounter;
-      setFormState((prevState) => ({
-        ...prevState,
-        woNumber: newWorkOrderNumber,
-      }));
+
       console.log("New work order number:", newWorkOrderNumber);
+      return newWorkOrderNumber;
     } catch (error) {
       console.error("Error generating work order number:", error);
       throw error;
@@ -294,6 +308,9 @@ const CreateWorkOrderForm = ({ SSuser }) => {
   }
   const toggleFileList = () => {
     setShowFiles(!showFiles);
+  };
+  const getFileName = (fullPath) => {
+    return fullPath.split("/").pop();
   };
 
   return (
@@ -631,7 +648,7 @@ const CreateWorkOrderForm = ({ SSuser }) => {
                                   className={styles.fileIcon}
                                 />
                                 <span className={styles.fileName}>
-                                  {file.path}
+                                  {getFileName(file.path)}
                                 </span>
                                 <div className={styles.fileActions}>
                                   <Button

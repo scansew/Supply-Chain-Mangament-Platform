@@ -63,7 +63,7 @@ function App({ signOut, user }) {
         variables: { username: user.username },
       });
 
-      console.log("User data1:", userData.data.getUserByUsername.username);
+      console.log("User data1:", userData.data.getUserByUsername);
       // setUser(userData.data.getUserByUsername);
       return userData.data.getUserByUsername;
     } catch (err) {
@@ -101,7 +101,7 @@ function App({ signOut, user }) {
         >
           <Flex direction="column" height="100%">
             <Text variation="primary" fontWeight="bold" marginBottom="1rem">
-              Welcome, {SSuser.email}
+              Welcome, {SSuser.given_name}
             </Text>
             <NavLink
               to="/"

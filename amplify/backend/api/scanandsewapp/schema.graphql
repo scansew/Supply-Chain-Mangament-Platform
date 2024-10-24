@@ -84,7 +84,7 @@ Boat_Seat_Covers
 
 type WorkOrder @model {
   id: ID! @primaryKey
-  woNumber: Int
+  woNumber: Int!
   createdById: ID! @index(name: "byCreator")
   assignedToId: ID! @index(name: "byAssignee")
   companyId: ID! @index(name: "byCompany")

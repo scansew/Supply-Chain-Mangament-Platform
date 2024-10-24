@@ -99,9 +99,9 @@ const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser }) => {
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*", // Be cautious with this in production
               },
-              customPrefix: {
-                public: "",
-              },
+              // customPrefix: {
+              //   public: "",
+              // },
               headers: {
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*", // Be cautious with this in production
