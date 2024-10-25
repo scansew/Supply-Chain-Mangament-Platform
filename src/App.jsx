@@ -63,7 +63,7 @@ function App({ signOut, user }) {
         variables: { username: user.username },
       });
 
-      console.log("User data1:", userData.data.getUserByUsername);
+      // console.log("User data1:", userData.data.getUserByUsername);
       // setUser(userData.data.getUserByUsername);
       return userData.data.getUserByUsername;
     } catch (err) {
@@ -86,8 +86,9 @@ function App({ signOut, user }) {
             justifyContent="space-between"
             alignItems="center"
             padding="1rem"
+            height="60px"
           >
-            <Image src={logo} alt="Company Logo" width="150px" />
+            <Image src={logo} alt="Company Logo" />
             <Button className="menu-toggle" onClick={toggleSidebar}>
               <FaBars />
             </Button>

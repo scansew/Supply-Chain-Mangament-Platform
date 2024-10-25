@@ -53,7 +53,6 @@ const CreateWorkOrderForm = ({ SSuser }) => {
     status: "PENDING",
     type: "",
     details: "",
-    process: "",
     make: "",
     model: "",
     year: "",
@@ -63,7 +62,6 @@ const CreateWorkOrderForm = ({ SSuser }) => {
     businessShippingAddress: "",
     customerName: "",
     customerDropShippingAddress: "",
-    files: [],
   });
   const workOrderTypes = [
     "Ratchet_Mooring",
@@ -83,7 +81,7 @@ const CreateWorkOrderForm = ({ SSuser }) => {
   const handleUploadSuccess = async (fileKeys) => {
     console.log("Files synced successfully:", fileKeys);
     await fetchS3Files();
-    setFormState((prevState) => ({ ...prevState, files }));
+    // setFormState((prevState) => ({ ...prevState, files }));
   };
 
   const fetchS3Files = async () => {
@@ -108,7 +106,7 @@ const CreateWorkOrderForm = ({ SSuser }) => {
         },
       });
       setFiles(fetchedFiles.items);
-      setFormState((prevState) => ({ ...prevState, files }));
+      // setFormState((prevState) => ({ ...prevState, files }));
       setDisplayedFiles(fetchedFiles.items);
       console.log("Updating table", fetchedFiles.items);
     } catch (error) {
@@ -175,7 +173,6 @@ const CreateWorkOrderForm = ({ SSuser }) => {
         status: "PENDING",
         type: "",
         details: "",
-        process: "",
         make: "",
         model: "",
         year: "",
@@ -185,7 +182,7 @@ const CreateWorkOrderForm = ({ SSuser }) => {
         businessShippingAddress: "",
         customerName: "",
         customerDropShippingAddress: "",
-        files: [],
+        // files: [],
       });
       setShowForm(false);
     } else {
@@ -254,25 +251,44 @@ const CreateWorkOrderForm = ({ SSuser }) => {
   async function handleSubmit(event) {
     event.preventDefault();
     try {
+      console.log("Form state:", formState);
       if (
         !formState.createdById ||
         !formState.assignedToId ||
         !formState.companyId ||
-        !formState.type ||
-        !formState.process
+        !formState.type
       ) {
         alert("Please fill in all required fields.");
         return;
       }
 
-      const woNumber = await generateWorkOrderNumber();
-      const workOrder = {
-        ...formState,
-        woNumber,
-        files: formState.files.map((file) => file.path),
-      };
+      // const woNumber = await generateWorkOrderNumber();
+      // const workOrder = {
+      //   ...formState,
+      //   type: Ratchet_Mooring,
+      // };
+      // const workOrder = {
+      //   "woNumber": 11213,
+      //   "createdById": "12422d4d-4815-499d-a5b2-485b11dd258e",
+      //   "assignedToId": "12422d4d-4815-499d-a5b2-485b11dd258e",
+      //   "companyId": "d110eb20-66b6-47d9-87e7-cf75a0e8b0a4",
+      //   "CNCId": "ed372b29-0a0b-47b6-a170-5f2f2253ec73",
+      //   "status": "PENDING",
+      //   "type": "Ratchet_Mooring",
+      //   "details": "xyz",
+      //   "process": "",
+      //   "make": "123",
+      //   "model": "123",
+      //   "year": 2024,
+      //   "businessName": "123",
+      //   "attnName": "123",
+      //   "businessPhone": "08792975919",
+      //   "businessShippingAddress": "123",
+      //   "customerName": "Shreyas Jagannath",
+      //   "customerDropShippingAddress": "Battersea court west\nUniversity campus\nGuildford",
+      //   }
       const input = {
-        input: workOrder,
+        input: formState,
       };
       await client.graphql({
         query: createWorkOrder,
@@ -287,7 +303,6 @@ const CreateWorkOrderForm = ({ SSuser }) => {
         status: "PENDING",
         type: "",
         details: "",
-        process: "",
         make: "",
         model: "",
         year: "",
@@ -297,7 +312,6 @@ const CreateWorkOrderForm = ({ SSuser }) => {
         businessShippingAddress: "",
         customerName: "",
         customerDropShippingAddress: "",
-        files: [],
       });
       setShowForm(false);
       alert("Work order created successfully!");
@@ -336,68 +350,6 @@ const CreateWorkOrderForm = ({ SSuser }) => {
             <form onSubmit={handleSubmit}>
               <div className="work-order-form-columns">
                 <div className="work-order-form-left">
-                  {/*
-              <div className="form-group">
-                 <label htmlFor="createdById">Created By</label>
-                <select
-                  id="createdById"
-                  value={formState.createdById}
-                  onChange={(e) => setInput("createdById", e.target.value)}
-                  required
-                >
-                  <option value="">Select Creator</option>
-                  {users.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.username}
-                    </option>
-                  ))}
-                </select>
-              </div> */}
-                  {/* <div className="form-group">
-                <label htmlFor="assignedToId">Assigned To</label>
-                <select
-                  id="assignedToId"
-                  value={formState.assignedToId}
-                  onChange={(e) => setInput("assignedToId", e.target.value)}
-                  required
-                >
-                  <option value="">Select Assignee</option>
-                  {users.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.username}
-                    </option>
-                  ))}
-                </select>
-              </div> */}
-                  {/* <div className="form-group">
-                <label htmlFor="companyId">Company</label>
-                <select
-                  id="companyId"
-                  value={formState.companyId}
-                  onChange={(e) => setInput("companyId", e.target.value)}
-                  required
-                >
-                  <option value="">Select Company</option>
-                  {companies.map((company) => (
-                    <option key={company.id} value={company.id}>
-                      {company.name}
-                    </option>
-                  ))}
-                </select>
-              </div> */}
-                  {/* <div className="form-group">
-                <label htmlFor="status">Status</label>
-                <select
-                  id="status"
-                  value={formState.status}
-                  onChange={(e) => setInput("status", e.target.value)}
-                  required
-                >
-                  <option value="PENDING">Pending</option>
-                  <option value="IN_PROGRESS">In Progress</option>
-                  <option value="COMPLETED">Completed</option>
-                </select>
-              </div> */}
                   <Card variation="elevated" style={{ marginBottom: "20px" }}>
                     <Heading level={5}>General Details</Heading>
                     <div className="form-group">
