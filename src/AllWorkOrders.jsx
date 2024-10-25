@@ -28,7 +28,7 @@ function AllWorkOrders({ SSuser }) {
   const [workOrders, setWorkOrders] = useState([]);
   const { tokens } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedWorkOrderId, setSelectedWorkOrderId] = useState(null);
+  const [selectedWorkOrder, setSelectedWorkOrder] = useState(null);
 
   useEffect(() => {
     fetchWorkOrders();
@@ -98,15 +98,15 @@ function AllWorkOrders({ SSuser }) {
       (workOrder) => workOrder.status === "COMPLETED"
     ),
   };
-  const handleViewDetails = (workOrderId) => {
-    console.log("Viewing details for work order ID:", workOrderId);
-    setSelectedWorkOrderId(workOrderId);
+  const handleViewDetails = (workOrder) => {
+    console.log("Viewing details for work order ID:", workOrder);
+    setSelectedWorkOrder(workOrder);
     setIsModalOpen(true);
   };
 
   return (
     <View width="100%">
-      <CreateWorkOrderForm SSuser={SSuser} />
+      <CreateWorkOrderForm SSuser={SSuser} button="create" />
 
       <Flex direction="row" width="100%">
         {Object.entries(groupedWorkOrders).map(([status, items]) => (
@@ -229,13 +229,7 @@ function AllWorkOrders({ SSuser }) {
                         <Button
                           variation="info"
                           size="small"
-                          onClick={() => handleViewDetails(item.id)}
-                          // onClick={(clickedItem) => {
-                          //   // Handle the click event, e.g., navigate to details page
-                          //   <ViewEditWorkOrder workOrderId={item.woNumber} />;
-
-                          //   console.log("Clicked item:", clickedItem);
-                          // }}
+                          onClick={() => handleViewDetails(item)}
                           marginTop={tokens.space.xs}
                         >
                           View Details
@@ -283,7 +277,7 @@ function AllWorkOrders({ SSuser }) {
                 Close
               </Button>
             </Flex>
-            <ViewEditWorkOrder workOrderId={selectedWorkOrderId} />
+            <ViewEditWorkOrder workOrderItem={selectedWorkOrder} SSuser={SSuser} />
           </Flex>
         </View>
       )}

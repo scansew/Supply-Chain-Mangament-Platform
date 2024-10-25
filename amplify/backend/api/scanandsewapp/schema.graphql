@@ -86,11 +86,11 @@ type WorkOrder @model {
   id: ID! @primaryKey
   woNumber: Int!
   createdById: ID! @index(name: "byCreator")
-  assignedToId: ID! @index(name: "byAssignee")
-  companyId: ID! @index(name: "byCompany")
-  CNCId: ID! @index(name: "byCNC")
-  status: WorkOrderStatus!
-  type: WorkOrderType!
+  assignedToId: ID @index(name: "byAssignee")
+  companyId: ID @index(name: "byCompany")
+  CNCId: ID @index(name: "byCNC")
+  status: WorkOrderStatus
+  type: WorkOrderType
   details: String
   materialSelection: AWSJSON
   estimatedPrice: Float
