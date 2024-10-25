@@ -283,26 +283,10 @@ const CreateWorkOrderForm = ({
   function setInput(key, value) {
     setFormState({ ...formState, [key]: value });
   }
-  function cleanInput(obj) {
-    const fieldsToRemove = [
-      "id",
-      "woNumber",
-      "createdById",
-      "createdAt",
-      "updatedAt",
-      "__typename",
-    ];
-    return Object.fromEntries(
-      Object.entries(obj).filter(
-        ([key, value]) => value != null && !fieldsToRemove.includes(key)
-      )
-    );
-  }
 
   async function handleSubmit(event) {
     event.preventDefault();
     try {
-      console.log("Form state updated:", cleanInput(formState));
       // if (
       //   !formState.createdById ||
       //   !formState.assignedToId ||
@@ -331,7 +315,7 @@ const CreateWorkOrderForm = ({
         createdById: "",
         assignedToId: "",
         companyId: "",
-        status: "PENDING",
+        status: "",
         type: "",
         details: "",
         make: "",
