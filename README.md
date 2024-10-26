@@ -14,6 +14,8 @@
 
 ### Add work order counter resolver
 
+##Update username resolver on appsync 
+
 #### Request
 
 {
