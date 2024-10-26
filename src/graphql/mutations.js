@@ -123,6 +123,8 @@ export const createUser = /* GraphQL */ `
       id
       username
       email
+      family_name
+      given_name
       passwordHash
       createdAt
       updatedAt
@@ -160,6 +162,8 @@ export const updateUser = /* GraphQL */ `
       id
       username
       email
+      family_name
+      given_name
       passwordHash
       createdAt
       updatedAt
@@ -197,6 +201,8 @@ export const deleteUser = /* GraphQL */ `
       id
       username
       email
+      family_name
+      given_name
       passwordHash
       createdAt
       updatedAt
@@ -310,6 +316,8 @@ export const createUserRole = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -353,6 +361,8 @@ export const updateUserRole = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -396,6 +406,8 @@ export const deleteUserRole = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -544,6 +556,8 @@ export const createWorkOrder = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -554,6 +568,8 @@ export const createWorkOrder = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -582,6 +598,8 @@ export const createWorkOrder = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -649,6 +667,8 @@ export const updateWorkOrder = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -659,6 +679,8 @@ export const updateWorkOrder = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -687,6 +709,8 @@ export const updateWorkOrder = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -754,6 +778,8 @@ export const deleteWorkOrder = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -764,6 +790,8 @@ export const deleteWorkOrder = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -792,6 +820,8 @@ export const deleteWorkOrder = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -869,6 +899,8 @@ export const createFile = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -938,6 +970,8 @@ export const updateFile = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -1007,6 +1041,8 @@ export const deleteFile = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -1032,6 +1068,8 @@ export const createAuditLog = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -1058,6 +1096,8 @@ export const updateAuditLog = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt
@@ -1084,6 +1124,8 @@ export const deleteAuditLog = /* GraphQL */ `
         id
         username
         email
+        family_name
+        given_name
         passwordHash
         createdAt
         updatedAt

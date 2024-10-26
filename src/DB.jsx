@@ -2,20 +2,26 @@ import { useEffect } from "react";
 import "@aws-amplify/ui-react/styles.css";
 import { generateClient } from "aws-amplify/api";
 import { listCompanies } from "./graphql/queries";
-import { createCompany,createUser,createWorkOrder, createWorkOrderCounter,incrementCounter } from './graphql/mutations';
+import {
+  createCompany,
+  createUser,
+  createWorkOrder,
+  createWorkOrderCounter,
+  incrementCounter,
+} from "./graphql/mutations";
+import { Card } from "@aws-amplify/ui-react";
 
 function DB({}) {
-  
   const client = generateClient();
   useEffect(() => {
     // generateWorkOrderNumber();
-    // createNewCompany();
-    fetchCompanies();
+    createNewCompany();
+    // fetchCompanies();
     // createNewWOCounter();
     // createNewWorkOrder();
     // fetchWorkOrders();
 
-    // createNewUser();
+    createNewUser();
     // fetchUsers();
   }, []);
 
@@ -75,14 +81,14 @@ function DB({}) {
     try {
       const result = await client.graphql({
         query: incrementCounter,
-        variables: { counterName: "workOrderNumber" }
+        variables: { counterName: "workOrderNumber" },
       });
-      
+
       const newWorkOrderNumber = result.data.incrementCounter;
-      console.log('New work order number:', newWorkOrderNumber);
+      console.log("New work order number:", newWorkOrderNumber);
       return newWorkOrderNumber;
     } catch (error) {
-      console.error('Error generating work order number:', error);
+      console.error("Error generating work order number:", error);
       throw error;
     }
   }
@@ -99,18 +105,18 @@ function DB({}) {
         process: "true",
         // Add other fields as per your schema
       };
-  
+
       const input = {
         input: workOrderDetails,
         // Add condition if needed
         // condition: { /* ... */ }
       };
-  
+
       const newWorkOrder = await client.graphql({
         query: createWorkOrder,
         variables: input,
       });
-  
+
       console.log("New work order created:", newWorkOrder.data.createWorkOrder);
       return newWorkOrder.data.createWorkOrder;
     } catch (error) {
@@ -126,18 +132,18 @@ function DB({}) {
         email: "john.doe@example.com",
         passwordHash: "John",
       };
-  
+
       const input = {
         input: userDetails,
         // Add condition if needed
         // condition: { /* ... */ }
       };
-  
+
       const newUser = await client.graphql({
         query: createUser,
         variables: input,
       });
-  
+
       console.log("New user created:", newUser.data.createUser);
       return newUser.data.createUser;
     } catch (error) {
@@ -148,8 +154,13 @@ function DB({}) {
 
   return (
     <>
-      {fetchCompanies} 
-
+      <Card>
+        {" "}
+        {fetchCompanies}
+        {createNewCompany}
+        {createNewUser}
+      </Card>
+      Done
     </>
   );
 }

@@ -1,5 +1,5 @@
-const { request, gql } = require('graphql-request');
-const https = require('https');
+const { request, gql } = require("graphql-request");
+const https = require("https");
 
 const graphqlEndpoint = process.env.API_SCANANDSEWAPP_GRAPHQLAPIENDPOINTOUTPUT;
 const apiKey = process.env.API_SCANANDSEWAPP_GRAPHQLAPIKEYOUTPUT;
@@ -7,18 +7,20 @@ const apiKey = process.env.API_SCANANDSEWAPP_GRAPHQLAPIKEYOUTPUT;
 const customFetch = (url, options) => {
   return new Promise((resolve, reject) => {
     const req = https.request(url, options, (res) => {
-      let data = '';
-      res.on('data', (chunk) => data += chunk);
-      res.on('end', () => resolve({ status: res.statusCode, text: () => Promise.resolve(data) }));
+      let data = "";
+      res.on("data", (chunk) => (data += chunk));
+      res.on("end", () =>
+        resolve({ status: res.statusCode, text: () => Promise.resolve(data) })
+      );
     });
-    req.on('error', reject);
+    req.on("error", reject);
     if (options.body) req.write(options.body);
     req.end();
   });
 };
 
 exports.handler = async (event, context) => {
-  console.log('Received event:', JSON.stringify(event, null, 2));
+  console.log("Received event:", JSON.stringify(event, null, 2));
 
   const createUserMutation = gql`
     mutation CreateUser($input: CreateUserInput!) {
@@ -26,6 +28,8 @@ exports.handler = async (event, context) => {
         id
         username
         email
+        family_name
+        given_name
       }
     }
   `;
@@ -34,7 +38,9 @@ exports.handler = async (event, context) => {
     input: {
       username: event.userName,
       email: event.request.userAttributes.email,
-    }
+      family_name: event.request.userAttributes.family_name,
+      given_name: event.request.userAttributes.given_name,
+    },
   };
 
   try {
@@ -43,15 +49,14 @@ exports.handler = async (event, context) => {
       document: createUserMutation,
       variables: variables,
       requestHeaders: {
-        'x-api-key': apiKey,
+        "x-api-key": apiKey,
       },
-      fetch: customFetch
+      fetch: customFetch,
     });
 
-    console.log('Successfully created user in AppSync:', result);
     return event;
   } catch (error) {
-    console.error('Error creating user in AppSync:', error);
+    console.error("Error creating user in AppSync:", error);
     throw error;
   }
 };

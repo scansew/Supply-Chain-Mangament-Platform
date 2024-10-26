@@ -11,9 +11,8 @@ import {
 } from "@aws-amplify/ui-react";
 import { uploadData } from "aws-amplify/storage";
 import { MdCloudUpload, MdCheckCircle, MdError } from "react-icons/md";
-import { filesByUploadedById } from "./graphql/queries";
 
-const FileUploader3 = ({ onUploadSuccess }) => {
+const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser }) => {
   const [files, setFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState({});
   const [uploading, setUploading] = useState(false);
@@ -22,6 +21,10 @@ const FileUploader3 = ({ onUploadSuccess }) => {
   const [allUploadsComplete, setAllUploadsComplete] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    console.log("Work Order Number is", workorderNumber);
+  }, []);
 
   const handleProgress = useCallback((fileName, progress) => {
     const percent = (progress.transferredBytes / progress.totalBytes) * 100;
@@ -80,13 +83,15 @@ const FileUploader3 = ({ onUploadSuccess }) => {
     (file) => {
       return new Promise(async (resolve, reject) => {
         try {
-          const key = `${Date.now()}_${file.name}`;
+          const key = `companies/${
+            SSuser.companyId
+          }/${workorderNumber}/${Date.now()}_${file.name}`;
 
           const upload = uploadData({
             key: key,
             data: file,
             options: {
-              accessLevel: "public",
+              accessLevel: "private",
               contentType: file.type,
               useAccelerateEndpoint: true, // Enable transfer acceleration
               onProgress: (progress) => handleProgress(file.name, progress),
@@ -94,9 +99,9 @@ const FileUploader3 = ({ onUploadSuccess }) => {
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*", // Be cautious with this in production
               },
-              customPrefix: {
-                public: "",
-              },
+              // customPrefix: {
+              //   public: "",
+              // },
               headers: {
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*", // Be cautious with this in production

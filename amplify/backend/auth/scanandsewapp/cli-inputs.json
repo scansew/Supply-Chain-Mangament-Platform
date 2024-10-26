@@ -79,7 +79,7 @@
     },
     "permissions": [],
     "authProviders": [],
-    "thirdPartyAuth": true,
+    "thirdPartyAuth": false,
     "authTriggerConnections": "[\n  {\n    \"triggerType\": \"PostConfirmation\",\n    \"lambdaFunctionName\": \"scanandsewappPostConfirmation\"\n  }\n]"
   }
 }

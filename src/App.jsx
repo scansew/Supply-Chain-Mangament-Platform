@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -30,17 +30,47 @@ import Dashboard from "./Dashboard";
 import Companies from "./Companies";
 import AllWorkOrders from "./AllWorkOrders";
 import Users from "./Users";
-
+import { getUserByUsername } from "./graphql/queries";
 // Import your logo
 import logo from "./assets/scansewlogo.png";
+import { generateClient } from "aws-amplify/api";
+const client = generateClient();
 
 function App({ signOut, user }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [SSuser, setSSUser] = useState("");
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
+  useEffect(() => {
+    const loadUser = async () => {
+      const userData = await fetchUser();
+      setSSUser(userData);
+    };
+    loadUser();
+  }, []);
 
+  const fetchUser = async () => {
+    try {
+      // // Get the current authenticated user
+      // const { tokens } = await fetchAuthSession();
+      // const username = tokens.accessToken.payload.username;
+      // console.log("Username:", username);
+      // Perform the GraphQL query
+      const userData = await client.graphql({
+        query: getUserByUsername,
+        variables: { username: user.username },
+      });
+
+      // console.log("User data1:", userData.data.getUserByUsername);
+      // setUser(userData.data.getUserByUsername);
+      return userData.data.getUserByUsername;
+    } catch (err) {
+      console.log("Error fetching user", err);
+      return null;
+    }
+  };
   return (
     <Router>
       <Grid
@@ -56,8 +86,9 @@ function App({ signOut, user }) {
             justifyContent="space-between"
             alignItems="center"
             padding="1rem"
+            height="60px"
           >
-            <Image src={logo} alt="Company Logo" width="150px" />
+            <Image src={logo} alt="Company Logo" />
             <Button className="menu-toggle" onClick={toggleSidebar}>
               <FaBars />
             </Button>
@@ -71,7 +102,7 @@ function App({ signOut, user }) {
         >
           <Flex direction="column" height="100%">
             <Text variation="primary" fontWeight="bold" marginBottom="1rem">
-              Welcome, {user.username}
+              Welcome, {SSuser.given_name}
             </Text>
             <NavLink
               to="/"
@@ -115,7 +146,10 @@ function App({ signOut, user }) {
         >
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/workorders" element={<AllWorkOrders />} />
+            <Route
+              path="/workorders"
+              element={<AllWorkOrders SSuser={SSuser} />}
+            />
             <Route path="/companies" element={<Companies />} />
             <Route path="/users" element={<Users />} />
           </Routes>

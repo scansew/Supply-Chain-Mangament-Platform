@@ -39,6 +39,10 @@ body {
   font-size: 1.5rem;
   color: var(--amplify-colors-font-primary);
   cursor: pointer;
+  margin-left: auto;
+}
+.menu-toggle:hover {
+  background-color: var(--amplify-colors-background-secondary);
 }
 
 /* Responsive Grid Adjustments */

@@ -34,7 +34,7 @@
         "scanandsewapp": {},
         "scanandsewappPostConfirmation": {
           "deploymentBucketName": "amplify-scanandsewapp-deve-f0bf1-deployment",
-          "s3Key": "amplify-builds/scanandsewappPostConfirmation-75696f4d465862585446-build.zip"
+          "s3Key": "amplify-builds/scanandsewappPostConfirmation-2b616d52396a4558566b-build.zip"
         }
       }
     }
@@ -59,7 +59,7 @@
       "function": {
         "scanandsewappPostConfirmation": {
           "deploymentBucketName": "amplify-scanandsewapp-staging-10b4d-deployment",
-          "s3Key": "amplify-builds/scanandsewappPostConfirmation-6f4269524f424f54454c-build.zip"
+          "s3Key": "amplify-builds/scanandsewappPostConfirmation-2b616d52396a4558566b-build.zip"
         }
       },
       "api": {
