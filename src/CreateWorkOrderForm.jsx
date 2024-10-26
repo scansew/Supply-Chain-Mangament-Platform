@@ -201,7 +201,7 @@ const CreateWorkOrderForm = ({
       setShowForm(false);
     } else {
       if (showForm === false) {
-        if (button != "edit") {
+        if (button == "create") {
           const newWorkOrderNumber = await generateWorkOrderNumber();
           setFormState((prevState) => ({
             ...prevState,
@@ -210,27 +210,28 @@ const CreateWorkOrderForm = ({
             assignedToId: SSuser.id,
             companyId: SSuser.companyId,
           }));
+        } else if (button == "edit") {
+          setFormState(() => ({
+            id: workOrderItem.id,
+            createdById: SSuser.id,
+            woNumber: workOrderItem.woNumber,
+            assignedToId: workOrderItem.assignedToId,
+            CNCId: workOrderItem.CNCId,
+            status: workOrderItem.status,
+            type: workOrderItem.type,
+            details: workOrderItem.details,
+            make: workOrderItem.make,
+            model: workOrderItem.model,
+            year: workOrderItem.year,
+            businessName: workOrderItem.businessName,
+            attnName: workOrderItem.attnName,
+            businessPhone: workOrderItem.businessPhone,
+            businessShippingAddress: workOrderItem.businessShippingAddress,
+            customerName: workOrderItem.customerName,
+            customerDropShippingAddress:
+              workOrderItem.customerDropShippingAddres,
+          }));
         }
-        console.log("Form state1:", workOrderItem);
-        setFormState(() => ({
-          id: workOrderItem.id,
-          createdById: SSuser.id,
-          woNumber: workOrderItem.woNumber,
-          assignedToId: workOrderItem.assignedToId,
-          CNCId: workOrderItem.CNCId,
-          status: workOrderItem.status,
-          type: workOrderItem.type,
-          details: workOrderItem.details,
-          make: workOrderItem.make,
-          model: workOrderItem.model,
-          year: workOrderItem.year,
-          businessName: workOrderItem.businessName,
-          attnName: workOrderItem.attnName,
-          businessPhone: workOrderItem.businessPhone,
-          businessShippingAddress: workOrderItem.businessShippingAddress,
-          customerName: workOrderItem.customerName,
-          customerDropShippingAddress: workOrderItem.customerDropShippingAddres,
-        }));
         // fetchUsers();
         await fetchCompanies();
         await fetchS3Files();
@@ -356,8 +357,8 @@ const CreateWorkOrderForm = ({
           Create New Work Order
         </Button>
       ) : (
-        <Button onClick={() => toggleForm()} variation="info" size="small">
-          Edit
+        <Button onClick={() => toggleForm()} variation="info" size="medium">
+          Edit Work Order
         </Button>
       )}
       {showForm && (

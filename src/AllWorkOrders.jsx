@@ -22,6 +22,8 @@ import {
 import { generateClient } from "aws-amplify/api";
 import { parseISO, format } from "date-fns"; // Make sure to install and import date-fns
 import ViewEditWorkOrder from "./ViewWorkorder";
+import { MdClose } from "react-icons/md";
+
 const client = generateClient();
 
 function AllWorkOrders({ SSuser }) {
@@ -146,7 +148,7 @@ function AllWorkOrders({ SSuser }) {
                     style={{
                       backgroundImage: `url(${
                         item.imageUrl ||
-                        "https://images.pexels.com/photos/33689/ship-boat-lake-garda-italy.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                        "https://scanandsewapp-storage-442a3489f0bf1-deve.s3.us-east-1.amazonaws.com/public/1729644765508_DSC02411.JPG?response-content-disposition=inline&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEI7%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJHMEUCIAvYqnCKUsH2pqMzoTPI53qGGK1LKj8WAlWXZclsz9ACAiEA9L4qiL%2FvZSDUzszE5o%2BL9tqM2eZXYch2cEYEdtVCrTQq5wMI9%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw2Mzc0MjM0OTgyNjkiDHzsszitIagwrk1xOCq7A61f81FlX%2BUtSCelv1VOLsaNabVd%2Fv0nJMT5n2pvSzygUgkAWuCYdggv6jcXwEf32z%2B0xgSvkfHoIl%2FvLkqlG60BYu4EMqiJ1DKK5yfAWTZItvw3ZGz7OKQYpBkHZJ%2BkxQkVUK57Oqf0inib2RUeU5vTwc%2F%2F%2BZen6v5JogvzJZGD33LoPTx0p%2FDfHV3ZGxLRsgUz0blz4lE99VV7k3k08hF0KCmnqrSrfqX%2FH5IZaBOn76rvwMmoTVVlJ9%2BSb0jJlhjYaTHq83HzeFVKO7hjzt03gVfLUl%2F5VBzNrfNFitIGlxSonaER7rYHPDZ2tCTCTREUm2irbn5642bZb5dSitOxkPQtsX5MWHzVkJJvAgRMDEjyXQKzHCddftMs5prrFkjZZabBmEgPyPpzQoat3ve6jleAOGf5xHezjUK4u6HIWMGcsl4%2Bj8qxcGn885L0O9QNSeDWte2qaWWAL80sexZbvyoBFOUwFfFENnmn%2BD5kbUf5Vzhlax9vbiRA2ffm4547wR6WY57XeGpJEeATXnUp%2BGnES5o7Llz5I6vsEcuC9qmU5U8tevfyPxVG1XSUoDA3jAS%2FH7Z8yOchMNzj7bgGOuQCX1m8TXf8g2A%2FtDiW1RfhfLsgGjb634v0lMqg9yufdZj8E7yagzTVdInpkqTp4JuUgq0mqU%2FccOsaNpissj9CYcS%2FbsPZCh54cPp3RTJiTStW%2BFNRG%2BpAIY8FH%2B71eo019KLfOHl%2BkDFHABAjXi%2F%2FKpsMK8srKiQPdIjUjTBYvWIEwh0OUnLucTkJbbtqnj2IRYKmk9ZJOfXGj%2B5Cn3hRMVUNYm0cgc3fxWI47wFMCRRHrYCk1G3LWkSLU7iB6cTJ7aevEXRESTAAC77TbR3nbsKOnCKsReXqzKSI8hp%2BzJfQsqzaTGDmEtoOe5e%2BFk05a%2B%2F%2BHd6mp4OlorvRyClFLo70tOOYJbVg2xKD27%2Bb3q976Wj6WUBIl8LRz7SfapBwaJz36yIe8gBkfwea8g1N425bmOex0g8RypS%2BVkLBcLup0wOf1paIE%2Bivxa%2BJHJJNYS1MeS6MHrMj7PywEFalZrii2%2Bs%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAZI2LGWQOTY7HN5OF%2F20241025%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20241025T214951Z&X-Amz-Expires=36000&X-Amz-SignedHeaders=host&X-Amz-Signature=4450577051c1d23d71a427477cd760f9767ca6d0004b824240b612f6a8fb8981"
                       })`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
@@ -273,11 +275,16 @@ function AllWorkOrders({ SSuser }) {
                 onClick={() => {
                   setIsModalOpen(false);
                 }}
+                aria-label="Close"
+                size="small"
               >
-                Close
+                <MdClose />
               </Button>
             </Flex>
-            <ViewEditWorkOrder workOrderItem={selectedWorkOrder} SSuser={SSuser} />
+            <ViewEditWorkOrder
+              workOrderItem={selectedWorkOrder}
+              SSuser={SSuser}
+            />
           </Flex>
         </View>
       )}
