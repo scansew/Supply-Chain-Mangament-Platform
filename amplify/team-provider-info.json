@@ -34,7 +34,7 @@
         "scanandsewapp": {},
         "scanandsewappPostConfirmation": {
           "deploymentBucketName": "amplify-scanandsewapp-deve-f0bf1-deployment",
-          "s3Key": "amplify-builds/scanandsewappPostConfirmation-75696f4d465862585446-build.zip"
+          "s3Key": "amplify-builds/scanandsewappPostConfirmation-2b616d52396a4558566b-build.zip"
         }
       }
     }
