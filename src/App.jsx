@@ -88,7 +88,7 @@ function App({ signOut, user }) {
             padding="1rem"
             height="60px"
           >
-            <Image src={logo} alt="Company Logo" />
+            <Text>{user.username}</Text>
             <Button className="menu-toggle" onClick={toggleSidebar}>
               <FaBars />
             </Button>
@@ -101,6 +101,13 @@ function App({ signOut, user }) {
           padding="1rem"
         >
           <Flex direction="column" height="100%">
+            <Image
+              src={logo}
+              alt="Company Logo"
+              height={"75px"}
+              width={"100px"}
+            />
+
             <Text variation="primary" fontWeight="bold" marginBottom="1rem">
               Welcome, {SSuser.given_name}
             </Text>
@@ -141,8 +148,7 @@ function App({ signOut, user }) {
         </View>
 
         <View
-          padding="2rem"
-          backgroundColor="var(--amplify-colors-background-tertiary)"
+          className="main-content"
         >
           <Routes>
             <Route path="/" element={<Dashboard />} />
@@ -155,7 +161,7 @@ function App({ signOut, user }) {
           </Routes>
         </View>
 
-        <View
+        {/* <View
           columnSpan={{ base: 1, large: 2 }}
           backgroundColor="var(--amplify-colors-background-secondary)"
           padding="1rem"
@@ -163,7 +169,7 @@ function App({ signOut, user }) {
           <Text textAlign="center">
             &copy; 2023 Scan and Sew. All rights reserved.
           </Text>
-        </View>
+        </View> */}
       </Grid>
     </Router>
   );

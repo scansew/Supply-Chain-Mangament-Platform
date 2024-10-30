@@ -4,7 +4,7 @@ import { Card, Heading, Text, Flex } from '@aws-amplify/ui-react';
 function Dashboard() {
   return (
     <div className="dash-content">
-      <Heading level={1}>Welcome to Your Dashboard,</Heading>
+      <Heading level={2}>Welcome to Your Dashboard,</Heading>
       
       <Flex direction="row" wrap="wrap" gap="1rem">
         <Card variation="elevated">

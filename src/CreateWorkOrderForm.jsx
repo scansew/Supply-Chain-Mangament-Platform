@@ -7,11 +7,9 @@ import {
   updateWorkOrder,
 } from "./graphql/mutations";
 import { listUsers, listCompanies } from "./graphql/queries";
-import {} from "./graphql/mutations";
 import { list, remove, getUrl } from "aws-amplify/storage";
 
 import FileUploader3 from "./FileUploader3";
-import DB from "./DB";
 
 import "./WOForm.css";
 import {
@@ -73,6 +71,7 @@ const CreateWorkOrderForm = ({
     businessShippingAddress: "",
     customerName: "",
     customerDropShippingAddress: "",
+    filesFolder: "",
   });
   const workOrderTypes = [
     "Ratchet_Mooring",
@@ -86,7 +85,6 @@ const CreateWorkOrderForm = ({
 
   useEffect(() => {
     // fetchUser();
-    // console.log("SSuser is", SSuser);
     // console.log("SSuser is", SSuser);
     if (button === "create") setCreateButton(true);
     else if (button === "edit") setEditButton(true);
@@ -103,22 +101,26 @@ const CreateWorkOrderForm = ({
     setIsLoading(true);
     setError(null);
     try {
-      // Fetch auth session
-      const session = await fetchAuthSession();
-
-      // Extract Identity Pool ID and Identity ID
-      const identityPoolId = session.identityPoolId;
-      const identityId = session.identityId;
-      console.log("Identity Pool ID:", identityId);
-      const key = `private/${identityId}/companies/${SSuser.companyId}/${formState.woNumber}`;
+      // // For Private upload of files
+      // const session = await fetchAuthSession();
+      // // Extract Identity Pool ID and Identity ID
+      // const identityPoolId = session.identityPoolId;
+      // const identityId = session.identityId;
+      // console.log("Identity Pool ID:", identityId);
+      // const key = `private/${identityId}/companies/${SSuser.companyId}/${formState.woNumber}`;
+      const key = `public/companies/${SSuser.companyId}/${formState.woNumber}`;
 
       const fetchedFiles = await list({
         path: key,
         options: {
-          accessLevel: "private",
+          accessLevel: "public",
           listAll: true,
         },
       });
+      if (fetchedFiles.items.length > 0) {
+        setFormState((prevState) => ({ ...prevState, filesFolder: key }));
+        console.log("Key is", formState.filesFolder);
+      }
       setFiles(fetchedFiles.items);
       // setFormState((prevState) => ({ ...prevState, files }));
       setDisplayedFiles(fetchedFiles.items);

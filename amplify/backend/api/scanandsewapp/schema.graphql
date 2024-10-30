@@ -71,15 +71,14 @@ enum WorkOrderStatus {
   COMPLETED
 }
 
-
 enum WorkOrderType {
-Ratchet_Mooring
-Ratchet_Travel
-Ratchet_Winter_Storage
-Snap_or_hardware_Full
-Snap_or_hardware_separate_bow_and_cockpit
-RV_Skirt
-Boat_Seat_Covers
+  Ratchet_Mooring
+  Ratchet_Travel
+  Ratchet_Winter_Storage
+  Snap_or_hardware_Full
+  Snap_or_hardware_separate_bow_and_cockpit
+  RV_Skirt
+  Boat_Seat_Covers
 }
 
 type WorkOrder @model {
@@ -90,6 +89,7 @@ type WorkOrder @model {
   companyId: ID @index(name: "byCompany")
   CNCId: ID @index(name: "byCNC")
   status: WorkOrderStatus
+  filesFolder: String
   type: WorkOrderType
   details: String
   materialSelection: AWSJSON

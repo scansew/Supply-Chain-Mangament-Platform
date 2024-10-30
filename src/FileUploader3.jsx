@@ -91,13 +91,15 @@ const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser }) => {
             key: key,
             data: file,
             options: {
-              accessLevel: "private",
+              accessLevel: "public",
               contentType: file.type,
               useAccelerateEndpoint: true, // Enable transfer acceleration
               onProgress: (progress) => handleProgress(file.name, progress),
               metadata: {
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*", // Be cautious with this in production
+                companyId: SSuser.companyId,
+                uploaderId: SSuser.username,
               },
               // customPrefix: {
               //   public: "",

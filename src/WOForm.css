@@ -50,6 +50,11 @@
 .work-order-form-right {
   flex: 1;
 }
+.create-work-order-button {
+  min-width: 220px !important;
+  padding: 8px 16px !important;
+  height: auto !important;
+}
 
 @media (max-width: 768px) {
   .work-order-form-columns {
@@ -309,7 +314,7 @@
   margin-top: 16px;
 }
 .required-field::after {
-  content: '*';
+  content: "*";
   color: red;
   margin-left: 3px;
 }
