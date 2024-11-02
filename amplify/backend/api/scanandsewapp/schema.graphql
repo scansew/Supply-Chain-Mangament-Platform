@@ -7,7 +7,8 @@ type Company @model {
   id: ID! @primaryKey
   name: String!
   address: String!
-  stripeConnectId: String!
+  companySecret: String! @index(name: "byCompanySecret")
+  stripeConnectId: String
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
   users: [User] @hasMany(indexName: "byCompany", fields: ["id"])
@@ -24,10 +25,9 @@ type User @model {
   email: String! @index(name: "byEmail", sortKeyFields: ["id"])
   family_name: String
   given_name: String
-  passwordHash: String
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
-  roles: [UserRole] @hasMany(indexName: "byUser", fields: ["id"])
+  role: roleType
   workOrdersCreated: [WorkOrder]
     @hasMany(indexName: "byCreator", fields: ["id"])
   workOrdersAssigned: [WorkOrder]
@@ -36,13 +36,17 @@ type User @model {
   auditLogs: [AuditLog] @hasMany(indexName: "byUser", fields: ["id"])
   companyId: ID @index(name: "byCompany")
 }
-
+enum roleType {
+  new
+  sAdmin
+  cAdmin
+  emp
+}
 type Role @model {
   id: ID! @primaryKey
   name: String!
   description: String
   permissions: [Permission] @hasMany(indexName: "byRole", fields: ["id"])
-  userRoles: [UserRole] @hasMany(indexName: "byRole", fields: ["id"])
 }
 
 type UserRole @model {
@@ -52,8 +56,6 @@ type UserRole @model {
   companyId: ID! @index(name: "byCompany")
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
-  user: User @belongsTo(fields: ["userId"])
-  role: Role @belongsTo(fields: ["roleId"])
   company: Company @belongsTo(fields: ["companyId"])
 }
 
@@ -71,15 +73,14 @@ enum WorkOrderStatus {
   COMPLETED
 }
 
-
 enum WorkOrderType {
-Ratchet_Mooring
-Ratchet_Travel
-Ratchet_Winter_Storage
-Snap_or_hardware_Full
-Snap_or_hardware_separate_bow_and_cockpit
-RV_Skirt
-Boat_Seat_Covers
+  Ratchet_Mooring
+  Ratchet_Travel
+  Ratchet_Winter_Storage
+  Snap_or_hardware_Full
+  Snap_or_hardware_separate_bow_and_cockpit
+  RV_Skirt
+  Boat_Seat_Covers
 }
 
 type WorkOrder @model {
@@ -90,6 +91,7 @@ type WorkOrder @model {
   companyId: ID @index(name: "byCompany")
   CNCId: ID @index(name: "byCNC")
   status: WorkOrderStatus
+  filesFolder: String
   type: WorkOrderType
   details: String
   materialSelection: AWSJSON
@@ -259,6 +261,7 @@ type WorkOrderCounter @model {
 
 type Mutation {
   incrementCounter(counterName: String!): Int!
+  updateUserCompany(userId: ID!, companySecret: String!): User
 }
 type Query {
   getUserByUsername(username: String!): User

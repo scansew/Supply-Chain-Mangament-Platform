@@ -16,7 +16,7 @@ import {
   TableHead,
   TableRow,
 } from "@aws-amplify/ui-react";
-import { createFile } from "./graphql/mutations";
+import { createFile } from "../graphql/mutations";
 import { generateClient } from "aws-amplify/api";
 const client = generateClient();
 

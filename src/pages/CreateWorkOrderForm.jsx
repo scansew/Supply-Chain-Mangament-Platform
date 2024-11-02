@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 
 import { generateClient } from "aws-amplify/api";
-import { createWorkOrder } from "./graphql/mutations";
-import { listUsers, listCompanies, getUserByUsername } from "./graphql/queries";
-import { incrementCounter } from "./graphql/mutations";
+import {
+  createWorkOrder,
+  incrementCounter,
+  updateWorkOrder,
+} from "../graphql/mutations";
+import { listUsers, listCompanies } from "../graphql/queries";
 import { list, remove, getUrl } from "aws-amplify/storage";
 
 import FileUploader3 from "./FileUploader3";
-import DB from "./DB";
 
 import "./WOForm.css";
 import {
@@ -33,12 +35,17 @@ import {
 } from "@aws-amplify/ui-react";
 
 import { fetchAuthSession } from "@aws-amplify/auth";
-const CreateWorkOrderForm = ({ SSuser, button }) => {
+const CreateWorkOrderForm = ({
+  SSuser,
+  button,
+  workOrderItem,
+  handleViewSuccess,
+}) => {
   const client = generateClient();
 
-  const [showForm, setShowForm] = useState(false);
   const [createButton, setCreateButton] = useState(false);
   const [editButton, setEditButton] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [users, setUsers] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [files, setFiles] = useState([]);
@@ -64,6 +71,7 @@ const CreateWorkOrderForm = ({ SSuser, button }) => {
     businessShippingAddress: "",
     customerName: "",
     customerDropShippingAddress: "",
+    filesFolder: "",
   });
   const workOrderTypes = [
     "Ratchet_Mooring",
@@ -77,10 +85,9 @@ const CreateWorkOrderForm = ({ SSuser, button }) => {
 
   useEffect(() => {
     // fetchUser();
-    console.log("SSuser2 is", SSuser);
-    console.log("SSuser is", SSuser);
+    // console.log("SSuser is", SSuser);
     if (button === "create") setCreateButton(true);
-    else setEditButton(true);
+    else if (button === "edit") setEditButton(true);
   }, []);
 
   const handleUploadSuccess = async (fileKeys) => {
@@ -94,22 +101,26 @@ const CreateWorkOrderForm = ({ SSuser, button }) => {
     setIsLoading(true);
     setError(null);
     try {
-      // Fetch auth session
-      const session = await fetchAuthSession();
-
-      // Extract Identity Pool ID and Identity ID
-      const identityPoolId = session.identityPoolId;
-      const identityId = session.identityId;
-      console.log("Identity Pool ID:", identityId);
-      const key = `private/${identityId}/companies/${SSuser.companyId}/${formState.woNumber}`;
+      // // For Private upload of files
+      // const session = await fetchAuthSession();
+      // // Extract Identity Pool ID and Identity ID
+      // const identityPoolId = session.identityPoolId;
+      // const identityId = session.identityId;
+      // console.log("Identity Pool ID:", identityId);
+      // const key = `private/${identityId}/companies/${SSuser.companyId}/${formState.woNumber}`;
+      const key = `public/companies/${SSuser.companyId}/${formState.woNumber}`;
 
       const fetchedFiles = await list({
         path: key,
         options: {
-          accessLevel: "private",
+          accessLevel: "public",
           listAll: true,
         },
       });
+      if (fetchedFiles.items.length > 0) {
+        setFormState((prevState) => ({ ...prevState, filesFolder: key }));
+        console.log("Key is", formState.filesFolder);
+      }
       setFiles(fetchedFiles.items);
       // setFormState((prevState) => ({ ...prevState, files }));
       setDisplayedFiles(fetchedFiles.items);
@@ -192,14 +203,37 @@ const CreateWorkOrderForm = ({ SSuser, button }) => {
       setShowForm(false);
     } else {
       if (showForm === false) {
-        const newWorkOrderNumber = await generateWorkOrderNumber();
-        setFormState((prevState) => ({
-          ...prevState,
-          woNumber: newWorkOrderNumber,
-          createdById: SSuser.id,
-          assignedToId: SSuser.id,
-          companyId: SSuser.companyId,
-        }));
+        if (button == "create") {
+          const newWorkOrderNumber = await generateWorkOrderNumber();
+          setFormState((prevState) => ({
+            ...prevState,
+            woNumber: newWorkOrderNumber,
+            createdById: SSuser.id,
+            assignedToId: SSuser.id,
+            companyId: SSuser.companyId,
+          }));
+        } else if (button == "edit") {
+          setFormState(() => ({
+            id: workOrderItem.id,
+            createdById: SSuser.id,
+            woNumber: workOrderItem.woNumber,
+            assignedToId: workOrderItem.assignedToId,
+            CNCId: workOrderItem.CNCId,
+            status: workOrderItem.status,
+            type: workOrderItem.type,
+            details: workOrderItem.details,
+            make: workOrderItem.make,
+            model: workOrderItem.model,
+            year: workOrderItem.year,
+            businessName: workOrderItem.businessName,
+            attnName: workOrderItem.attnName,
+            businessPhone: workOrderItem.businessPhone,
+            businessShippingAddress: workOrderItem.businessShippingAddress,
+            customerName: workOrderItem.customerName,
+            customerDropShippingAddress:
+              workOrderItem.customerDropShippingAddres,
+          }));
+        }
         // fetchUsers();
         await fetchCompanies();
         await fetchS3Files();
@@ -256,30 +290,35 @@ const CreateWorkOrderForm = ({ SSuser, button }) => {
   async function handleSubmit(event) {
     event.preventDefault();
     try {
-      console.log("Form state:", formState);
-      if (
-        !formState.createdById ||
-        !formState.assignedToId ||
-        !formState.companyId ||
-        !formState.type
-      ) {
-        alert("Please fill in all required fields.");
-        return;
-      }
+      // if (
+      //   !formState.createdById ||
+      //   !formState.assignedToId ||
+      //   !formState.companyId ||
+      //   !formState.type
+      // ) {
+      //   alert("Please fill in all required fields.");
+      //   return;
+      // }
       const input = {
         input: formState,
       };
-      await client.graphql({
-        query: createWorkOrder,
-        variables: input,
-      });
+      if (button === "create")
+        await client.graphql({
+          query: createWorkOrder,
+          variables: input,
+        });
+      else if (button === "edit")
+        await client.graphql({
+          query: updateWorkOrder,
+          variables: input,
+        });
 
       setFormState({
         woNumber: "",
         createdById: "",
         assignedToId: "",
         companyId: "",
-        status: "PENDING",
+        status: "",
         type: "",
         details: "",
         make: "",
@@ -292,6 +331,9 @@ const CreateWorkOrderForm = ({ SSuser, button }) => {
         customerName: "",
         customerDropShippingAddress: "",
       });
+      if (typeof handleViewSuccess === "function") {
+        handleViewSuccess();
+      }
       setShowForm(false);
       alert("Work order created successfully!");
     } catch (err) {
@@ -308,14 +350,19 @@ const CreateWorkOrderForm = ({ SSuser, button }) => {
 
   return (
     <div className="work-order-container">
-      <Button
-        onClick={() => toggleForm()}
-        variation="primary"
-        className="create-work-order-button"
-      >
-        Create New Work Order
-      </Button>
-
+      {button === "create" ? (
+        <Button
+          onClick={() => toggleForm()}
+          variation="primary"
+          className="create-work-order-button"
+        >
+          Create New Work Order
+        </Button>
+      ) : (
+        <Button onClick={() => toggleForm()} variation="info" size="medium">
+          Edit Work Order
+        </Button>
+      )}
       {showForm && (
         <div className="work-order-form-wrapper" onClick={toggleForm}>
           <div className="work-order-form" onClick={(e) => e.stopPropagation()}>
@@ -427,7 +474,6 @@ const CreateWorkOrderForm = ({ SSuser, button }) => {
                         id="companyId"
                         value={formState.companyId}
                         onChange={(e) => setInput("CNCId", e.target.value)}
-                        required
                       >
                         <option value="">Select CNC Company</option>
                         {companies.map((company) => (
@@ -516,7 +562,7 @@ const CreateWorkOrderForm = ({ SSuser, button }) => {
                   </Card>
 
                   <Button type="submit" variation="primary">
-                    Create Work Order
+                    Submit
                   </Button>
                 </div>
 

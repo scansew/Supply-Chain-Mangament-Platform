@@ -6,7 +6,13 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import {
+  Button,
+  Flex,
+  Grid,
+  SelectField,
+  TextField,
+} from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
 import { getUser } from "../graphql/queries";
@@ -29,9 +35,9 @@ export default function UserUpdateForm(props) {
     email: "",
     family_name: "",
     given_name: "",
-    passwordHash: "",
     createdAt: "",
     updatedAt: "",
+    role: "",
   };
   const [username, setUsername] = React.useState(initialValues.username);
   const [email, setEmail] = React.useState(initialValues.email);
@@ -39,11 +45,9 @@ export default function UserUpdateForm(props) {
     initialValues.family_name
   );
   const [given_name, setGiven_name] = React.useState(initialValues.given_name);
-  const [passwordHash, setPasswordHash] = React.useState(
-    initialValues.passwordHash
-  );
   const [createdAt, setCreatedAt] = React.useState(initialValues.createdAt);
   const [updatedAt, setUpdatedAt] = React.useState(initialValues.updatedAt);
+  const [role, setRole] = React.useState(initialValues.role);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = userRecord
@@ -53,9 +57,9 @@ export default function UserUpdateForm(props) {
     setEmail(cleanValues.email);
     setFamily_name(cleanValues.family_name);
     setGiven_name(cleanValues.given_name);
-    setPasswordHash(cleanValues.passwordHash);
     setCreatedAt(cleanValues.createdAt);
     setUpdatedAt(cleanValues.updatedAt);
+    setRole(cleanValues.role);
     setErrors({});
   };
   const [userRecord, setUserRecord] = React.useState(userModelProp);
@@ -79,9 +83,9 @@ export default function UserUpdateForm(props) {
     email: [{ type: "Required" }],
     family_name: [],
     given_name: [],
-    passwordHash: [],
     createdAt: [],
     updatedAt: [],
+    role: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -130,9 +134,9 @@ export default function UserUpdateForm(props) {
           email,
           family_name: family_name ?? null,
           given_name: given_name ?? null,
-          passwordHash: passwordHash ?? null,
           createdAt: createdAt ?? null,
           updatedAt: updatedAt ?? null,
+          role: role ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -197,9 +201,9 @@ export default function UserUpdateForm(props) {
               email,
               family_name,
               given_name,
-              passwordHash,
               createdAt,
               updatedAt,
+              role,
             };
             const result = onChange(modelFields);
             value = result?.username ?? value;
@@ -227,9 +231,9 @@ export default function UserUpdateForm(props) {
               email: value,
               family_name,
               given_name,
-              passwordHash,
               createdAt,
               updatedAt,
+              role,
             };
             const result = onChange(modelFields);
             value = result?.email ?? value;
@@ -257,9 +261,9 @@ export default function UserUpdateForm(props) {
               email,
               family_name: value,
               given_name,
-              passwordHash,
               createdAt,
               updatedAt,
+              role,
             };
             const result = onChange(modelFields);
             value = result?.family_name ?? value;
@@ -287,9 +291,9 @@ export default function UserUpdateForm(props) {
               email,
               family_name,
               given_name: value,
-              passwordHash,
               createdAt,
               updatedAt,
+              role,
             };
             const result = onChange(modelFields);
             value = result?.given_name ?? value;
@@ -303,36 +307,6 @@ export default function UserUpdateForm(props) {
         errorMessage={errors.given_name?.errorMessage}
         hasError={errors.given_name?.hasError}
         {...getOverrideProps(overrides, "given_name")}
-      ></TextField>
-      <TextField
-        label="Password hash"
-        isRequired={false}
-        isReadOnly={false}
-        value={passwordHash}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              username,
-              email,
-              family_name,
-              given_name,
-              passwordHash: value,
-              createdAt,
-              updatedAt,
-            };
-            const result = onChange(modelFields);
-            value = result?.passwordHash ?? value;
-          }
-          if (errors.passwordHash?.hasError) {
-            runValidationTasks("passwordHash", value);
-          }
-          setPasswordHash(value);
-        }}
-        onBlur={() => runValidationTasks("passwordHash", passwordHash)}
-        errorMessage={errors.passwordHash?.errorMessage}
-        hasError={errors.passwordHash?.hasError}
-        {...getOverrideProps(overrides, "passwordHash")}
       ></TextField>
       <TextField
         label="Created at"
@@ -349,9 +323,9 @@ export default function UserUpdateForm(props) {
               email,
               family_name,
               given_name,
-              passwordHash,
               createdAt: value,
               updatedAt,
+              role,
             };
             const result = onChange(modelFields);
             value = result?.createdAt ?? value;
@@ -381,9 +355,9 @@ export default function UserUpdateForm(props) {
               email,
               family_name,
               given_name,
-              passwordHash,
               createdAt,
               updatedAt: value,
+              role,
             };
             const result = onChange(modelFields);
             value = result?.updatedAt ?? value;
@@ -398,6 +372,57 @@ export default function UserUpdateForm(props) {
         hasError={errors.updatedAt?.hasError}
         {...getOverrideProps(overrides, "updatedAt")}
       ></TextField>
+      <SelectField
+        label="Role"
+        placeholder="Please select an option"
+        isDisabled={false}
+        value={role}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              username,
+              email,
+              family_name,
+              given_name,
+              createdAt,
+              updatedAt,
+              role: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.role ?? value;
+          }
+          if (errors.role?.hasError) {
+            runValidationTasks("role", value);
+          }
+          setRole(value);
+        }}
+        onBlur={() => runValidationTasks("role", role)}
+        errorMessage={errors.role?.errorMessage}
+        hasError={errors.role?.hasError}
+        {...getOverrideProps(overrides, "role")}
+      >
+        <option
+          children="New"
+          value="new"
+          {...getOverrideProps(overrides, "roleoption0")}
+        ></option>
+        <option
+          children="S admin"
+          value="sAdmin"
+          {...getOverrideProps(overrides, "roleoption1")}
+        ></option>
+        <option
+          children="C admin"
+          value="cAdmin"
+          {...getOverrideProps(overrides, "roleoption2")}
+        ></option>
+        <option
+          children="Emp"
+          value="emp"
+          {...getOverrideProps(overrides, "roleoption3")}
+        ></option>
+      </SelectField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
