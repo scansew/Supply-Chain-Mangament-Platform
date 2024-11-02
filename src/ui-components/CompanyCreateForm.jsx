@@ -25,12 +25,16 @@ export default function CompanyCreateForm(props) {
   const initialValues = {
     name: "",
     address: "",
+    companySecret: "",
     stripeConnectId: "",
     createdAt: "",
     updatedAt: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [address, setAddress] = React.useState(initialValues.address);
+  const [companySecret, setCompanySecret] = React.useState(
+    initialValues.companySecret
+  );
   const [stripeConnectId, setStripeConnectId] = React.useState(
     initialValues.stripeConnectId
   );
@@ -40,6 +44,7 @@ export default function CompanyCreateForm(props) {
   const resetStateValues = () => {
     setName(initialValues.name);
     setAddress(initialValues.address);
+    setCompanySecret(initialValues.companySecret);
     setStripeConnectId(initialValues.stripeConnectId);
     setCreatedAt(initialValues.createdAt);
     setUpdatedAt(initialValues.updatedAt);
@@ -48,7 +53,8 @@ export default function CompanyCreateForm(props) {
   const validations = {
     name: [{ type: "Required" }],
     address: [{ type: "Required" }],
-    stripeConnectId: [{ type: "Required" }],
+    companySecret: [{ type: "Required" }],
+    stripeConnectId: [],
     createdAt: [],
     updatedAt: [],
   };
@@ -97,6 +103,7 @@ export default function CompanyCreateForm(props) {
         let modelFields = {
           name,
           address,
+          companySecret,
           stripeConnectId,
           createdAt,
           updatedAt,
@@ -164,6 +171,7 @@ export default function CompanyCreateForm(props) {
             const modelFields = {
               name: value,
               address,
+              companySecret,
               stripeConnectId,
               createdAt,
               updatedAt,
@@ -192,6 +200,7 @@ export default function CompanyCreateForm(props) {
             const modelFields = {
               name,
               address: value,
+              companySecret,
               stripeConnectId,
               createdAt,
               updatedAt,
@@ -210,8 +219,37 @@ export default function CompanyCreateForm(props) {
         {...getOverrideProps(overrides, "address")}
       ></TextField>
       <TextField
-        label="Stripe connect id"
+        label="Company secret"
         isRequired={true}
+        isReadOnly={false}
+        value={companySecret}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              address,
+              companySecret: value,
+              stripeConnectId,
+              createdAt,
+              updatedAt,
+            };
+            const result = onChange(modelFields);
+            value = result?.companySecret ?? value;
+          }
+          if (errors.companySecret?.hasError) {
+            runValidationTasks("companySecret", value);
+          }
+          setCompanySecret(value);
+        }}
+        onBlur={() => runValidationTasks("companySecret", companySecret)}
+        errorMessage={errors.companySecret?.errorMessage}
+        hasError={errors.companySecret?.hasError}
+        {...getOverrideProps(overrides, "companySecret")}
+      ></TextField>
+      <TextField
+        label="Stripe connect id"
+        isRequired={false}
         isReadOnly={false}
         value={stripeConnectId}
         onChange={(e) => {
@@ -220,6 +258,7 @@ export default function CompanyCreateForm(props) {
             const modelFields = {
               name,
               address,
+              companySecret,
               stripeConnectId: value,
               createdAt,
               updatedAt,
@@ -250,6 +289,7 @@ export default function CompanyCreateForm(props) {
             const modelFields = {
               name,
               address,
+              companySecret,
               stripeConnectId,
               createdAt: value,
               updatedAt,
@@ -280,6 +320,7 @@ export default function CompanyCreateForm(props) {
             const modelFields = {
               name,
               address,
+              companySecret,
               stripeConnectId,
               createdAt,
               updatedAt: value,

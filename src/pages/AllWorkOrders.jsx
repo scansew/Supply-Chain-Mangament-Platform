@@ -13,12 +13,12 @@ import {
 } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import CreateWorkOrderForm from "./CreateWorkOrderForm";
-import { listWorkOrders } from "./graphql/queries";
+import { listWorkOrders } from "../graphql/queries";
 import {
   onCreateWorkOrder,
   onUpdateWorkOrder,
   onDeleteWorkOrder,
-} from "./graphql/subscriptions";
+} from "../graphql/subscriptions";
 import { generateClient } from "aws-amplify/api";
 import { parseISO, format } from "date-fns"; // Make sure to install and import date-fns
 import ViewEditWorkOrder from "./ViewWorkorder";
@@ -115,7 +115,7 @@ function AllWorkOrders({ SSuser }) {
   return (
     <View width="100%">
       <CreateWorkOrderForm SSuser={SSuser} button="create" />
-      <Flex direction="row" width="100%" >
+      <Flex direction="row" width="100%">
         {Object.entries(groupedWorkOrders).map(([status, items]) => (
           <Card
             key={status}
@@ -142,7 +142,6 @@ function AllWorkOrders({ SSuser }) {
                 wrap="nowrap"
                 height="calc(100% - 60px)"
                 padding={tokens.space.small}
-                // overflow="auto"
               >
                 {(item, handleCardClick) => (
                   <Card

@@ -6,6 +6,38 @@ export const incrementCounter = /* GraphQL */ `
     incrementCounter(counterName: $counterName)
   }
 `;
+export const updateUserCompany = /* GraphQL */ `
+  mutation UpdateUserCompany($userId: ID!, $companySecret: String!) {
+    updateUserCompany(userId: $userId, companySecret: $companySecret) {
+      id
+      username
+      email
+      family_name
+      given_name
+      createdAt
+      updatedAt
+      role
+      workOrdersCreated {
+        nextToken
+        __typename
+      }
+      workOrdersAssigned {
+        nextToken
+        __typename
+      }
+      filesUploaded {
+        nextToken
+        __typename
+      }
+      auditLogs {
+        nextToken
+        __typename
+      }
+      companyId
+      __typename
+    }
+  }
+`;
 export const createCompany = /* GraphQL */ `
   mutation CreateCompany(
     $input: CreateCompanyInput!
@@ -15,6 +47,7 @@ export const createCompany = /* GraphQL */ `
       id
       name
       address
+      companySecret
       stripeConnectId
       createdAt
       updatedAt
@@ -51,6 +84,7 @@ export const updateCompany = /* GraphQL */ `
       id
       name
       address
+      companySecret
       stripeConnectId
       createdAt
       updatedAt
@@ -87,6 +121,7 @@ export const deleteCompany = /* GraphQL */ `
       id
       name
       address
+      companySecret
       stripeConnectId
       createdAt
       updatedAt
@@ -125,13 +160,9 @@ export const createUser = /* GraphQL */ `
       email
       family_name
       given_name
-      passwordHash
       createdAt
       updatedAt
-      roles {
-        nextToken
-        __typename
-      }
+      role
       workOrdersCreated {
         nextToken
         __typename
@@ -164,13 +195,9 @@ export const updateUser = /* GraphQL */ `
       email
       family_name
       given_name
-      passwordHash
       createdAt
       updatedAt
-      roles {
-        nextToken
-        __typename
-      }
+      role
       workOrdersCreated {
         nextToken
         __typename
@@ -203,13 +230,9 @@ export const deleteUser = /* GraphQL */ `
       email
       family_name
       given_name
-      passwordHash
       createdAt
       updatedAt
-      roles {
-        nextToken
-        __typename
-      }
+      role
       workOrdersCreated {
         nextToken
         __typename
@@ -244,10 +267,6 @@ export const createRole = /* GraphQL */ `
         nextToken
         __typename
       }
-      userRoles {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -264,10 +283,6 @@ export const updateRole = /* GraphQL */ `
       name
       description
       permissions {
-        nextToken
-        __typename
-      }
-      userRoles {
         nextToken
         __typename
       }
@@ -290,10 +305,6 @@ export const deleteRole = /* GraphQL */ `
         nextToken
         __typename
       }
-      userRoles {
-        nextToken
-        __typename
-      }
       createdAt
       updatedAt
       __typename
@@ -312,30 +323,11 @@ export const createUserRole = /* GraphQL */ `
       companyId
       createdAt
       updatedAt
-      user {
-        id
-        username
-        email
-        family_name
-        given_name
-        passwordHash
-        createdAt
-        updatedAt
-        companyId
-        __typename
-      }
-      role {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
       company {
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -357,30 +349,11 @@ export const updateUserRole = /* GraphQL */ `
       companyId
       createdAt
       updatedAt
-      user {
-        id
-        username
-        email
-        family_name
-        given_name
-        passwordHash
-        createdAt
-        updatedAt
-        companyId
-        __typename
-      }
-      role {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
       company {
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -402,30 +375,11 @@ export const deleteUserRole = /* GraphQL */ `
       companyId
       createdAt
       updatedAt
-      user {
-        id
-        username
-        email
-        family_name
-        given_name
-        passwordHash
-        createdAt
-        updatedAt
-        companyId
-        __typename
-      }
-      role {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
       company {
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -520,6 +474,7 @@ export const createWorkOrder = /* GraphQL */ `
       companyId
       CNCId
       status
+      filesFolder
       type
       details
       materialSelection
@@ -558,9 +513,9 @@ export const createWorkOrder = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -570,9 +525,9 @@ export const createWorkOrder = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -580,6 +535,7 @@ export const createWorkOrder = /* GraphQL */ `
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -589,6 +545,7 @@ export const createWorkOrder = /* GraphQL */ `
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -600,9 +557,9 @@ export const createWorkOrder = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -631,6 +588,7 @@ export const updateWorkOrder = /* GraphQL */ `
       companyId
       CNCId
       status
+      filesFolder
       type
       details
       materialSelection
@@ -669,9 +627,9 @@ export const updateWorkOrder = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -681,9 +639,9 @@ export const updateWorkOrder = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -691,6 +649,7 @@ export const updateWorkOrder = /* GraphQL */ `
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -700,6 +659,7 @@ export const updateWorkOrder = /* GraphQL */ `
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -711,9 +671,9 @@ export const updateWorkOrder = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -742,6 +702,7 @@ export const deleteWorkOrder = /* GraphQL */ `
       companyId
       CNCId
       status
+      filesFolder
       type
       details
       materialSelection
@@ -780,9 +741,9 @@ export const deleteWorkOrder = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -792,9 +753,9 @@ export const deleteWorkOrder = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -802,6 +763,7 @@ export const deleteWorkOrder = /* GraphQL */ `
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -811,6 +773,7 @@ export const deleteWorkOrder = /* GraphQL */ `
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -822,9 +785,9 @@ export const deleteWorkOrder = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -861,6 +824,7 @@ export const createFile = /* GraphQL */ `
         companyId
         CNCId
         status
+        filesFolder
         type
         details
         materialSelection
@@ -901,9 +865,9 @@ export const createFile = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -932,6 +896,7 @@ export const updateFile = /* GraphQL */ `
         companyId
         CNCId
         status
+        filesFolder
         type
         details
         materialSelection
@@ -972,9 +937,9 @@ export const updateFile = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -1003,6 +968,7 @@ export const deleteFile = /* GraphQL */ `
         companyId
         CNCId
         status
+        filesFolder
         type
         details
         materialSelection
@@ -1043,9 +1009,9 @@ export const deleteFile = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -1070,9 +1036,9 @@ export const createAuditLog = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -1098,9 +1064,9 @@ export const updateAuditLog = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -1126,9 +1092,9 @@ export const deleteAuditLog = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -1158,6 +1124,7 @@ export const createPayment = /* GraphQL */ `
         companyId
         CNCId
         status
+        filesFolder
         type
         details
         materialSelection
@@ -1217,6 +1184,7 @@ export const updatePayment = /* GraphQL */ `
         companyId
         CNCId
         status
+        filesFolder
         type
         details
         materialSelection
@@ -1276,6 +1244,7 @@ export const deletePayment = /* GraphQL */ `
         companyId
         CNCId
         status
+        filesFolder
         type
         details
         materialSelection
@@ -1375,6 +1344,7 @@ export const createMaterialPricing = /* GraphQL */ `
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -1400,6 +1370,7 @@ export const updateMaterialPricing = /* GraphQL */ `
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -1425,6 +1396,7 @@ export const deleteMaterialPricing = /* GraphQL */ `
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt

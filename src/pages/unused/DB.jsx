@@ -1,14 +1,14 @@
 import { useEffect } from "react";
 import "@aws-amplify/ui-react/styles.css";
 import { generateClient } from "aws-amplify/api";
-import { listCompanies } from "./graphql/queries";
+import { listCompanies } from "../graphql/queries";
 import {
   createCompany,
   createUser,
   createWorkOrder,
   createWorkOrderCounter,
   incrementCounter,
-} from "./graphql/mutations";
+} from "../graphql/mutations";
 import { Card } from "@aws-amplify/ui-react";
 
 function DB({}) {

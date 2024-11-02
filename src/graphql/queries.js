@@ -9,13 +9,9 @@ export const getUserByUsername = /* GraphQL */ `
       email
       family_name
       given_name
-      passwordHash
       createdAt
       updatedAt
-      roles {
-        nextToken
-        __typename
-      }
+      role
       workOrdersCreated {
         nextToken
         __typename
@@ -43,6 +39,7 @@ export const getCompany = /* GraphQL */ `
       id
       name
       address
+      companySecret
       stripeConnectId
       createdAt
       updatedAt
@@ -89,6 +86,7 @@ export const listCompanies = /* GraphQL */ `
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -107,13 +105,9 @@ export const getUser = /* GraphQL */ `
       email
       family_name
       given_name
-      passwordHash
       createdAt
       updatedAt
-      roles {
-        nextToken
-        __typename
-      }
+      role
       workOrdersCreated {
         nextToken
         __typename
@@ -156,9 +150,9 @@ export const listUsers = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -174,10 +168,6 @@ export const getRole = /* GraphQL */ `
       name
       description
       permissions {
-        nextToken
-        __typename
-      }
-      userRoles {
         nextToken
         __typename
       }
@@ -224,30 +214,11 @@ export const getUserRole = /* GraphQL */ `
       companyId
       createdAt
       updatedAt
-      user {
-        id
-        username
-        email
-        family_name
-        given_name
-        passwordHash
-        createdAt
-        updatedAt
-        companyId
-        __typename
-      }
-      role {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
       company {
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -346,6 +317,7 @@ export const getWorkOrder = /* GraphQL */ `
       companyId
       CNCId
       status
+      filesFolder
       type
       details
       materialSelection
@@ -384,9 +356,9 @@ export const getWorkOrder = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -396,9 +368,9 @@ export const getWorkOrder = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -406,6 +378,7 @@ export const getWorkOrder = /* GraphQL */ `
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -415,6 +388,7 @@ export const getWorkOrder = /* GraphQL */ `
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -426,9 +400,9 @@ export const getWorkOrder = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -467,6 +441,7 @@ export const listWorkOrders = /* GraphQL */ `
         companyId
         CNCId
         status
+        filesFolder
         type
         details
         materialSelection
@@ -524,6 +499,7 @@ export const getFile = /* GraphQL */ `
         companyId
         CNCId
         status
+        filesFolder
         type
         details
         materialSelection
@@ -564,9 +540,9 @@ export const getFile = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -618,9 +594,9 @@ export const getAuditLog = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -676,6 +652,7 @@ export const getPayment = /* GraphQL */ `
         companyId
         CNCId
         status
+        filesFolder
         type
         details
         materialSelection
@@ -797,6 +774,7 @@ export const getMaterialPricing = /* GraphQL */ `
         id
         name
         address
+        companySecret
         stripeConnectId
         createdAt
         updatedAt
@@ -1259,6 +1237,36 @@ export const listWorkOrderCounters = /* GraphQL */ `
     }
   }
 `;
+export const companiesByCompanySecret = /* GraphQL */ `
+  query CompaniesByCompanySecret(
+    $companySecret: String!
+    $sortDirection: ModelSortDirection
+    $filter: ModelCompanyFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    companiesByCompanySecret(
+      companySecret: $companySecret
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const usersByUsernameAndId = /* GraphQL */ `
   query UsersByUsernameAndId(
     $username: String!
@@ -1282,9 +1290,9 @@ export const usersByUsernameAndId = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -1316,9 +1324,9 @@ export const usersByEmailAndId = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -1348,9 +1356,9 @@ export const usersByCompanyId = /* GraphQL */ `
         email
         family_name
         given_name
-        passwordHash
         createdAt
         updatedAt
+        role
         companyId
         __typename
       }
@@ -1498,6 +1506,7 @@ export const workOrdersByCreatedById = /* GraphQL */ `
         companyId
         CNCId
         status
+        filesFolder
         type
         details
         materialSelection
@@ -1560,6 +1569,7 @@ export const workOrdersByAssignedToId = /* GraphQL */ `
         companyId
         CNCId
         status
+        filesFolder
         type
         details
         materialSelection
@@ -1622,6 +1632,7 @@ export const workOrdersByCompanyId = /* GraphQL */ `
         companyId
         CNCId
         status
+        filesFolder
         type
         details
         materialSelection
@@ -1684,6 +1695,7 @@ export const workOrdersByCNCId = /* GraphQL */ `
         companyId
         CNCId
         status
+        filesFolder
         type
         details
         materialSelection

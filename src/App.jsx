@@ -4,6 +4,7 @@ import {
   Route,
   Routes,
   NavLink,
+  Navigate,
 } from "react-router-dom";
 import {
   FaHome,
@@ -26,12 +27,11 @@ import "@aws-amplify/ui-react/styles.css";
 import "./App.css";
 
 // Import your components
-import Dashboard from "./Dashboard";
-import Companies from "./Companies";
-import AllWorkOrders from "./AllWorkOrders";
-import Users from "./Users";
+import Dashboard from "./pages/Dashboard";
+import Companies from "./pages/Companies";
+import AllWorkOrders from "./pages/AllWorkOrders";
+import Users from "./pages/Users";
 import { getUserByUsername } from "./graphql/queries";
-// Import your logo
 import logo from "./assets/scansewlogo.png";
 import { generateClient } from "aws-amplify/api";
 const client = generateClient();
@@ -43,34 +43,148 @@ function App({ signOut, user }) {
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
+
   useEffect(() => {
     const loadUser = async () => {
       const userData = await fetchUser();
       setSSUser(userData);
+      console.log("SSuser", userData);
     };
     loadUser();
   }, []);
 
   const fetchUser = async () => {
     try {
-      // // Get the current authenticated user
-      // const { tokens } = await fetchAuthSession();
-      // const username = tokens.accessToken.payload.username;
-      // console.log("Username:", username);
-      // Perform the GraphQL query
       const userData = await client.graphql({
         query: getUserByUsername,
         variables: { username: user.username },
       });
-
-      // console.log("User data1:", userData.data.getUserByUsername);
-      // setUser(userData.data.getUserByUsername);
       return userData.data.getUserByUsername;
     } catch (err) {
       console.log("Error fetching user", err);
       return null;
     }
   };
+
+  // Protected Route component
+  const ProtectedRoute = ({ children, allowedRoles }) => {
+    if (!allowedRoles.includes(SSuser.role)) {
+      return <Navigate to="/" replace />;
+    }
+    return children;
+  };
+
+  const renderNavLinks = () => {
+    // All users see Home
+    if (SSuser.role === "new") {
+      return (
+        <>
+          <NavLink
+            to="/"
+            end
+            className="sidebar-link"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <FaHome className="sidebar-icon" /> <span>Home</span>
+          </NavLink>
+        </>
+      );
+    }
+
+    // emp sees Home and Work Orders
+    if (SSuser.role === "emp") {
+      return (
+        <>
+          <NavLink
+            to="/"
+            end
+            className="sidebar-link"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <FaHome className="sidebar-icon" /> <span>Home</span>
+          </NavLink>
+          <NavLink
+            to="/workorders"
+            className="sidebar-link"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <FaClipboardList className="sidebar-icon" />{" "}
+            <span>Work Orders</span>
+          </NavLink>
+        </>
+      );
+    }
+
+    // cAdmin sees Home, Work Orders, and Users
+    if (SSuser.role === "cAdmin") {
+      return (
+        <>
+          <NavLink
+            to="/"
+            end
+            className="sidebar-link"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <FaHome className="sidebar-icon" /> <span>Home</span>
+          </NavLink>
+          <NavLink
+            to="/workorders"
+            className="sidebar-link"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <FaClipboardList className="sidebar-icon" />{" "}
+            <span>Work Orders</span>
+          </NavLink>
+          <NavLink
+            to="/users"
+            className="sidebar-link"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <FaUsers className="sidebar-icon" /> <span>Users</span>
+          </NavLink>
+        </>
+      );
+    }
+
+    // sAdmin sees all routes
+    if (SSuser.role === "sAdmin") {
+      return (
+        <>
+          <NavLink
+            to="/"
+            end
+            className="sidebar-link"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <FaHome className="sidebar-icon" /> <span>Home</span>
+          </NavLink>
+          <NavLink
+            to="/workorders"
+            className="sidebar-link"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <FaClipboardList className="sidebar-icon" />{" "}
+            <span>Work Orders</span>
+          </NavLink>
+          <NavLink
+            to="/companies"
+            className="sidebar-link"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <FaBuilding className="sidebar-icon" /> <span>Companies</span>
+          </NavLink>
+          <NavLink
+            to="/users"
+            className="sidebar-link"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <FaUsers className="sidebar-icon" /> <span>Users</span>
+          </NavLink>
+        </>
+      );
+    }
+  };
+
   return (
     <Router>
       <Grid
@@ -111,65 +225,54 @@ function App({ signOut, user }) {
             <Text variation="primary" fontWeight="bold" marginBottom="1rem">
               Welcome, {SSuser.given_name}
             </Text>
-            <NavLink
-              to="/"
-              end
-              className="sidebar-link"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <FaHome className="sidebar-icon" /> <span>Home</span>
-            </NavLink>
-            <NavLink
-              to="/workorders"
-              className="sidebar-link"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <FaClipboardList className="sidebar-icon" />{" "}
-              <span>Work Orders</span>
-            </NavLink>
-            <NavLink
-              to="/companies"
-              className="sidebar-link"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <FaBuilding className="sidebar-icon" /> <span>Companies</span>
-            </NavLink>
-            <NavLink
-              to="/users"
-              className="sidebar-link"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <FaUsers className="sidebar-icon" /> <span>Users</span>
-            </NavLink>
+
+            {renderNavLinks()}
+
             <Button onClick={signOut} variation="warning" marginTop="auto">
               <FaSignOutAlt className="sidebar-icon" /> <span>Sign Out</span>
             </Button>
           </Flex>
         </View>
 
-        <View
-          className="main-content"
-        >
+        <View className="main-content">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            {/* Home is accessible to all */}
+            <Route path="/" element={<Dashboard SSuser={SSuser} />} />
+
+            {/* Work Orders accessible to emp, cAdmin, and sAdmin */}
             <Route
               path="/workorders"
-              element={<AllWorkOrders SSuser={SSuser} />}
+              element={
+                <ProtectedRoute allowedRoles={["emp", "cAdmin", "sAdmin"]}>
+                  <AllWorkOrders SSuser={SSuser} />
+                </ProtectedRoute>
+              }
             />
-            <Route path="/companies" element={<Companies />} />
-            <Route path="/users" element={<Users />} />
+
+            {/* Companies accessible to sAdmin only */}
+            <Route
+              path="/companies"
+              element={
+                <ProtectedRoute allowedRoles={["sAdmin"]}>
+                  <Companies SSuser={SSuser} />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Users accessible to cAdmin and sAdmin */}
+            <Route
+              path="/users"
+              element={
+                <ProtectedRoute allowedRoles={["cAdmin", "sAdmin"]}>
+                  <Users SSuser={SSuser} />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Catch all route for non-matching paths */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </View>
-
-        {/* <View
-          columnSpan={{ base: 1, large: 2 }}
-          backgroundColor="var(--amplify-colors-background-secondary)"
-          padding="1rem"
-        >
-          <Text textAlign="center">
-            &copy; 2023 Scan and Sew. All rights reserved.
-          </Text>
-        </View> */}
       </Grid>
     </Router>
   );

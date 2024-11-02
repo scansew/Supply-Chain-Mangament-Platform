@@ -24,6 +24,7 @@ export declare type ValidationFunction<T> = (value: T, validationResponse: Valid
 export declare type CompanyUpdateFormInputValues = {
     name?: string;
     address?: string;
+    companySecret?: string;
     stripeConnectId?: string;
     createdAt?: string;
     updatedAt?: string;
@@ -31,6 +32,7 @@ export declare type CompanyUpdateFormInputValues = {
 export declare type CompanyUpdateFormValidationValues = {
     name?: ValidationFunction<string>;
     address?: ValidationFunction<string>;
+    companySecret?: ValidationFunction<string>;
     stripeConnectId?: ValidationFunction<string>;
     createdAt?: ValidationFunction<string>;
     updatedAt?: ValidationFunction<string>;
@@ -40,6 +42,7 @@ export declare type CompanyUpdateFormOverridesProps = {
     CompanyUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
     name?: PrimitiveOverrideProps<TextFieldProps>;
     address?: PrimitiveOverrideProps<TextFieldProps>;
+    companySecret?: PrimitiveOverrideProps<TextFieldProps>;
     stripeConnectId?: PrimitiveOverrideProps<TextFieldProps>;
     createdAt?: PrimitiveOverrideProps<TextFieldProps>;
     updatedAt?: PrimitiveOverrideProps<TextFieldProps>;

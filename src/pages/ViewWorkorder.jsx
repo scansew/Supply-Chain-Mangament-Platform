@@ -30,7 +30,7 @@ import {
 } from "react-icons/md";
 import {} from "react-icons/md";
 import CreateWorkOrderForm from "./CreateWorkOrderForm";
-import { getWorkOrder } from "./graphql/queries";
+import { getWorkOrder } from "../graphql/queries";
 import { list, remove, getUrl } from "aws-amplify/storage";
 import styles from "./WOForm.module.css";
 import { fetchAuthSession } from "@aws-amplify/auth";
