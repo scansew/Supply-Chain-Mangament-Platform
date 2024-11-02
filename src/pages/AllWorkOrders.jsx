@@ -82,16 +82,23 @@ function AllWorkOrders({ SSuser }) {
 
   const fetchWorkOrders = async () => {
     try {
-      const userData = await client.graphql({
-        query: listWorkOrders,
-        variables: {
-          filter: {
-            companyId: { eq: SSuser.companyId },
+      if (SSuser.role === "sAdmin") {
+        const userData = await client.graphql({
+          query: listWorkOrders,
+        });
+        setWorkOrders(userData.data.listWorkOrders.items);
+      } else {
+        const userData = await client.graphql({
+          query: listWorkOrders,
+          variables: {
+            filter: {
+              companyId: { eq: SSuser.companyId },
+            },
           },
-        },
-      });
-      setWorkOrders(userData.data.listWorkOrders.items);
-      console.log("fetched images", userData.data.listWorkOrders.items);
+        });
+        setWorkOrders(userData.data.listWorkOrders.items);
+      }
+      console.log("fetched Work Orders");
     } catch (err) {
       console.log("error fetching WO", err);
     }
