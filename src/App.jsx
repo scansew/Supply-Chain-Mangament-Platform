@@ -48,7 +48,7 @@ function App({ signOut, user }) {
     const loadUser = async () => {
       const userData = await fetchUser();
       setSSUser(userData);
-      console.log("SSuser", userData);
+      // console.log("SSuser", userData);
     };
     loadUser();
   }, []);
@@ -184,7 +184,22 @@ function App({ signOut, user }) {
       );
     }
   };
+  const handleFeedbackClick = () => {
+    // // Replace this with your Google Sheets URL
+    const sheetUrl = "https://forms.gle/qM2oLQndYjxeNrgy6";
+    window.open(sheetUrl, "_blank");
 
+    // <iframe
+    //   src="https://docs.google.com/forms/d/e/1FAIpQLSfm2U6ifaGXVGTuKEpxwMA7ga0QfnZmTK3Yg5Ld3BsIxBnK9Q/viewform?embedded=true"
+    //   width="640"
+    //   height="1277"
+    //   frameborder="0"
+    //   marginheight="0"
+    //   marginwidth="0"
+    // >
+    //   Loading…
+    // </iframe>;
+  };
   return (
     <Router>
       <Grid
@@ -227,7 +242,9 @@ function App({ signOut, user }) {
             </Text>
 
             {renderNavLinks()}
-
+            <Button onClick={handleFeedbackClick} variation="link">
+              Submit Feedback
+            </Button>
             <Button onClick={signOut} variation="warning" marginTop="auto">
               <FaSignOutAlt className="sidebar-icon" /> <span>Sign Out</span>
             </Button>
