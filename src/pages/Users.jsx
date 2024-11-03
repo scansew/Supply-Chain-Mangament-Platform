@@ -82,21 +82,56 @@ function Users({ SSuser }) {
       alert("Please enter a valid email address");
       return;
     }
+    // REACT_APP_AWS_REGION=your-aws-region
+    // REACT_APP_SENDER_EMAIL=your-verified-ses-email@domain.com
+    // REACT_APP_SIGNUP_URL=your-signup-url
+    // console.log(process.env.REACT_APP_AWS_REGION);
 
-    try {
-      // Add your user search logic here
-      console.log("Searching for user with email:", inviteEmail);
-      // Example API call:
-      // const response = await searchUserByEmail(inviteEmail);
-      // if (response.exists) {
-      //   // Handle existing user
-      // } else {
-      //   // Handle new user invitation
-      // }
-    } catch (error) {
-      console.error("Error searching user:", error);
-      alert("Error searching for user");
-    }
+    // try {
+    //   // You'll need to set up AWS SES in your project and ensure you have the required permissions
+    //   const params = {
+    //     Destination: {
+    //       ToAddresses: [inviteEmail],
+    //     },
+    //     Message: {
+    //       Body: {
+    //         Html: {
+    //           Data: `
+    //             <html>
+    //               <body>
+    //                 <h2>Invitation to Join</h2>
+    //                 <p>You have been invited to join our platform.</p>
+    //                 <p>Please click the link below to complete your registration:</p>
+    //                 <p><a href="${process.env.REACT_APP_SIGNUP_URL}">Join Now</a></p>
+    //               </body>
+    //             </html>
+    //           `,
+    //         },
+    //         Text: {
+    //           Data: "You have been invited to join our platform.",
+    //         },
+    //       },
+    //       Subject: {
+    //         Data: "Invitation to Join",
+    //       },
+    //     },
+    //     Source: process.env.REACT_APP_SENDER_EMAIL, // This should be your verified SES email
+    //   };
+
+    //   // Using AWS SDK v3 syntax
+    //   const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
+    //   const sesClient = new SESClient({
+    //     region: process.env.REACT_APP_AWS_REGION,
+    //   });
+    //   await sesClient.send(new SendEmailCommand(params));
+
+    //   alert("Invitation sent successfully!");
+    //   setIsInviteModalOpen(false);
+    //   setInviteEmail("");
+    // } catch (error) {
+    //   console.error("Error sending invitation:", error);
+    //   alert("Error sending invitation. Please try again.");
+    // }
   };
 
   if (loading) return <Loader variation="linear" />;
@@ -107,7 +142,7 @@ function Users({ SSuser }) {
       <Flex direction="column" padding="medium">
         <Flex justifyContent="space-between" alignItems="center">
           <h1>Users</h1>
-          <Button variation="primary" onClick={handleInviteClick}>
+          <Button variation="primary" onClick={handleInviteClick} disabled>
             Invite User
           </Button>
         </Flex>
@@ -127,13 +162,12 @@ function Users({ SSuser }) {
                 <TableCell>{user.given_name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.role}</TableCell>
-                <TableCell>
-                  {user.companyId ? user.companyId : "N/A"}
-                </TableCell>
+                <TableCell>{user.companyId ? user.companyId : "N/A"}</TableCell>
                 <TableCell>
                   <Button
                     variation="link"
                     onClick={() => handleEditClick(user)}
+                    disabled
                   >
                     Edit
                   </Button>

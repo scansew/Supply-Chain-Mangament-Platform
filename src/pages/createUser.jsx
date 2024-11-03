@@ -16,7 +16,7 @@ const client = generateClient();
 
 function CreateUser({ isOpen, onClose, onSuccess, initialData }) {
   const [formData, setFormData] = useState({
-    name: "",
+    given_name: "",
     email: "",
     role: "employee",
     companyId: "",
@@ -28,7 +28,7 @@ function CreateUser({ isOpen, onClose, onSuccess, initialData }) {
   useEffect(() => {
     if (initialData) {
       setFormData({
-        name: initialData.name || "",
+        given_name: initialData.given_name || "",
         email: initialData.email || "",
         role: initialData.role || "employee",
         companyId: initialData.companyId || "",
@@ -36,7 +36,7 @@ function CreateUser({ isOpen, onClose, onSuccess, initialData }) {
     } else {
       // Reset form when not editing
       setFormData({
-        name: "",
+        given_name: "",
         email: "",
         role: "employee",
         companyId: "",
@@ -56,7 +56,7 @@ function CreateUser({ isOpen, onClose, onSuccess, initialData }) {
 
   const resetForm = () => {
     setFormData({
-      name: "",
+      given_name: "",
       email: "",
       role: "employee",
       companyId: "",
@@ -70,7 +70,7 @@ function CreateUser({ isOpen, onClose, onSuccess, initialData }) {
   };
 
   const validateForm = () => {
-    if (!formData.name.trim()) return "Name is required";
+    if (!formData.given_name.trim()) return "Given Name is required";
     if (!formData.email.trim()) return "Email is required";
     if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
       return "Invalid email format";
@@ -93,7 +93,7 @@ function CreateUser({ isOpen, onClose, onSuccess, initialData }) {
     try {
       const mutation = initialData ? updateUser : createUser;
       const input = {
-        name: formData.name,
+        given_name: formData.name,
         email: formData.email.toLowerCase(),
         role: formData.role,
         companyId: formData.companyId,
@@ -156,7 +156,7 @@ function CreateUser({ isOpen, onClose, onSuccess, initialData }) {
               <TextField
                 name="name"
                 label="Name"
-                value={formData.name}
+                value={formData.given_name}
                 onChange={handleInputChange}
                 required
               />
@@ -176,9 +176,9 @@ function CreateUser({ isOpen, onClose, onSuccess, initialData }) {
                 value={formData.role}
                 onChange={handleInputChange}
               >
-                <option value="employee">Employee</option>
-                <option value="admin">Admin</option>
-                <option value="manager">Manager</option>
+                <option value="emp">Employee</option>
+                <option value="cAdmin">Admin</option>
+                <option value="new">New Employee</option>
               </SelectField>
 
               <TextField
