@@ -33,7 +33,6 @@ import CreateWorkOrderForm from "./CreateWorkOrderForm";
 import { getWorkOrder } from "../graphql/queries";
 import { list, remove, getUrl } from "aws-amplify/storage";
 import styles from "./WOForm.module.css";
-import { fetchAuthSession } from "@aws-amplify/auth";
 import { generateClient } from "aws-amplify/api";
 
 const ViewEditWorkOrder = ({ workOrderItem, SSuser }) => {
@@ -67,24 +66,18 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser }) => {
       console.error("Error fetching work order:", error);
     }
   };
+
   const fetchS3Files = async () => {
     setFiles("");
     setIsLoading(true);
     setError(null);
     try {
-      // Fetch auth session
-      const session = await fetchAuthSession();
-
-      // Extract Identity Pool ID and Identity ID
-      const identityPoolId = session.identityPoolId;
-      const identityId = session.identityId;
-      console.log("Identity Pool ID:", identityId);
-      const key = `private/${identityId}/companies/${SSuser.companyId}/${workOrderItem.woNumber}`;
-
+      const key = editedWorkOrder.filesFolder;
+      console.log("Key is", key);
       const fetchedFiles = await list({
         path: key,
         options: {
-          accessLevel: "private",
+          accessLevel: "public",
           listAll: true,
         },
       });
@@ -99,6 +92,7 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser }) => {
       setIsLoading(false);
     }
   };
+
   async function handleDelete(key) {
     try {
       await remove({

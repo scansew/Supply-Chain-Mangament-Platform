@@ -24,17 +24,8 @@ import {
 } from "react-icons/md";
 import { Card, Heading } from "@aws-amplify/ui-react";
 import styles from "./WOForm.module.css";
-import {
-  View,
-  Button,
-  Table,
-  TableCell,
-  TableBody,
-  TableHead,
-  TableRow,
-} from "@aws-amplify/ui-react";
+import { Button } from "@aws-amplify/ui-react";
 
-import { fetchAuthSession } from "@aws-amplify/auth";
 const CreateWorkOrderForm = ({
   SSuser,
   button,
@@ -101,13 +92,6 @@ const CreateWorkOrderForm = ({
     setIsLoading(true);
     setError(null);
     try {
-      // // For Private upload of files
-      // const session = await fetchAuthSession();
-      // // Extract Identity Pool ID and Identity ID
-      // const identityPoolId = session.identityPoolId;
-      // const identityId = session.identityId;
-      // console.log("Identity Pool ID:", identityId);
-      // const key = `private/${identityId}/companies/${SSuser.companyId}/${formState.woNumber}`;
       const key = `public/companies/${SSuser.companyId}/${formState.woNumber}`;
 
       const fetchedFiles = await list({
