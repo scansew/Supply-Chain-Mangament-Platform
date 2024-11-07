@@ -95,7 +95,7 @@ function Users({ SSuser }) {
 
   const handleMailtoClick = useCallback(() => {
     const companyName = company?.name || "Our Company";
-    const inviteUrl = "https://main.d2hlus9pns00e4.amplifyapp.com/"; // Replace with your actual signup URL
+    const inviteUrl = "https://main.scansew.com"; // Replace with your actual signup URL
     const companySecret = company?.companySecret || "Not available";
 
     const subject = encodeURIComponent(
@@ -126,7 +126,7 @@ function Users({ SSuser }) {
 
   const copyInviteCredentials = useCallback(() => {
     const companyName = company?.name || "Our Company";
-    const inviteUrl = "https://main.d2hlus9pns00e4.amplifyapp.com/"; // Replace with your actual signup URL
+    const inviteUrl = "https://main.scansew.com"; // Replace with your actual signup URL
     const companySecret = company?.companySecret || "Not available";
 
     const inviteText = `
@@ -286,11 +286,8 @@ function Users({ SSuser }) {
                   </Text>
                   <Text>
                     Login Portal :{" "}
-                    <Link
-                      href="https://main.d2hlus9pns00e4.amplifyapp.com/"
-                      isExternal
-                    >
-                      https://main.d2hlus9pns00e4.amplifyapp.com/
+                    <Link href="https://main.scansew.com" isExternal>
+                      https://main.scansew.com
                     </Link>
                   </Text>
                   <Flex direction="column" alignItems="center" gap="medium">

@@ -217,7 +217,7 @@ function App({ signOut, user }) {
             padding="1rem"
             height="60px"
           >
-            <Text>{user.username}</Text>
+            {/* <Text>{user.username}</Text> */}
             <Button className="menu-toggle" onClick={toggleSidebar}>
               <FaBars />
             </Button>

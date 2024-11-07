@@ -139,3 +139,5 @@ $util.toJson($ctx.result.items[0])
     $util.error($ctx.error.message, $ctx.error.type)
 #end
 $util.toJson($ctx.result)
+
+## Change signup invite URL
