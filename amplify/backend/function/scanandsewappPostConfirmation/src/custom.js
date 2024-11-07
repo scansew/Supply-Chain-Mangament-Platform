@@ -30,6 +30,7 @@ exports.handler = async (event, context) => {
         email
         family_name
         given_name
+        role
       }
     }
   `;
@@ -40,6 +41,7 @@ exports.handler = async (event, context) => {
       email: event.request.userAttributes.email,
       family_name: event.request.userAttributes.family_name,
       given_name: event.request.userAttributes.given_name,
+      role: "new",
     },
   };
 

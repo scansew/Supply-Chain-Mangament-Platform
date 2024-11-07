@@ -186,7 +186,7 @@ function App({ signOut, user }) {
   };
   const handleFeedbackClick = () => {
     // // Replace this with your Google Sheets URL
-    const sheetUrl = "https://forms.gle/qM2oLQndYjxeNrgy6";
+    const sheetUrl = "https://forms.gle/vjKUhjNECHL6JTmdA";
     window.open(sheetUrl, "_blank");
 
     // <iframe

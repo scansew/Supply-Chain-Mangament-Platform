@@ -263,6 +263,7 @@ type Mutation {
   incrementCounter(counterName: String!): Int!
   updateUserCompany(userId: ID!, companySecret: String!): User
 }
+
 type Query {
   getUserByUsername(username: String!): User
 }
