@@ -34,6 +34,7 @@ export const updateUserCompany = /* GraphQL */ `
         __typename
       }
       companyId
+      companyName
       __typename
     }
   }
@@ -180,6 +181,7 @@ export const createUser = /* GraphQL */ `
         __typename
       }
       companyId
+      companyName
       __typename
     }
   }
@@ -215,6 +217,7 @@ export const updateUser = /* GraphQL */ `
         __typename
       }
       companyId
+      companyName
       __typename
     }
   }
@@ -250,6 +253,7 @@ export const deleteUser = /* GraphQL */ `
         __typename
       }
       companyId
+      companyName
       __typename
     }
   }
@@ -517,6 +521,7 @@ export const createWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       assignedTo {
@@ -529,6 +534,7 @@ export const createWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       company {
@@ -561,6 +567,7 @@ export const createWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       files {
@@ -631,6 +638,7 @@ export const updateWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       assignedTo {
@@ -643,6 +651,7 @@ export const updateWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       company {
@@ -675,6 +684,7 @@ export const updateWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       files {
@@ -745,6 +755,7 @@ export const deleteWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       assignedTo {
@@ -757,6 +768,7 @@ export const deleteWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       company {
@@ -789,6 +801,7 @@ export const deleteWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       files {
@@ -869,6 +882,7 @@ export const createFile = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       __typename
@@ -941,6 +955,7 @@ export const updateFile = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       __typename
@@ -1013,6 +1028,7 @@ export const deleteFile = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       __typename
@@ -1040,6 +1056,7 @@ export const createAuditLog = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       updatedAt
@@ -1068,6 +1085,7 @@ export const updateAuditLog = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       updatedAt
@@ -1096,6 +1114,7 @@ export const deleteAuditLog = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       updatedAt

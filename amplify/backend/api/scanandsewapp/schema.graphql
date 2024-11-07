@@ -35,6 +35,7 @@ type User @model {
   filesUploaded: [File] @hasMany(indexName: "byUploader", fields: ["id"])
   auditLogs: [AuditLog] @hasMany(indexName: "byUser", fields: ["id"])
   companyId: ID @index(name: "byCompany")
+  companyName: String 
 }
 enum roleType {
   new

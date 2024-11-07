@@ -131,6 +131,7 @@ export const onCreateUser = /* GraphQL */ `
         __typename
       }
       companyId
+      companyName
       __typename
     }
   }
@@ -163,6 +164,7 @@ export const onUpdateUser = /* GraphQL */ `
         __typename
       }
       companyId
+      companyName
       __typename
     }
   }
@@ -195,6 +197,7 @@ export const onDeleteUser = /* GraphQL */ `
         __typename
       }
       companyId
+      companyName
       __typename
     }
   }
@@ -440,6 +443,7 @@ export const onCreateWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       assignedTo {
@@ -452,6 +456,7 @@ export const onCreateWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       company {
@@ -484,6 +489,7 @@ export const onCreateWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       files {
@@ -553,6 +559,7 @@ export const onUpdateWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       assignedTo {
@@ -565,6 +572,7 @@ export const onUpdateWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       company {
@@ -597,6 +605,7 @@ export const onUpdateWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       files {
@@ -666,6 +675,7 @@ export const onDeleteWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       assignedTo {
@@ -678,6 +688,7 @@ export const onDeleteWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       company {
@@ -710,6 +721,7 @@ export const onDeleteWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       files {
@@ -787,6 +799,7 @@ export const onCreateFile = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       __typename
@@ -856,6 +869,7 @@ export const onUpdateFile = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       __typename
@@ -925,6 +939,7 @@ export const onDeleteFile = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       __typename
@@ -949,6 +964,7 @@ export const onCreateAuditLog = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       updatedAt
@@ -974,6 +990,7 @@ export const onUpdateAuditLog = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       updatedAt
@@ -999,6 +1016,7 @@ export const onDeleteAuditLog = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       updatedAt

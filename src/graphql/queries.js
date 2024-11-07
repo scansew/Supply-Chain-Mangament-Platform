@@ -29,6 +29,7 @@ export const getUserByUsername = /* GraphQL */ `
         __typename
       }
       companyId
+      companyName
       __typename
     }
   }
@@ -125,6 +126,7 @@ export const getUser = /* GraphQL */ `
         __typename
       }
       companyId
+      companyName
       __typename
     }
   }
@@ -154,6 +156,7 @@ export const listUsers = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       nextToken
@@ -360,6 +363,7 @@ export const getWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       assignedTo {
@@ -372,6 +376,7 @@ export const getWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       company {
@@ -404,6 +409,7 @@ export const getWorkOrder = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       files {
@@ -544,6 +550,7 @@ export const getFile = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       __typename
@@ -598,6 +605,7 @@ export const getAuditLog = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       updatedAt
@@ -1294,6 +1302,7 @@ export const usersByUsernameAndId = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       nextToken
@@ -1328,6 +1337,7 @@ export const usersByEmailAndId = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       nextToken
@@ -1360,6 +1370,7 @@ export const usersByCompanyId = /* GraphQL */ `
         updatedAt
         role
         companyId
+        companyName
         __typename
       }
       nextToken

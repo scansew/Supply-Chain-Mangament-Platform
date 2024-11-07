@@ -36,6 +36,7 @@ export default function UserCreateForm(props) {
     createdAt: "",
     updatedAt: "",
     role: "",
+    companyName: "",
   };
   const [username, setUsername] = React.useState(initialValues.username);
   const [email, setEmail] = React.useState(initialValues.email);
@@ -46,6 +47,9 @@ export default function UserCreateForm(props) {
   const [createdAt, setCreatedAt] = React.useState(initialValues.createdAt);
   const [updatedAt, setUpdatedAt] = React.useState(initialValues.updatedAt);
   const [role, setRole] = React.useState(initialValues.role);
+  const [companyName, setCompanyName] = React.useState(
+    initialValues.companyName
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setUsername(initialValues.username);
@@ -55,6 +59,7 @@ export default function UserCreateForm(props) {
     setCreatedAt(initialValues.createdAt);
     setUpdatedAt(initialValues.updatedAt);
     setRole(initialValues.role);
+    setCompanyName(initialValues.companyName);
     setErrors({});
   };
   const validations = {
@@ -65,6 +70,7 @@ export default function UserCreateForm(props) {
     createdAt: [],
     updatedAt: [],
     role: [],
+    companyName: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -116,6 +122,7 @@ export default function UserCreateForm(props) {
           createdAt,
           updatedAt,
           role,
+          companyName,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -185,6 +192,7 @@ export default function UserCreateForm(props) {
               createdAt,
               updatedAt,
               role,
+              companyName,
             };
             const result = onChange(modelFields);
             value = result?.username ?? value;
@@ -215,6 +223,7 @@ export default function UserCreateForm(props) {
               createdAt,
               updatedAt,
               role,
+              companyName,
             };
             const result = onChange(modelFields);
             value = result?.email ?? value;
@@ -245,6 +254,7 @@ export default function UserCreateForm(props) {
               createdAt,
               updatedAt,
               role,
+              companyName,
             };
             const result = onChange(modelFields);
             value = result?.family_name ?? value;
@@ -275,6 +285,7 @@ export default function UserCreateForm(props) {
               createdAt,
               updatedAt,
               role,
+              companyName,
             };
             const result = onChange(modelFields);
             value = result?.given_name ?? value;
@@ -307,6 +318,7 @@ export default function UserCreateForm(props) {
               createdAt: value,
               updatedAt,
               role,
+              companyName,
             };
             const result = onChange(modelFields);
             value = result?.createdAt ?? value;
@@ -339,6 +351,7 @@ export default function UserCreateForm(props) {
               createdAt,
               updatedAt: value,
               role,
+              companyName,
             };
             const result = onChange(modelFields);
             value = result?.updatedAt ?? value;
@@ -369,6 +382,7 @@ export default function UserCreateForm(props) {
               createdAt,
               updatedAt,
               role: value,
+              companyName,
             };
             const result = onChange(modelFields);
             value = result?.role ?? value;
@@ -404,6 +418,37 @@ export default function UserCreateForm(props) {
           {...getOverrideProps(overrides, "roleoption3")}
         ></option>
       </SelectField>
+      <TextField
+        label="Company name"
+        isRequired={false}
+        isReadOnly={false}
+        value={companyName}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              username,
+              email,
+              family_name,
+              given_name,
+              createdAt,
+              updatedAt,
+              role,
+              companyName: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.companyName ?? value;
+          }
+          if (errors.companyName?.hasError) {
+            runValidationTasks("companyName", value);
+          }
+          setCompanyName(value);
+        }}
+        onBlur={() => runValidationTasks("companyName", companyName)}
+        errorMessage={errors.companyName?.errorMessage}
+        hasError={errors.companyName?.hasError}
+        {...getOverrideProps(overrides, "companyName")}
+      ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

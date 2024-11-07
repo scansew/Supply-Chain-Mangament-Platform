@@ -1,7 +1,7 @@
 // Users.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { generateClient } from "aws-amplify/api";
-import { listUsers } from "../graphql/queries";
+import { listUsers, getCompany } from "../graphql/queries";
 import {
   Table,
   TableCell,
@@ -15,6 +15,8 @@ import {
   View,
   Heading,
   Card,
+  Link,
+  Text,
 } from "@aws-amplify/ui-react";
 import CreateUser from "./createUser";
 
@@ -28,10 +30,40 @@ function Users({ SSuser }) {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [copySuccess, setCopySuccess] = useState(false);
+  const [company, setCompany] = useState(null);
+  const [showSecret, setShowSecret] = useState(false);
 
   useEffect(() => {
     fetchUsers();
+    fetchCompanyDetails();
   }, []);
+  const toggleSecretVisibility = () => {
+    setShowSecret(!showSecret);
+  };
+  const maskCompanySecret = (secret) => {
+    if (!secret) return "Not available";
+    return showSecret
+      ? secret
+      : secret.substring(0, 4) + "*".repeat(secret.length - 4);
+  };
+  async function fetchCompanyDetails() {
+    if (!SSuser.companyId) {
+      console.log("No company ID available");
+      return;
+    }
+
+    try {
+      const companyData = await client.graphql({
+        query: getCompany,
+        variables: { id: SSuser.companyId },
+      });
+      setCompany(companyData.data.getCompany);
+    } catch (err) {
+      console.error("Error fetching company details:", err);
+      setError("An error occurred while fetching company details.");
+    }
+  }
 
   async function fetchUsers() {
     try {
@@ -45,8 +77,8 @@ function Users({ SSuser }) {
           query: listUsers,
           variables: {
             filter: {
-              role: {
-                eq: "emp",
+              companyId: {
+                eq: SSuser.companyId,
               },
             },
           },
@@ -61,6 +93,71 @@ function Users({ SSuser }) {
     }
   }
 
+  const handleMailtoClick = useCallback(() => {
+    const companyName = company?.name || "Our Company";
+    const inviteUrl = "https://main.d2hlus9pns00e4.amplifyapp.com/"; // Replace with your actual signup URL
+    const companySecret = company?.companySecret || "Not available";
+
+    const subject = encodeURIComponent(
+      `Invitation to join ${companyName} on the Scan and Sew platform platform`
+    );
+    const body = encodeURIComponent(
+      `
+  Hello!
+  
+  You've been invited to join ${companyName} on the Scan and Sew platform.
+  
+  To get started, please follow these steps:
+  1. Visit the signup page: ${inviteUrl}
+  2. After you finish the sign-up process, log in to the portal and enter the following secret in the text box provided to gain access.
+  3. Use the following Company Secret: ${companySecret}
+  
+  IMPORTANT: Keep this Company Secret confidential. Do not share it with anyone outside your organization.
+  
+  If you have any questions, please don't hesitate to reach out.
+  
+  Best regards,
+  ${companyName} Team
+    `.trim()
+    );
+
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  }, [SSuser.companyId, company]);
+
+  const copyInviteCredentials = useCallback(() => {
+    const companyName = company?.name || "Our Company";
+    const inviteUrl = "https://main.d2hlus9pns00e4.amplifyapp.com/"; // Replace with your actual signup URL
+    const companySecret = company?.companySecret || "Not available";
+
+    const inviteText = `
+  Hello!
+  
+  You've been invited to join ${companyName} on the Scan and Sew platform platform.
+  
+  To get started, please follow these steps:
+  1. Visit the signup page: ${inviteUrl}
+  2. After you finish the sign-up process, log in to the portal and enter the following secret in the text box provided to gain access.
+  3. Use the following Company Secret: ${companySecret}
+  
+  IMPORTANT: Keep this Company Secret confidential. Do not share it with anyone outside your organization.
+  
+  If you have any questions, please don't hesitate to reach out.
+  
+  Best regards,
+  ${companyName} Team
+    `.trim();
+
+    navigator.clipboard.writeText(inviteText).then(
+      () => {
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      },
+      (err) => {
+        console.error("Failed to copy: ", err);
+      }
+    );
+  }, [SSuser.companyId, company]);
+
   const handleInviteClick = () => {
     setIsInviteModalOpen(true);
   };
@@ -74,6 +171,7 @@ function Users({ SSuser }) {
     setUsers((prevUsers) =>
       prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
     );
+    alert("User updated successfully!");
   };
 
   const handleSearchUser = async (e) => {
@@ -82,56 +180,6 @@ function Users({ SSuser }) {
       alert("Please enter a valid email address");
       return;
     }
-    // REACT_APP_AWS_REGION=your-aws-region
-    // REACT_APP_SENDER_EMAIL=your-verified-ses-email@domain.com
-    // REACT_APP_SIGNUP_URL=your-signup-url
-    // console.log(process.env.REACT_APP_AWS_REGION);
-
-    // try {
-    //   // You'll need to set up AWS SES in your project and ensure you have the required permissions
-    //   const params = {
-    //     Destination: {
-    //       ToAddresses: [inviteEmail],
-    //     },
-    //     Message: {
-    //       Body: {
-    //         Html: {
-    //           Data: `
-    //             <html>
-    //               <body>
-    //                 <h2>Invitation to Join</h2>
-    //                 <p>You have been invited to join our platform.</p>
-    //                 <p>Please click the link below to complete your registration:</p>
-    //                 <p><a href="${process.env.REACT_APP_SIGNUP_URL}">Join Now</a></p>
-    //               </body>
-    //             </html>
-    //           `,
-    //         },
-    //         Text: {
-    //           Data: "You have been invited to join our platform.",
-    //         },
-    //       },
-    //       Subject: {
-    //         Data: "Invitation to Join",
-    //       },
-    //     },
-    //     Source: process.env.REACT_APP_SENDER_EMAIL, // This should be your verified SES email
-    //   };
-
-    //   // Using AWS SDK v3 syntax
-    //   const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
-    //   const sesClient = new SESClient({
-    //     region: process.env.REACT_APP_AWS_REGION,
-    //   });
-    //   await sesClient.send(new SendEmailCommand(params));
-
-    //   alert("Invitation sent successfully!");
-    //   setIsInviteModalOpen(false);
-    //   setInviteEmail("");
-    // } catch (error) {
-    //   console.error("Error sending invitation:", error);
-    //   alert("Error sending invitation. Please try again.");
-    // }
   };
 
   if (loading) return <Loader variation="linear" />;
@@ -142,10 +190,11 @@ function Users({ SSuser }) {
       <Flex direction="column" padding="medium">
         <Flex justifyContent="space-between" alignItems="center">
           <h1>Users</h1>
-          <Button variation="primary" onClick={handleInviteClick} disabled>
+          <Button variation="primary" onClick={handleInviteClick}>
             Invite User
           </Button>
         </Flex>
+
         <Table caption="" highlightOnHover={true} variation="striped">
           <TableHead>
             <TableRow>
@@ -162,12 +211,13 @@ function Users({ SSuser }) {
                 <TableCell>{user.given_name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.role}</TableCell>
-                <TableCell>{user.companyId ? user.companyId : "N/A"}</TableCell>
+                <TableCell>
+                  {user.companyName ? user.companyName : "N/A"}
+                </TableCell>
                 <TableCell>
                   <Button
                     variation="link"
                     onClick={() => handleEditClick(user)}
-                    disabled
                   >
                     Edit
                   </Button>
@@ -203,11 +253,62 @@ function Users({ SSuser }) {
           >
             <Card
               variation="elevated"
-              width="400px"
+              width="600px"
               padding="large"
               backgroundColor="white"
             >
-              <Flex direction="column" gap="medium">
+              <View position="relative">
+                <Button
+                  onClick={() => setIsInviteModalOpen(false)}
+                  size="small"
+                  variation="link"
+                  style={{
+                    position: "absolute",
+                    top: "0",
+                    right: "0",
+                  }}
+                >
+                  &times;
+                </Button>
+
+                <Heading level={3}>Invite Credentials</Heading>
+                <Flex direction="column" gap="medium">
+                  <Flex
+                    justifyContent="space-between"
+                    alignItems="center"
+                  ></Flex>
+                  <Text>Company Name: {company?.name || "Not available"}</Text>
+                  <Text>
+                    Company Secret: {maskCompanySecret(company?.companySecret)}{" "}
+                    <Button size="small" onClick={toggleSecretVisibility}>
+                      {showSecret ? "Hide" : "Reveal"}
+                    </Button>
+                  </Text>
+                  <Text>
+                    Login Portal :{" "}
+                    <Link
+                      href="https://main.d2hlus9pns00e4.amplifyapp.com/"
+                      isExternal
+                    >
+                      https://main.d2hlus9pns00e4.amplifyapp.com/
+                    </Link>
+                  </Text>
+                  <Flex direction="column" alignItems="center" gap="medium">
+                    <Flex gap="small">
+                      <Button
+                        onClick={copyInviteCredentials}
+                        size="small"
+                        variation={copySuccess ? "primary" : "default"}
+                      >
+                        {copySuccess ? "Copied!" : "Copy Invite"}
+                      </Button>
+                      <Button onClick={handleMailtoClick} size="small">
+                        Email Invite
+                      </Button>
+                    </Flex>
+                  </Flex>
+                </Flex>
+                {/* <Flex direction="column" gap="medium">
                 <Heading level={3}>Invite User</Heading>
                 <form onSubmit={handleSearchUser}>
                   <Flex direction="column" gap="medium">
@@ -234,7 +335,8 @@ function Users({ SSuser }) {
                     </Flex>
                   </Flex>
                 </form>
-              </Flex>
+              </Flex> */}
+              </View>
             </Card>
           </View>
         )}
