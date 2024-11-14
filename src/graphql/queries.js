@@ -30,6 +30,10 @@ export const getUserByUsername = /* GraphQL */ `
       }
       companyId
       companyName
+      stageUpdates {
+        nextToken
+        __typename
+      }
       __typename
     }
   }
@@ -60,7 +64,11 @@ export const getCompany = /* GraphQL */ `
         nextToken
         __typename
       }
-      userRoles {
+      companyRoles {
+        nextToken
+        __typename
+      }
+      workflowStages {
         nextToken
         __typename
       }
@@ -89,6 +97,62 @@ export const listCompanies = /* GraphQL */ `
         address
         companySecret
         stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getCompanyRole = /* GraphQL */ `
+  query GetCompanyRole($id: ID!) {
+    getCompanyRole(id: $id) {
+      id
+      roleId
+      companyId
+      shippingAddress
+      private
+      isActive
+      createdAt
+      updatedAt
+      company {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const listCompanyRoles = /* GraphQL */ `
+  query ListCompanyRoles(
+    $id: ID
+    $filter: ModelCompanyRoleFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listCompanyRoles(
+      id: $id
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        id
+        roleId
+        companyId
+        shippingAddress
+        private
+        isActive
         createdAt
         updatedAt
         __typename
@@ -127,6 +191,10 @@ export const getUser = /* GraphQL */ `
       }
       companyId
       companyName
+      stageUpdates {
+        nextToken
+        __typename
+      }
       __typename
     }
   }
@@ -157,152 +225,6 @@ export const listUsers = /* GraphQL */ `
         role
         companyId
         companyName
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getRole = /* GraphQL */ `
-  query GetRole($id: ID!) {
-    getRole(id: $id) {
-      id
-      name
-      description
-      permissions {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listRoles = /* GraphQL */ `
-  query ListRoles(
-    $id: ID
-    $filter: ModelRoleFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-  ) {
-    listRoles(
-      id: $id
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
-      items {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getUserRole = /* GraphQL */ `
-  query GetUserRole($id: ID!) {
-    getUserRole(id: $id) {
-      id
-      userId
-      roleId
-      companyId
-      createdAt
-      updatedAt
-      company {
-        id
-        name
-        address
-        companySecret
-        stripeConnectId
-        createdAt
-        updatedAt
-        __typename
-      }
-      __typename
-    }
-  }
-`;
-export const listUserRoles = /* GraphQL */ `
-  query ListUserRoles(
-    $id: ID
-    $filter: ModelUserRoleFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-  ) {
-    listUserRoles(
-      id: $id
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
-      items {
-        id
-        userId
-        roleId
-        companyId
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getPermission = /* GraphQL */ `
-  query GetPermission($id: ID!) {
-    getPermission(id: $id) {
-      id
-      roleId
-      action
-      description
-      role {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listPermissions = /* GraphQL */ `
-  query ListPermissions(
-    $id: ID
-    $filter: ModelPermissionFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-  ) {
-    listPermissions(
-      id: $id
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
-      items {
-        id
-        roleId
-        action
-        description
-        createdAt
-        updatedAt
         __typename
       }
       nextToken
@@ -420,6 +342,17 @@ export const getWorkOrder = /* GraphQL */ `
         nextToken
         __typename
       }
+      currentStage
+      currentStageId
+      estimatedCompletionDate
+      workflowStages {
+        nextToken
+        __typename
+      }
+      stageUpdates {
+        nextToken
+        __typename
+      }
       __typename
     }
   }
@@ -480,6 +413,206 @@ export const listWorkOrders = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getWorkflowStage = /* GraphQL */ `
+  query GetWorkflowStage($id: ID!) {
+    getWorkflowStage(id: $id) {
+      id
+      workOrderId
+      stage
+      status
+      companyId
+      startDate
+      completionDate
+      estimatedCompletionDate
+      notes
+      attn
+      qualityCheck
+      createdAt
+      updatedAt
+      priority
+      estimatedDuration
+      workOrder {
+        id
+        woNumber
+        createdById
+        assignedToId
+        companyId
+        CNCId
+        status
+        filesFolder
+        type
+        details
+        materialSelection
+        estimatedPrice
+        msrp
+        createdAt
+        updatedAt
+        process
+        make
+        model
+        year
+        crmClientId
+        rawImages
+        rawDesignImages
+        description
+        materialPrice
+        manufacturePrice
+        raw3dModel
+        designPhotos
+        outline3dModel
+        approved3dModel
+        main2dPattern
+        billOfMaterials
+        cnc2dPattern
+        scanInfo
+        businessName
+        attnName
+        businessPhone
+        businessShippingAddress
+        customerName
+        customerDropShippingAddress
+        shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
+        __typename
+      }
+      company {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      stageUpdates {
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const listWorkflowStages = /* GraphQL */ `
+  query ListWorkflowStages(
+    $id: ID
+    $filter: ModelWorkflowStageFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listWorkflowStages(
+      id: $id
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        id
+        workOrderId
+        stage
+        status
+        companyId
+        startDate
+        completionDate
+        estimatedCompletionDate
+        notes
+        attn
+        qualityCheck
+        createdAt
+        updatedAt
+        priority
+        estimatedDuration
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getStageUpdate = /* GraphQL */ `
+  query GetStageUpdate($id: ID!) {
+    getStageUpdate(id: $id) {
+      id
+      workflowStageId
+      status
+      notes
+      timestamp
+      updatedById
+      updatedBy {
+        id
+        username
+        email
+        family_name
+        given_name
+        createdAt
+        updatedAt
+        role
+        companyId
+        companyName
+        __typename
+      }
+      workflowStage {
+        id
+        workOrderId
+        stage
+        status
+        companyId
+        startDate
+        completionDate
+        estimatedCompletionDate
+        notes
+        attn
+        qualityCheck
+        createdAt
+        updatedAt
+        priority
+        estimatedDuration
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listStageUpdates = /* GraphQL */ `
+  query ListStageUpdates(
+    $id: ID
+    $filter: ModelStageUpdateFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listStageUpdates(
+      id: $id
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        id
+        workflowStageId
+        status
+        notes
+        timestamp
+        updatedById
+        createdAt
+        updatedAt
         __typename
       }
       nextToken
@@ -538,6 +671,9 @@ export const getFile = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       uploadedBy {
@@ -693,6 +829,9 @@ export const getPayment = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       __typename
@@ -1207,6 +1346,124 @@ export const listTotals = /* GraphQL */ `
     }
   }
 `;
+export const getPermission = /* GraphQL */ `
+  query GetPermission($id: ID!) {
+    getPermission(id: $id) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listPermissions = /* GraphQL */ `
+  query ListPermissions(
+    $id: ID
+    $filter: ModelPermissionFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listPermissions(
+      id: $id
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        id
+        name
+        description
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getRole = /* GraphQL */ `
+  query GetRole($id: ID!) {
+    getRole(id: $id) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listRoles = /* GraphQL */ `
+  query ListRoles(
+    $id: ID
+    $filter: ModelRoleFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listRoles(
+      id: $id
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        id
+        name
+        description
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getUserRole = /* GraphQL */ `
+  query GetUserRole($id: ID!) {
+    getUserRole(id: $id) {
+      id
+      name
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listUserRoles = /* GraphQL */ `
+  query ListUserRoles(
+    $id: ID
+    $filter: ModelUserRoleFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listUserRoles(
+      id: $id
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        id
+        name
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getWorkOrderCounter = /* GraphQL */ `
   query GetWorkOrderCounter($counterName: String!) {
     getWorkOrderCounter(counterName: $counterName) {
@@ -1266,6 +1523,37 @@ export const companiesByCompanySecret = /* GraphQL */ `
         address
         companySecret
         stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const companyRolesByCompanyId = /* GraphQL */ `
+  query CompanyRolesByCompanyId(
+    $companyId: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelCompanyRoleFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    companyRolesByCompanyId(
+      companyId: $companyId
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        roleId
+        companyId
+        shippingAddress
+        private
+        isActive
         createdAt
         updatedAt
         __typename
@@ -1378,122 +1666,6 @@ export const usersByCompanyId = /* GraphQL */ `
     }
   }
 `;
-export const userRolesByUserId = /* GraphQL */ `
-  query UserRolesByUserId(
-    $userId: ID!
-    $sortDirection: ModelSortDirection
-    $filter: ModelUserRoleFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    userRolesByUserId(
-      userId: $userId
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        userId
-        roleId
-        companyId
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const userRolesByRoleId = /* GraphQL */ `
-  query UserRolesByRoleId(
-    $roleId: ID!
-    $sortDirection: ModelSortDirection
-    $filter: ModelUserRoleFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    userRolesByRoleId(
-      roleId: $roleId
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        userId
-        roleId
-        companyId
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const userRolesByCompanyId = /* GraphQL */ `
-  query UserRolesByCompanyId(
-    $companyId: ID!
-    $sortDirection: ModelSortDirection
-    $filter: ModelUserRoleFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    userRolesByCompanyId(
-      companyId: $companyId
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        userId
-        roleId
-        companyId
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const permissionsByRoleId = /* GraphQL */ `
-  query PermissionsByRoleId(
-    $roleId: ID!
-    $sortDirection: ModelSortDirection
-    $filter: ModelPermissionFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    permissionsByRoleId(
-      roleId: $roleId
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        roleId
-        action
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
 export const workOrdersByCreatedById = /* GraphQL */ `
   query WorkOrdersByCreatedById(
     $createdById: ID!
@@ -1550,6 +1722,9 @@ export const workOrdersByCreatedById = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       nextToken
@@ -1613,6 +1788,9 @@ export const workOrdersByAssignedToId = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       nextToken
@@ -1676,6 +1854,9 @@ export const workOrdersByCompanyId = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       nextToken
@@ -1739,6 +1920,147 @@ export const workOrdersByCNCId = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const workflowStagesByWorkOrderId = /* GraphQL */ `
+  query WorkflowStagesByWorkOrderId(
+    $workOrderId: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelWorkflowStageFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    workflowStagesByWorkOrderId(
+      workOrderId: $workOrderId
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        workOrderId
+        stage
+        status
+        companyId
+        startDate
+        completionDate
+        estimatedCompletionDate
+        notes
+        attn
+        qualityCheck
+        createdAt
+        updatedAt
+        priority
+        estimatedDuration
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const workflowStagesByCompanyId = /* GraphQL */ `
+  query WorkflowStagesByCompanyId(
+    $companyId: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelWorkflowStageFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    workflowStagesByCompanyId(
+      companyId: $companyId
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        workOrderId
+        stage
+        status
+        companyId
+        startDate
+        completionDate
+        estimatedCompletionDate
+        notes
+        attn
+        qualityCheck
+        createdAt
+        updatedAt
+        priority
+        estimatedDuration
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const stageUpdatesByWorkflowStageId = /* GraphQL */ `
+  query StageUpdatesByWorkflowStageId(
+    $workflowStageId: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelStageUpdateFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    stageUpdatesByWorkflowStageId(
+      workflowStageId: $workflowStageId
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        workflowStageId
+        status
+        notes
+        timestamp
+        updatedById
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const stageUpdatesByUpdatedById = /* GraphQL */ `
+  query StageUpdatesByUpdatedById(
+    $updatedById: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelStageUpdateFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    stageUpdatesByUpdatedById(
+      updatedById: $updatedById
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        workflowStageId
+        status
+        notes
+        timestamp
+        updatedById
+        createdAt
+        updatedAt
         __typename
       }
       nextToken

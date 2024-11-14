@@ -169,86 +169,83 @@ const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser }) => {
   };
 
   return (
-    <Card variation="elevated" padding="1.5rem">
-      <label>Upload Image Files</label>
+    <Flex direction="column" gap="1rem">
+      <View
+        as="div"
+        padding="3rem"
+        backgroundColor={
+          isDragging ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.05)"
+        }
+        borderRadius="8px"
+        border={isDragging ? "2px dashed #007bff" : "2px dashed #ccc"}
+        textAlign="center"
+        cursor="pointer"
+        onClick={() => fileInputRef.current.click()}
+        onDragEnter={handleDragEnter}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        <Icon as={MdCloudUpload} fontSize="3rem" color="#666" />
+        <Text>
+          {isDragging
+            ? "Drop files here"
+            : "Drag and drop files here or click to select files"}
+        </Text>
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+        />
+      </View>
 
-      <Flex direction="column" gap="1rem">
-        <View
-          as="div"
-          padding="3rem"
-          backgroundColor={
-            isDragging ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.05)"
-          }
-          borderRadius="8px"
-          border={isDragging ? "2px dashed #007bff" : "2px dashed #ccc"}
-          textAlign="center"
-          cursor="pointer"
-          onClick={() => fileInputRef.current.click()}
-          onDragEnter={handleDragEnter}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          <Icon as={MdCloudUpload} fontSize="3rem" color="#666" />
-          <Text>
-            {isDragging
-              ? "Drop files here"
-              : "Drag and drop files here or click to select files"}
-          </Text>
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            onChange={handleFileChange}
-            style={{ display: "none" }}
-          />
-        </View>
-
-        <Flex justifyContent="space-between" alignItems="center">
-          {failedUploads.length > 0 && (
-            <Button
-              onClick={() => reuploadFailedFiles()}
-              disabled={uploading}
-              variation="warning"
-            >
-              Retry Failed Uploads
-            </Button>
-          )}
-
-          {failedUploads.length === 0 &&
-            successUploads.length === files.length && (
-              <Badge variation="success">
-                All files have been successfully uploaded!
-              </Badge>
-            )}
-          {uploading && (
-            <div>
-              <Badge variation="info">Uploading file(s).</Badge>
-            </div>
-          )}
-        </Flex>
-        {successUploads.length < files.length && files.length > 0 && (
-          <Card>
-            <p>{files.length} file(s) selected for upload </p>
-            <View height="4px" backgroundColor="lightgray">
-              <View
-                backgroundColor="#00a8cc"
-                height="100%"
-                width={`${calculateTotalProgress()}%`}
-                style={{ transition: "width 0.3s ease-in-out" }}
-              />
-            </View>
-            {files.length > 0 && calculateTotalProgress()}% done
-          </Card>
+      <Flex justifyContent="space-between" alignItems="center">
+        {failedUploads.length > 0 && (
+          <Button
+            onClick={() => reuploadFailedFiles()}
+            disabled={uploading}
+            variation="warning"
+          >
+            Retry Failed Uploads
+          </Button>
         )}
-        <Button
-          onClick={() => uploadFiles(files)}
-          disabled={uploading || files.length === 0}
-          variation="primary"
-        >
-          {uploading ? "Uploading..." : "Upload Files"}
-        </Button>
-        {/* {files.length > 0 && (
+
+        {failedUploads.length === 0 &&
+          successUploads.length === files.length && (
+            <Badge variation="success">
+              All files have been successfully uploaded!
+            </Badge>
+          )}
+        {uploading && (
+          <div>
+            <Badge variation="info">Uploading file(s).</Badge>
+          </div>
+        )}
+      </Flex>
+      {successUploads.length < files.length && files.length > 0 && (
+        <Card>
+          <p>{files.length} file(s) selected for upload </p>
+          <View height="4px" backgroundColor="lightgray">
+            <View
+              backgroundColor="#00a8cc"
+              height="100%"
+              width={`${calculateTotalProgress()}%`}
+              style={{ transition: "width 0.3s ease-in-out" }}
+            />
+          </View>
+          {files.length > 0 && calculateTotalProgress()}% done
+        </Card>
+      )}
+      <Button
+        onClick={() => uploadFiles(files)}
+        disabled={uploading || files.length === 0}
+        variation="primary"
+      >
+        {uploading ? "Uploading..." : "Upload Files"}
+      </Button>
+      {/* {files.length > 0 && (
           <Card>
             <Heading level={5}>Selected Files</Heading>
             <View className="file-grid">
@@ -283,8 +280,7 @@ const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser }) => {
             </View>
           </Card>
         )} */}
-      </Flex>
-    </Card>
+    </Flex>
   );
 };
 

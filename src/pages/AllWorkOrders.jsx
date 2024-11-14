@@ -10,10 +10,17 @@ import {
   View,
   useTheme,
   Button,
+  Table,
+  TableCell,
+  TableBody,
+  TableRow,
+  Menu,
+  MenuItem,
 } from "@aws-amplify/ui-react";
+import {} from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import CreateWorkOrderForm from "./CreateWorkOrderForm";
-import { listWorkOrders } from "../graphql/queries";
+import { listWorkOrders, listCompanyRoles } from "../graphql/queries";
 import {
   onCreateWorkOrder,
   onUpdateWorkOrder,
@@ -31,7 +38,9 @@ function AllWorkOrders({ SSuser }) {
   const { tokens } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedWorkOrder, setSelectedWorkOrder] = useState(null);
-
+  const [companyRoles, setCompanyRoles] = useState([]);
+  const [isDataFetched, setIsDataFetched] = useState(false);
+  const [currentRole, setCurrentRoles] = useState(null);
   useEffect(() => {
     fetchWorkOrders();
 
@@ -103,15 +112,98 @@ function AllWorkOrders({ SSuser }) {
       console.log("error fetching WO", err);
     }
   };
+  const stageSequence = [
+    "SCANNING",
+    "DESIGN",
+    "CNC_CUTTING",
+    "MANUFACTURING",
+    "WAREHOUSE",
+    "CUSTOMER_DELIVERY",
+  ];
+  const getStagesForCompanyType = (companyType) => {
+    switch (companyType?.toUpperCase()) {
+      case "SCAN":
+        return stageSequence; // Show all stages
+      case "CNC":
+        return ["CNC_CUTTING"]; // Show only CNC_CUTTING stage
+      case "MANUFACTURE":
+        return ["MANUFACTURING"]; // Show only MANUFACTURING stage
+      default:
+        return [];
+    }
+  };
 
-  const groupedWorkOrders = {
-    PENDING: workOrders.filter((workOrder) => workOrder.status === "PENDING"),
-    IN_PROGRESS: workOrders.filter(
-      (workOrder) => workOrder.status === "IN_PROGRESS"
-    ),
-    COMPLETED: workOrders.filter(
-      (workOrder) => workOrder.status === "COMPLETED"
-    ),
+  // Add this function to fetch company types
+  const fetchCompanyTypes = async () => {
+    try {
+      const response = await client.graphql({
+        query: listCompanyRoles,
+        variables: {
+          filter: {
+            companyId: { eq: SSuser.companyId },
+          },
+        },
+      });
+
+      // Get the company types from the attributes
+      const companyRoles1 = response.data.listCompanyRoles.items;
+      if (companyRoles1) {
+        setCompanyRoles(companyRoles1);
+      }
+      console.log(companyRoles);
+
+      setIsDataFetched(true);
+    } catch (error) {
+      console.error("Error fetching company types:", error);
+      setIsDataFetched(false);
+    }
+  };
+  useEffect(() => {
+    fetchCompanyTypes();
+  });
+  const handleSwitchRoles = (role) => {
+    setCurrentRoles(role.roleId);
+  };
+
+  const relevantStages = getStagesForCompanyType(currentRole);
+
+  // Create grouped work orders only for relevant stages
+  const groupedWorkOrders = relevantStages.reduce((acc, stage) => {
+    acc[stage] = workOrders.filter(
+      (workOrder) => workOrder.currentStage === stage
+    );
+    return acc;
+  }, {});
+
+  const renderRoleSwitcher = () => {
+    if (!isDataFetched) return null;
+
+    return (
+      <Table>
+        <TableBody>
+          <TableRow>
+            <TableCell>
+              <Menu
+                trigger={
+                  <Button variant="ghost" size="small">
+                    Switch Roles
+                  </Button>
+                }
+              >
+                {companyRoles.map((role) => (
+                  <MenuItem
+                    key={role.roleId}
+                    onClick={() => handleSwitchRoles(role)}
+                  >
+                    {role.roleId}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    );
   };
   const handleViewDetails = (workOrder) => {
     console.log("Viewing details for work order ID:", workOrder);
@@ -122,18 +214,20 @@ function AllWorkOrders({ SSuser }) {
   return (
     <View width="100%">
       <CreateWorkOrderForm SSuser={SSuser} button="create" />
+      {renderRoleSwitcher()}
       <Flex direction="row" width="100%">
         {Object.entries(groupedWorkOrders).map(([status, items]) => (
           <Card
             key={status}
             // backgroundColor={tokens.colors.neutral[20]}
             padding={tokens.space.zero}
+            width="350px" // Set a fixed width for each column
           >
             <Heading level={5}>{status.replace("_", " ")}</Heading>
 
             <Flex
               variation="outlined"
-              width="350px"
+              width="100%" // Changed from fixed 350px to 100%
               height="100%"
               minheight="100vh"
               // backgroundColor={tokens.colors.neutral[20]}

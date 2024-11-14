@@ -1,0 +1,352 @@
+// I'll help you modify the tracking system specifically for your workflow stages. Based on your schema.graphql, let's implement a specialized tracking system for the scan and sew process.
+
+// First, let's add specific enums and types to your schema.graphql:
+
+enum WorkflowStage {
+  SCANNING
+  DESIGN
+  CNC_CUTTING
+  MANUFACTURING
+  WAREHOUSE
+  CUSTOMER_DELIVERY
+}
+
+enum StageStatus {
+  QUEUED
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+  EXCEPTION
+}
+
+type WorkflowStage @model {
+  id: ID! @primaryKey
+  workOrderId: ID! @index(name: "byWorkOrder")
+  stage: WorkflowStage!
+  status: StageStatus!
+  companyId: ID! @index(name: "byCompany")
+  assignedToId: ID
+  startDate: AWSDateTime
+  completionDate: AWSDateTime
+  estimatedCompletionDate: AWSDateTime
+  notes: String
+  qualityCheck: Boolean
+  workOrder: WorkOrder @belongsTo(fields: ["workOrderId"])
+  company: Company @belongsTo(fields: ["companyId"])
+  assignedTo: User @belongsTo(fields: ["assignedToId"])
+}
+
+type StageUpdate @model {
+  id: ID! @primaryKey
+  workflowStageId: ID! @index(name: "byWorkflowStage")
+  status: StageStatus!
+  notes: String
+  timestamp: AWSDateTime!
+  updatedById: ID!
+  updatedBy: User @belongsTo(fields: ["updatedById"])
+  workflowStage: WorkflowStage @belongsTo(fields: ["workflowStageId"])
+}
+
+# Update WorkOrder type
+type WorkOrder @model {
+  # ... existing fields ...
+  currentStage: WorkflowStage
+  currentStageId: ID
+  estimatedCompletionDate: AWSDateTime
+  workflowStages: [WorkflowStage] @hasMany(indexName: "byWorkOrder", fields: ["id"])
+}
+
+// Copy
+
+// Insert at cursor
+// graphql
+// Implement the workflow stage management:
+
+interface CreateWorkflowStage {
+  workOrderId: string;
+  stage: WorkflowStage;
+  companyId: string;
+  assignedToId?: string;
+  estimatedCompletionDate?: string;
+  notes?: string;
+}
+
+async function createWorkflowStage({
+  workOrderId,
+  stage,
+  companyId,
+  assignedToId,
+  estimatedCompletionDate,
+  notes
+}: CreateWorkflowStage) {
+  try {
+    const workflowStage = await API.graphql(graphqlOperation(createWorkflowStage, {
+      input: {
+        workOrderId,
+        stage,
+        companyId,
+        status: 'QUEUED',
+        assignedToId,
+        estimatedCompletionDate,
+        notes
+      }
+    }));
+
+    // If this is the scanning stage, update the work order
+    if (stage === 'SCANNING') {
+      await API.graphql(graphqlOperation(updateWorkOrder, {
+        input: {
+          id: workOrderId,
+          currentStage: 'SCANNING',
+          currentStageId: workflowStage.data.createWorkflowStage.id
+        }
+      }));
+    }
+
+    return workflowStage.data.createWorkflowStage;
+  } catch (error) {
+    console.error('Error creating workflow stage:', error);
+    throw error;
+  }
+}
+
+// Copy
+
+// Insert at cursor
+// typescript
+// Implement stage status updates:
+
+interface UpdateStageStatus {
+  stageId: string;
+  status: StageStatus;
+  notes?: string;
+  qualityCheck?: boolean;
+}
+
+async function updateStageStatus({
+  stageId,
+  status,
+  notes,
+  qualityCheck
+}: UpdateStageStatus) {
+  try {
+    const currentUser = await Auth.currentAuthenticatedUser();
+
+    // Update the workflow stage
+    const stageUpdate = await API.graphql(graphqlOperation(updateWorkflowStage, {
+      input: {
+        id: stageId,
+        status,
+        ...(status === 'COMPLETED' && { completionDate: new Date().toISOString() }),
+        ...(status === 'IN_PROGRESS' && { startDate: new Date().toISOString() }),
+        ...(qualityCheck !== undefined && { qualityCheck })
+      }
+    }));
+
+    // Create a stage update record
+    const update = await API.graphql(graphqlOperation(createStageUpdate, {
+      input: {
+        workflowStageId: stageId,
+        status,
+        notes,
+        timestamp: new Date().toISOString(),
+        updatedById: currentUser.username
+      }
+    }));
+
+    // If completed, move to next stage
+    if (status === 'COMPLETED') {
+      await moveToNextStage(stageUpdate.data.updateWorkflowStage.workOrderId);
+    }
+
+    return {
+      stageUpdate,
+      update
+    };
+  } catch (error) {
+    console.error('Error updating stage status:', error);
+    throw error;
+  }
+}
+
+async function moveToNextStage(workOrderId: string) {
+  const stageSequence = [
+    'SCANNING',
+    'DESIGN',
+    'CNC_CUTTING',
+    'MANUFACTURING',
+    'WAREHOUSE',
+    'CUSTOMER_DELIVERY'
+  ];
+
+  try {
+    const workOrder = await API.graphql(graphqlOperation(getWorkOrder, { id: workOrderId }));
+    const currentIndex = stageSequence.indexOf(currentStage);
+    
+    if (currentIndex < stageSequence.length - 1) {
+      const nextStage = stageSequence[currentIndex + 1];
+      const stages = await API.graphql(graphqlOperation(listWorkflowStages, {
+        filter: {
+          workOrderId: { eq: workOrderId },
+          stage: { eq: nextStage }
+        }
+      }));
+
+      const nextStageId = stages.data.listWorkflowStages.items[0].id;
+
+      await API.graphql(graphqlOperation(updateWorkOrder, {
+        input: {
+          id: workOrderId,
+          currentStage: nextStage,
+          currentStageId: nextStageId
+        }
+      }));
+    }
+  } catch (error) {
+    console.error('Error moving to next stage:', error);
+    throw error;
+  }
+}
+
+// Copy
+
+// Insert at cursor
+// typescript
+// Implement workflow tracking retrieval:
+
+async function getWorkflowTracking(workOrderId: string) {
+  try {
+    // Get all workflow stages
+    const stages = await API.graphql(graphqlOperation(listWorkflowStages, {
+      filter: {
+        workOrderId: { eq: workOrderId }
+      },
+      sort: {
+        field: 'stage',
+        direction: 'ASC'
+      }
+    }));
+
+    // Get updates for each stage
+    const stagesWithUpdates = await Promise.all(
+      stages.data.listWorkflowStages.items.map(async (stage: any) => {
+        const updates = await API.graphql(graphqlOperation(listStageUpdates, {
+          filter: {
+            workflowStageId: { eq: stage.id }
+          },
+          sort: {
+            field: 'timestamp',
+            direction: 'DESC'
+          }
+        }));
+
+        return {
+          ...stage,
+          updates: updates.data.listStageUpdates.items
+        };
+      })
+    );
+
+    return stagesWithUpdates;
+  } catch (error) {
+    console.error('Error fetching workflow tracking:', error);
+    throw error;
+  }
+}
+
+// Copy
+
+// Insert at cursor
+// typescript
+// Usage example:
+
+// Initialize all stages for a new work order
+const workflowStages = [
+  {
+    stage: 'SCANNING',
+    companyId: 'scanning-company-id',
+    estimatedCompletionDate: '2024-01-15'
+  },
+  {
+    stage: 'DESIGN',
+    companyId: 'design-company-id',
+    estimatedCompletionDate: '2024-01-20'
+  },
+  {
+    stage: 'CNC_CUTTING',
+    companyId: 'cnc-company-id',
+    estimatedCompletionDate: '2024-01-25'
+  },
+  {
+    stage: 'MANUFACTURING',
+    companyId: 'manufacturing-company-id',
+    estimatedCompletionDate: '2024-02-01'
+  },
+  {
+    stage: 'WAREHOUSE',
+    companyId: 'warehouse-company-id',
+    estimatedCompletionDate: '2024-02-05'
+  },
+  {
+    stage: 'CUSTOMER_DELIVERY',
+    companyId: 'delivery-company-id',
+    estimatedCompletionDate: '2024-02-10'
+  }
+];
+
+// Create all stages
+for (const stage of workflowStages) {
+  await createWorkflowStage({
+    workOrderId: 'work-order-123',
+    ...stage
+  });
+}
+
+// Update stage status
+await updateStageStatus({
+  stageId: 'stage-123',
+  status: 'IN_PROGRESS',
+  notes: 'Starting the scanning process',
+  qualityCheck: true
+});
+
+// Get full workflow history
+const workflowHistory = await getWorkflowTracking('work-order-123');
+
+// Copy
+
+// Insert at cursor
+// typescript
+// This implementation provides:
+
+// Specific stages for your scan and sew process
+
+// Quality check tracking
+
+// Assigned company and user tracking
+
+// Estimated and actual completion dates
+
+// Stage-specific notes and updates
+
+// Automatic progression through stages
+
+// Complete workflow history
+
+// Status tracking for each stage
+
+// You can enhance this further by adding:
+
+// Quality control checkpoints
+
+// File attachments for each stage
+
+// Automated notifications between stages
+
+// SLA tracking
+
+// Performance metrics
+
+// Customer notifications
+
+// Integration with your existing CNC and scanning systems

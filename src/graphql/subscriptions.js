@@ -27,7 +27,11 @@ export const onCreateCompany = /* GraphQL */ `
         nextToken
         __typename
       }
-      userRoles {
+      companyRoles {
+        nextToken
+        __typename
+      }
+      workflowStages {
         nextToken
         __typename
       }
@@ -61,7 +65,11 @@ export const onUpdateCompany = /* GraphQL */ `
         nextToken
         __typename
       }
-      userRoles {
+      companyRoles {
+        nextToken
+        __typename
+      }
+      workflowStages {
         nextToken
         __typename
       }
@@ -95,8 +103,93 @@ export const onDeleteCompany = /* GraphQL */ `
         nextToken
         __typename
       }
-      userRoles {
+      companyRoles {
         nextToken
+        __typename
+      }
+      workflowStages {
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const onCreateCompanyRole = /* GraphQL */ `
+  subscription OnCreateCompanyRole(
+    $filter: ModelSubscriptionCompanyRoleFilterInput
+  ) {
+    onCreateCompanyRole(filter: $filter) {
+      id
+      roleId
+      companyId
+      shippingAddress
+      private
+      isActive
+      createdAt
+      updatedAt
+      company {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const onUpdateCompanyRole = /* GraphQL */ `
+  subscription OnUpdateCompanyRole(
+    $filter: ModelSubscriptionCompanyRoleFilterInput
+  ) {
+    onUpdateCompanyRole(filter: $filter) {
+      id
+      roleId
+      companyId
+      shippingAddress
+      private
+      isActive
+      createdAt
+      updatedAt
+      company {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const onDeleteCompanyRole = /* GraphQL */ `
+  subscription OnDeleteCompanyRole(
+    $filter: ModelSubscriptionCompanyRoleFilterInput
+  ) {
+    onDeleteCompanyRole(filter: $filter) {
+      id
+      roleId
+      companyId
+      shippingAddress
+      private
+      isActive
+      createdAt
+      updatedAt
+      company {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
         __typename
       }
       __typename
@@ -132,6 +225,10 @@ export const onCreateUser = /* GraphQL */ `
       }
       companyId
       companyName
+      stageUpdates {
+        nextToken
+        __typename
+      }
       __typename
     }
   }
@@ -165,6 +262,10 @@ export const onUpdateUser = /* GraphQL */ `
       }
       companyId
       companyName
+      stageUpdates {
+        nextToken
+        __typename
+      }
       __typename
     }
   }
@@ -198,192 +299,10 @@ export const onDeleteUser = /* GraphQL */ `
       }
       companyId
       companyName
-      __typename
-    }
-  }
-`;
-export const onCreateRole = /* GraphQL */ `
-  subscription OnCreateRole($filter: ModelSubscriptionRoleFilterInput) {
-    onCreateRole(filter: $filter) {
-      id
-      name
-      description
-      permissions {
+      stageUpdates {
         nextToken
         __typename
       }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateRole = /* GraphQL */ `
-  subscription OnUpdateRole($filter: ModelSubscriptionRoleFilterInput) {
-    onUpdateRole(filter: $filter) {
-      id
-      name
-      description
-      permissions {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteRole = /* GraphQL */ `
-  subscription OnDeleteRole($filter: ModelSubscriptionRoleFilterInput) {
-    onDeleteRole(filter: $filter) {
-      id
-      name
-      description
-      permissions {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onCreateUserRole = /* GraphQL */ `
-  subscription OnCreateUserRole($filter: ModelSubscriptionUserRoleFilterInput) {
-    onCreateUserRole(filter: $filter) {
-      id
-      userId
-      roleId
-      companyId
-      createdAt
-      updatedAt
-      company {
-        id
-        name
-        address
-        companySecret
-        stripeConnectId
-        createdAt
-        updatedAt
-        __typename
-      }
-      __typename
-    }
-  }
-`;
-export const onUpdateUserRole = /* GraphQL */ `
-  subscription OnUpdateUserRole($filter: ModelSubscriptionUserRoleFilterInput) {
-    onUpdateUserRole(filter: $filter) {
-      id
-      userId
-      roleId
-      companyId
-      createdAt
-      updatedAt
-      company {
-        id
-        name
-        address
-        companySecret
-        stripeConnectId
-        createdAt
-        updatedAt
-        __typename
-      }
-      __typename
-    }
-  }
-`;
-export const onDeleteUserRole = /* GraphQL */ `
-  subscription OnDeleteUserRole($filter: ModelSubscriptionUserRoleFilterInput) {
-    onDeleteUserRole(filter: $filter) {
-      id
-      userId
-      roleId
-      companyId
-      createdAt
-      updatedAt
-      company {
-        id
-        name
-        address
-        companySecret
-        stripeConnectId
-        createdAt
-        updatedAt
-        __typename
-      }
-      __typename
-    }
-  }
-`;
-export const onCreatePermission = /* GraphQL */ `
-  subscription OnCreatePermission(
-    $filter: ModelSubscriptionPermissionFilterInput
-  ) {
-    onCreatePermission(filter: $filter) {
-      id
-      roleId
-      action
-      description
-      role {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdatePermission = /* GraphQL */ `
-  subscription OnUpdatePermission(
-    $filter: ModelSubscriptionPermissionFilterInput
-  ) {
-    onUpdatePermission(filter: $filter) {
-      id
-      roleId
-      action
-      description
-      role {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeletePermission = /* GraphQL */ `
-  subscription OnDeletePermission(
-    $filter: ModelSubscriptionPermissionFilterInput
-  ) {
-    onDeletePermission(filter: $filter) {
-      id
-      roleId
-      action
-      description
-      role {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
-      createdAt
-      updatedAt
       __typename
     }
   }
@@ -497,6 +416,17 @@ export const onCreateWorkOrder = /* GraphQL */ `
         __typename
       }
       payments {
+        nextToken
+        __typename
+      }
+      currentStage
+      currentStageId
+      estimatedCompletionDate
+      workflowStages {
+        nextToken
+        __typename
+      }
+      stageUpdates {
         nextToken
         __typename
       }
@@ -616,6 +546,17 @@ export const onUpdateWorkOrder = /* GraphQL */ `
         nextToken
         __typename
       }
+      currentStage
+      currentStageId
+      estimatedCompletionDate
+      workflowStages {
+        nextToken
+        __typename
+      }
+      stageUpdates {
+        nextToken
+        __typename
+      }
       __typename
     }
   }
@@ -732,6 +673,413 @@ export const onDeleteWorkOrder = /* GraphQL */ `
         nextToken
         __typename
       }
+      currentStage
+      currentStageId
+      estimatedCompletionDate
+      workflowStages {
+        nextToken
+        __typename
+      }
+      stageUpdates {
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const onCreateWorkflowStage = /* GraphQL */ `
+  subscription OnCreateWorkflowStage(
+    $filter: ModelSubscriptionWorkflowStageFilterInput
+  ) {
+    onCreateWorkflowStage(filter: $filter) {
+      id
+      workOrderId
+      stage
+      status
+      companyId
+      startDate
+      completionDate
+      estimatedCompletionDate
+      notes
+      attn
+      qualityCheck
+      createdAt
+      updatedAt
+      priority
+      estimatedDuration
+      workOrder {
+        id
+        woNumber
+        createdById
+        assignedToId
+        companyId
+        CNCId
+        status
+        filesFolder
+        type
+        details
+        materialSelection
+        estimatedPrice
+        msrp
+        createdAt
+        updatedAt
+        process
+        make
+        model
+        year
+        crmClientId
+        rawImages
+        rawDesignImages
+        description
+        materialPrice
+        manufacturePrice
+        raw3dModel
+        designPhotos
+        outline3dModel
+        approved3dModel
+        main2dPattern
+        billOfMaterials
+        cnc2dPattern
+        scanInfo
+        businessName
+        attnName
+        businessPhone
+        businessShippingAddress
+        customerName
+        customerDropShippingAddress
+        shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
+        __typename
+      }
+      company {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      stageUpdates {
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const onUpdateWorkflowStage = /* GraphQL */ `
+  subscription OnUpdateWorkflowStage(
+    $filter: ModelSubscriptionWorkflowStageFilterInput
+  ) {
+    onUpdateWorkflowStage(filter: $filter) {
+      id
+      workOrderId
+      stage
+      status
+      companyId
+      startDate
+      completionDate
+      estimatedCompletionDate
+      notes
+      attn
+      qualityCheck
+      createdAt
+      updatedAt
+      priority
+      estimatedDuration
+      workOrder {
+        id
+        woNumber
+        createdById
+        assignedToId
+        companyId
+        CNCId
+        status
+        filesFolder
+        type
+        details
+        materialSelection
+        estimatedPrice
+        msrp
+        createdAt
+        updatedAt
+        process
+        make
+        model
+        year
+        crmClientId
+        rawImages
+        rawDesignImages
+        description
+        materialPrice
+        manufacturePrice
+        raw3dModel
+        designPhotos
+        outline3dModel
+        approved3dModel
+        main2dPattern
+        billOfMaterials
+        cnc2dPattern
+        scanInfo
+        businessName
+        attnName
+        businessPhone
+        businessShippingAddress
+        customerName
+        customerDropShippingAddress
+        shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
+        __typename
+      }
+      company {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      stageUpdates {
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const onDeleteWorkflowStage = /* GraphQL */ `
+  subscription OnDeleteWorkflowStage(
+    $filter: ModelSubscriptionWorkflowStageFilterInput
+  ) {
+    onDeleteWorkflowStage(filter: $filter) {
+      id
+      workOrderId
+      stage
+      status
+      companyId
+      startDate
+      completionDate
+      estimatedCompletionDate
+      notes
+      attn
+      qualityCheck
+      createdAt
+      updatedAt
+      priority
+      estimatedDuration
+      workOrder {
+        id
+        woNumber
+        createdById
+        assignedToId
+        companyId
+        CNCId
+        status
+        filesFolder
+        type
+        details
+        materialSelection
+        estimatedPrice
+        msrp
+        createdAt
+        updatedAt
+        process
+        make
+        model
+        year
+        crmClientId
+        rawImages
+        rawDesignImages
+        description
+        materialPrice
+        manufacturePrice
+        raw3dModel
+        designPhotos
+        outline3dModel
+        approved3dModel
+        main2dPattern
+        billOfMaterials
+        cnc2dPattern
+        scanInfo
+        businessName
+        attnName
+        businessPhone
+        businessShippingAddress
+        customerName
+        customerDropShippingAddress
+        shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
+        __typename
+      }
+      company {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      stageUpdates {
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const onCreateStageUpdate = /* GraphQL */ `
+  subscription OnCreateStageUpdate(
+    $filter: ModelSubscriptionStageUpdateFilterInput
+  ) {
+    onCreateStageUpdate(filter: $filter) {
+      id
+      workflowStageId
+      status
+      notes
+      timestamp
+      updatedById
+      updatedBy {
+        id
+        username
+        email
+        family_name
+        given_name
+        createdAt
+        updatedAt
+        role
+        companyId
+        companyName
+        __typename
+      }
+      workflowStage {
+        id
+        workOrderId
+        stage
+        status
+        companyId
+        startDate
+        completionDate
+        estimatedCompletionDate
+        notes
+        attn
+        qualityCheck
+        createdAt
+        updatedAt
+        priority
+        estimatedDuration
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateStageUpdate = /* GraphQL */ `
+  subscription OnUpdateStageUpdate(
+    $filter: ModelSubscriptionStageUpdateFilterInput
+  ) {
+    onUpdateStageUpdate(filter: $filter) {
+      id
+      workflowStageId
+      status
+      notes
+      timestamp
+      updatedById
+      updatedBy {
+        id
+        username
+        email
+        family_name
+        given_name
+        createdAt
+        updatedAt
+        role
+        companyId
+        companyName
+        __typename
+      }
+      workflowStage {
+        id
+        workOrderId
+        stage
+        status
+        companyId
+        startDate
+        completionDate
+        estimatedCompletionDate
+        notes
+        attn
+        qualityCheck
+        createdAt
+        updatedAt
+        priority
+        estimatedDuration
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteStageUpdate = /* GraphQL */ `
+  subscription OnDeleteStageUpdate(
+    $filter: ModelSubscriptionStageUpdateFilterInput
+  ) {
+    onDeleteStageUpdate(filter: $filter) {
+      id
+      workflowStageId
+      status
+      notes
+      timestamp
+      updatedById
+      updatedBy {
+        id
+        username
+        email
+        family_name
+        given_name
+        createdAt
+        updatedAt
+        role
+        companyId
+        companyName
+        __typename
+      }
+      workflowStage {
+        id
+        workOrderId
+        stage
+        status
+        companyId
+        startDate
+        completionDate
+        estimatedCompletionDate
+        notes
+        attn
+        qualityCheck
+        createdAt
+        updatedAt
+        priority
+        estimatedDuration
+        __typename
+      }
+      createdAt
+      updatedAt
       __typename
     }
   }
@@ -787,6 +1135,9 @@ export const onCreateFile = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       uploadedBy {
@@ -857,6 +1208,9 @@ export const onUpdateFile = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       uploadedBy {
@@ -927,6 +1281,9 @@ export const onDeleteFile = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       uploadedBy {
@@ -1075,6 +1432,9 @@ export const onCreatePayment = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       __typename
@@ -1132,6 +1492,9 @@ export const onUpdatePayment = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       __typename
@@ -1189,6 +1552,9 @@ export const onDeletePayment = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       __typename
@@ -1681,6 +2047,117 @@ export const onDeleteTotal = /* GraphQL */ `
       id
       name
       quantity
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreatePermission = /* GraphQL */ `
+  subscription OnCreatePermission(
+    $filter: ModelSubscriptionPermissionFilterInput
+  ) {
+    onCreatePermission(filter: $filter) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdatePermission = /* GraphQL */ `
+  subscription OnUpdatePermission(
+    $filter: ModelSubscriptionPermissionFilterInput
+  ) {
+    onUpdatePermission(filter: $filter) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeletePermission = /* GraphQL */ `
+  subscription OnDeletePermission(
+    $filter: ModelSubscriptionPermissionFilterInput
+  ) {
+    onDeletePermission(filter: $filter) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateRole = /* GraphQL */ `
+  subscription OnCreateRole($filter: ModelSubscriptionRoleFilterInput) {
+    onCreateRole(filter: $filter) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateRole = /* GraphQL */ `
+  subscription OnUpdateRole($filter: ModelSubscriptionRoleFilterInput) {
+    onUpdateRole(filter: $filter) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteRole = /* GraphQL */ `
+  subscription OnDeleteRole($filter: ModelSubscriptionRoleFilterInput) {
+    onDeleteRole(filter: $filter) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateUserRole = /* GraphQL */ `
+  subscription OnCreateUserRole($filter: ModelSubscriptionUserRoleFilterInput) {
+    onCreateUserRole(filter: $filter) {
+      id
+      name
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateUserRole = /* GraphQL */ `
+  subscription OnUpdateUserRole($filter: ModelSubscriptionUserRoleFilterInput) {
+    onUpdateUserRole(filter: $filter) {
+      id
+      name
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteUserRole = /* GraphQL */ `
+  subscription OnDeleteUserRole($filter: ModelSubscriptionUserRoleFilterInput) {
+    onDeleteUserRole(filter: $filter) {
+      id
+      name
       createdAt
       updatedAt
       __typename

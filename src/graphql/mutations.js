@@ -35,6 +35,10 @@ export const updateUserCompany = /* GraphQL */ `
       }
       companyId
       companyName
+      stageUpdates {
+        nextToken
+        __typename
+      }
       __typename
     }
   }
@@ -68,7 +72,11 @@ export const createCompany = /* GraphQL */ `
         nextToken
         __typename
       }
-      userRoles {
+      companyRoles {
+        nextToken
+        __typename
+      }
+      workflowStages {
         nextToken
         __typename
       }
@@ -105,7 +113,11 @@ export const updateCompany = /* GraphQL */ `
         nextToken
         __typename
       }
-      userRoles {
+      companyRoles {
+        nextToken
+        __typename
+      }
+      workflowStages {
         nextToken
         __typename
       }
@@ -142,8 +154,96 @@ export const deleteCompany = /* GraphQL */ `
         nextToken
         __typename
       }
-      userRoles {
+      companyRoles {
         nextToken
+        __typename
+      }
+      workflowStages {
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const createCompanyRole = /* GraphQL */ `
+  mutation CreateCompanyRole(
+    $input: CreateCompanyRoleInput!
+    $condition: ModelCompanyRoleConditionInput
+  ) {
+    createCompanyRole(input: $input, condition: $condition) {
+      id
+      roleId
+      companyId
+      shippingAddress
+      private
+      isActive
+      createdAt
+      updatedAt
+      company {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const updateCompanyRole = /* GraphQL */ `
+  mutation UpdateCompanyRole(
+    $input: UpdateCompanyRoleInput!
+    $condition: ModelCompanyRoleConditionInput
+  ) {
+    updateCompanyRole(input: $input, condition: $condition) {
+      id
+      roleId
+      companyId
+      shippingAddress
+      private
+      isActive
+      createdAt
+      updatedAt
+      company {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const deleteCompanyRole = /* GraphQL */ `
+  mutation DeleteCompanyRole(
+    $input: DeleteCompanyRoleInput!
+    $condition: ModelCompanyRoleConditionInput
+  ) {
+    deleteCompanyRole(input: $input, condition: $condition) {
+      id
+      roleId
+      companyId
+      shippingAddress
+      private
+      isActive
+      createdAt
+      updatedAt
+      company {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
         __typename
       }
       __typename
@@ -182,6 +282,10 @@ export const createUser = /* GraphQL */ `
       }
       companyId
       companyName
+      stageUpdates {
+        nextToken
+        __typename
+      }
       __typename
     }
   }
@@ -218,6 +322,10 @@ export const updateUser = /* GraphQL */ `
       }
       companyId
       companyName
+      stageUpdates {
+        nextToken
+        __typename
+      }
       __typename
     }
   }
@@ -254,213 +362,10 @@ export const deleteUser = /* GraphQL */ `
       }
       companyId
       companyName
-      __typename
-    }
-  }
-`;
-export const createRole = /* GraphQL */ `
-  mutation CreateRole(
-    $input: CreateRoleInput!
-    $condition: ModelRoleConditionInput
-  ) {
-    createRole(input: $input, condition: $condition) {
-      id
-      name
-      description
-      permissions {
+      stageUpdates {
         nextToken
         __typename
       }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const updateRole = /* GraphQL */ `
-  mutation UpdateRole(
-    $input: UpdateRoleInput!
-    $condition: ModelRoleConditionInput
-  ) {
-    updateRole(input: $input, condition: $condition) {
-      id
-      name
-      description
-      permissions {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const deleteRole = /* GraphQL */ `
-  mutation DeleteRole(
-    $input: DeleteRoleInput!
-    $condition: ModelRoleConditionInput
-  ) {
-    deleteRole(input: $input, condition: $condition) {
-      id
-      name
-      description
-      permissions {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const createUserRole = /* GraphQL */ `
-  mutation CreateUserRole(
-    $input: CreateUserRoleInput!
-    $condition: ModelUserRoleConditionInput
-  ) {
-    createUserRole(input: $input, condition: $condition) {
-      id
-      userId
-      roleId
-      companyId
-      createdAt
-      updatedAt
-      company {
-        id
-        name
-        address
-        companySecret
-        stripeConnectId
-        createdAt
-        updatedAt
-        __typename
-      }
-      __typename
-    }
-  }
-`;
-export const updateUserRole = /* GraphQL */ `
-  mutation UpdateUserRole(
-    $input: UpdateUserRoleInput!
-    $condition: ModelUserRoleConditionInput
-  ) {
-    updateUserRole(input: $input, condition: $condition) {
-      id
-      userId
-      roleId
-      companyId
-      createdAt
-      updatedAt
-      company {
-        id
-        name
-        address
-        companySecret
-        stripeConnectId
-        createdAt
-        updatedAt
-        __typename
-      }
-      __typename
-    }
-  }
-`;
-export const deleteUserRole = /* GraphQL */ `
-  mutation DeleteUserRole(
-    $input: DeleteUserRoleInput!
-    $condition: ModelUserRoleConditionInput
-  ) {
-    deleteUserRole(input: $input, condition: $condition) {
-      id
-      userId
-      roleId
-      companyId
-      createdAt
-      updatedAt
-      company {
-        id
-        name
-        address
-        companySecret
-        stripeConnectId
-        createdAt
-        updatedAt
-        __typename
-      }
-      __typename
-    }
-  }
-`;
-export const createPermission = /* GraphQL */ `
-  mutation CreatePermission(
-    $input: CreatePermissionInput!
-    $condition: ModelPermissionConditionInput
-  ) {
-    createPermission(input: $input, condition: $condition) {
-      id
-      roleId
-      action
-      description
-      role {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const updatePermission = /* GraphQL */ `
-  mutation UpdatePermission(
-    $input: UpdatePermissionInput!
-    $condition: ModelPermissionConditionInput
-  ) {
-    updatePermission(input: $input, condition: $condition) {
-      id
-      roleId
-      action
-      description
-      role {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const deletePermission = /* GraphQL */ `
-  mutation DeletePermission(
-    $input: DeletePermissionInput!
-    $condition: ModelPermissionConditionInput
-  ) {
-    deletePermission(input: $input, condition: $condition) {
-      id
-      roleId
-      action
-      description
-      role {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
-      createdAt
-      updatedAt
       __typename
     }
   }
@@ -575,6 +480,17 @@ export const createWorkOrder = /* GraphQL */ `
         __typename
       }
       payments {
+        nextToken
+        __typename
+      }
+      currentStage
+      currentStageId
+      estimatedCompletionDate
+      workflowStages {
+        nextToken
+        __typename
+      }
+      stageUpdates {
         nextToken
         __typename
       }
@@ -695,6 +611,17 @@ export const updateWorkOrder = /* GraphQL */ `
         nextToken
         __typename
       }
+      currentStage
+      currentStageId
+      estimatedCompletionDate
+      workflowStages {
+        nextToken
+        __typename
+      }
+      stageUpdates {
+        nextToken
+        __typename
+      }
       __typename
     }
   }
@@ -812,6 +739,419 @@ export const deleteWorkOrder = /* GraphQL */ `
         nextToken
         __typename
       }
+      currentStage
+      currentStageId
+      estimatedCompletionDate
+      workflowStages {
+        nextToken
+        __typename
+      }
+      stageUpdates {
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const createWorkflowStage = /* GraphQL */ `
+  mutation CreateWorkflowStage(
+    $input: CreateWorkflowStageInput!
+    $condition: ModelWorkflowStageConditionInput
+  ) {
+    createWorkflowStage(input: $input, condition: $condition) {
+      id
+      workOrderId
+      stage
+      status
+      companyId
+      startDate
+      completionDate
+      estimatedCompletionDate
+      notes
+      attn
+      qualityCheck
+      createdAt
+      updatedAt
+      priority
+      estimatedDuration
+      workOrder {
+        id
+        woNumber
+        createdById
+        assignedToId
+        companyId
+        CNCId
+        status
+        filesFolder
+        type
+        details
+        materialSelection
+        estimatedPrice
+        msrp
+        createdAt
+        updatedAt
+        process
+        make
+        model
+        year
+        crmClientId
+        rawImages
+        rawDesignImages
+        description
+        materialPrice
+        manufacturePrice
+        raw3dModel
+        designPhotos
+        outline3dModel
+        approved3dModel
+        main2dPattern
+        billOfMaterials
+        cnc2dPattern
+        scanInfo
+        businessName
+        attnName
+        businessPhone
+        businessShippingAddress
+        customerName
+        customerDropShippingAddress
+        shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
+        __typename
+      }
+      company {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      stageUpdates {
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const updateWorkflowStage = /* GraphQL */ `
+  mutation UpdateWorkflowStage(
+    $input: UpdateWorkflowStageInput!
+    $condition: ModelWorkflowStageConditionInput
+  ) {
+    updateWorkflowStage(input: $input, condition: $condition) {
+      id
+      workOrderId
+      stage
+      status
+      companyId
+      startDate
+      completionDate
+      estimatedCompletionDate
+      notes
+      attn
+      qualityCheck
+      createdAt
+      updatedAt
+      priority
+      estimatedDuration
+      workOrder {
+        id
+        woNumber
+        createdById
+        assignedToId
+        companyId
+        CNCId
+        status
+        filesFolder
+        type
+        details
+        materialSelection
+        estimatedPrice
+        msrp
+        createdAt
+        updatedAt
+        process
+        make
+        model
+        year
+        crmClientId
+        rawImages
+        rawDesignImages
+        description
+        materialPrice
+        manufacturePrice
+        raw3dModel
+        designPhotos
+        outline3dModel
+        approved3dModel
+        main2dPattern
+        billOfMaterials
+        cnc2dPattern
+        scanInfo
+        businessName
+        attnName
+        businessPhone
+        businessShippingAddress
+        customerName
+        customerDropShippingAddress
+        shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
+        __typename
+      }
+      company {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      stageUpdates {
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const deleteWorkflowStage = /* GraphQL */ `
+  mutation DeleteWorkflowStage(
+    $input: DeleteWorkflowStageInput!
+    $condition: ModelWorkflowStageConditionInput
+  ) {
+    deleteWorkflowStage(input: $input, condition: $condition) {
+      id
+      workOrderId
+      stage
+      status
+      companyId
+      startDate
+      completionDate
+      estimatedCompletionDate
+      notes
+      attn
+      qualityCheck
+      createdAt
+      updatedAt
+      priority
+      estimatedDuration
+      workOrder {
+        id
+        woNumber
+        createdById
+        assignedToId
+        companyId
+        CNCId
+        status
+        filesFolder
+        type
+        details
+        materialSelection
+        estimatedPrice
+        msrp
+        createdAt
+        updatedAt
+        process
+        make
+        model
+        year
+        crmClientId
+        rawImages
+        rawDesignImages
+        description
+        materialPrice
+        manufacturePrice
+        raw3dModel
+        designPhotos
+        outline3dModel
+        approved3dModel
+        main2dPattern
+        billOfMaterials
+        cnc2dPattern
+        scanInfo
+        businessName
+        attnName
+        businessPhone
+        businessShippingAddress
+        customerName
+        customerDropShippingAddress
+        shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
+        __typename
+      }
+      company {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      stageUpdates {
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+export const createStageUpdate = /* GraphQL */ `
+  mutation CreateStageUpdate(
+    $input: CreateStageUpdateInput!
+    $condition: ModelStageUpdateConditionInput
+  ) {
+    createStageUpdate(input: $input, condition: $condition) {
+      id
+      workflowStageId
+      status
+      notes
+      timestamp
+      updatedById
+      updatedBy {
+        id
+        username
+        email
+        family_name
+        given_name
+        createdAt
+        updatedAt
+        role
+        companyId
+        companyName
+        __typename
+      }
+      workflowStage {
+        id
+        workOrderId
+        stage
+        status
+        companyId
+        startDate
+        completionDate
+        estimatedCompletionDate
+        notes
+        attn
+        qualityCheck
+        createdAt
+        updatedAt
+        priority
+        estimatedDuration
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateStageUpdate = /* GraphQL */ `
+  mutation UpdateStageUpdate(
+    $input: UpdateStageUpdateInput!
+    $condition: ModelStageUpdateConditionInput
+  ) {
+    updateStageUpdate(input: $input, condition: $condition) {
+      id
+      workflowStageId
+      status
+      notes
+      timestamp
+      updatedById
+      updatedBy {
+        id
+        username
+        email
+        family_name
+        given_name
+        createdAt
+        updatedAt
+        role
+        companyId
+        companyName
+        __typename
+      }
+      workflowStage {
+        id
+        workOrderId
+        stage
+        status
+        companyId
+        startDate
+        completionDate
+        estimatedCompletionDate
+        notes
+        attn
+        qualityCheck
+        createdAt
+        updatedAt
+        priority
+        estimatedDuration
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteStageUpdate = /* GraphQL */ `
+  mutation DeleteStageUpdate(
+    $input: DeleteStageUpdateInput!
+    $condition: ModelStageUpdateConditionInput
+  ) {
+    deleteStageUpdate(input: $input, condition: $condition) {
+      id
+      workflowStageId
+      status
+      notes
+      timestamp
+      updatedById
+      updatedBy {
+        id
+        username
+        email
+        family_name
+        given_name
+        createdAt
+        updatedAt
+        role
+        companyId
+        companyName
+        __typename
+      }
+      workflowStage {
+        id
+        workOrderId
+        stage
+        status
+        companyId
+        startDate
+        completionDate
+        estimatedCompletionDate
+        notes
+        attn
+        qualityCheck
+        createdAt
+        updatedAt
+        priority
+        estimatedDuration
+        __typename
+      }
+      createdAt
+      updatedAt
       __typename
     }
   }
@@ -870,6 +1210,9 @@ export const createFile = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       uploadedBy {
@@ -943,6 +1286,9 @@ export const updateFile = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       uploadedBy {
@@ -1016,6 +1362,9 @@ export const deleteFile = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       uploadedBy {
@@ -1176,6 +1525,9 @@ export const createPayment = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       __typename
@@ -1236,6 +1588,9 @@ export const updatePayment = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       __typename
@@ -1296,6 +1651,9 @@ export const deletePayment = /* GraphQL */ `
         customerName
         customerDropShippingAddress
         shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
         __typename
       }
       __typename
@@ -1863,6 +2221,138 @@ export const deleteTotal = /* GraphQL */ `
       id
       name
       quantity
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createPermission = /* GraphQL */ `
+  mutation CreatePermission(
+    $input: CreatePermissionInput!
+    $condition: ModelPermissionConditionInput
+  ) {
+    createPermission(input: $input, condition: $condition) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updatePermission = /* GraphQL */ `
+  mutation UpdatePermission(
+    $input: UpdatePermissionInput!
+    $condition: ModelPermissionConditionInput
+  ) {
+    updatePermission(input: $input, condition: $condition) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deletePermission = /* GraphQL */ `
+  mutation DeletePermission(
+    $input: DeletePermissionInput!
+    $condition: ModelPermissionConditionInput
+  ) {
+    deletePermission(input: $input, condition: $condition) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createRole = /* GraphQL */ `
+  mutation CreateRole(
+    $input: CreateRoleInput!
+    $condition: ModelRoleConditionInput
+  ) {
+    createRole(input: $input, condition: $condition) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateRole = /* GraphQL */ `
+  mutation UpdateRole(
+    $input: UpdateRoleInput!
+    $condition: ModelRoleConditionInput
+  ) {
+    updateRole(input: $input, condition: $condition) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteRole = /* GraphQL */ `
+  mutation DeleteRole(
+    $input: DeleteRoleInput!
+    $condition: ModelRoleConditionInput
+  ) {
+    deleteRole(input: $input, condition: $condition) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createUserRole = /* GraphQL */ `
+  mutation CreateUserRole(
+    $input: CreateUserRoleInput!
+    $condition: ModelUserRoleConditionInput
+  ) {
+    createUserRole(input: $input, condition: $condition) {
+      id
+      name
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateUserRole = /* GraphQL */ `
+  mutation UpdateUserRole(
+    $input: UpdateUserRoleInput!
+    $condition: ModelUserRoleConditionInput
+  ) {
+    updateUserRole(input: $input, condition: $condition) {
+      id
+      name
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteUserRole = /* GraphQL */ `
+  mutation DeleteUserRole(
+    $input: DeleteUserRoleInput!
+    $condition: ModelUserRoleConditionInput
+  ) {
+    deleteUserRole(input: $input, condition: $condition) {
+      id
+      name
       createdAt
       updatedAt
       __typename

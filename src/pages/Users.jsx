@@ -1,7 +1,8 @@
 // Users.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import { generateClient } from "aws-amplify/api";
-import { listUsers, getCompany } from "../graphql/queries";
+import { listUsers, getCompany, listCompanyRoles } from "../graphql/queries";
+import { createCompanyRole, updateCompany } from "../graphql/mutations";
 import {
   Table,
   TableCell,
@@ -17,8 +18,10 @@ import {
   Card,
   Link,
   Text,
+  CheckboxField,
 } from "@aws-amplify/ui-react";
 import CreateUser from "./createUser";
+import { Menu, MenuItem } from "@aws-amplify/ui-react";
 
 const client = generateClient();
 
@@ -32,8 +35,23 @@ function Users({ SSuser }) {
   const [inviteEmail, setInviteEmail] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
   const [company, setCompany] = useState(null);
+  const [editedCompany, setEditedCompany] = useState(null);
   const [showSecret, setShowSecret] = useState(false);
+  const [isEditCompanyModalOpen, setIsEditCompanyModalOpen] = useState(false);
+  // Add this state at the top with other state declarations
+  const [companyRoles, setCompanyRoles] = useState([]);
+  const [selectedTypes, setSelectedTypes] = useState([]);
+  const [isDataFetched, setIsDataFetched] = useState(false);
 
+  const companyTypes = [
+    "CNC",
+    "SCAN",
+    "MANUFACTURE",
+    "CUSTOMER",
+    "WHOLESALE",
+    "DEALER",
+    "RV_DEALER",
+  ];
   useEffect(() => {
     fetchUsers();
     fetchCompanyDetails();
@@ -64,6 +82,94 @@ function Users({ SSuser }) {
       setError("An error occurred while fetching company details.");
     }
   }
+
+  // Add this function to fetch company types
+  const fetchCompanyTypes = async () => {
+    try {
+      const response = await client.graphql({
+        query: listCompanyRoles,
+        variables: {
+          filter: {
+            companyId: { eq: SSuser.companyId },
+          },
+        },
+      });
+
+      // Get the company types from the attributes
+      const companyRoles1 = response.data.listCompanyRoles.items;
+      if (companyRoles1) {
+        setCompanyRoles(companyRoles1);
+      }
+      console.log(companyRoles);
+
+      setIsDataFetched(true);
+    } catch (error) {
+      console.error("Error fetching company types:", error);
+      setIsDataFetched(false);
+    }
+  };
+
+  // Inside your Users.jsx component
+
+
+  const handleCreateRoles = async () => {
+    try {
+      // Array to store all creation promises
+      const rolePromises = selectedTypes.map(async (type) => {
+        const roleData = {
+          companyId: SSuser.companyId,
+          roleId: type,
+        };
+
+        const response = await client.graphql({
+          query: createCompanyRole,
+          variables: {
+            input: roleData,
+          },
+        });
+
+        return response.data.createCompanyRole;
+      });
+
+      // Wait for all roles to be created
+      const createdRoles = await Promise.all(rolePromises);
+      console.log("Created roles:", createdRoles);
+
+      // Refresh the roles list
+      fetchCompanyTypes();
+
+      // Show success message
+      alert("Roles created successfully!");
+    } catch (error) {
+      console.error("Error creating roles:", error);
+      alert("Failed to create roles. Please try again.");
+    }
+  };
+
+  // Component to handle role selection and creation
+  const handleCheckboxChange = (type) => {
+    setSelectedTypes((prev) => {
+      if (prev.includes(type)) {
+        return prev.filter((t) => t !== type);
+      } else {
+        return [...prev, type];
+      }
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (selectedTypes.length === 0) {
+      alert("Please select at least one role type");
+      return;
+    }
+    await handleCreateRoles(selectedTypes);
+  };
+
+  // Add useEffect to fetch company types when component mounts
+  useEffect(() => {
+    fetchCompanyTypes();
+  }, []);
 
   async function fetchUsers() {
     try {
@@ -181,6 +287,43 @@ function Users({ SSuser }) {
       return;
     }
   };
+  const handleEditCompany = () => {
+    // Add your company editing logic here
+    // For example, you could open a modal similar to the invite modal
+    setIsEditCompanyModalOpen(true);
+  };
+  const handleSwitchRoles = () => {};
+  const handleUpdateCompany = async (e) => {
+    e.preventDefault();
+    if (selectedTypes.length === 0) {
+      alert("Please select at least one role type");
+      return;
+    }
+    await handleCreateRoles(selectedTypes);
+    try {
+      const updatedCompany = await client.graphql({
+        query: updateCompany,
+        variables: {
+          input: {
+            id: company.id,
+            ...editedCompany,
+          },
+        },
+      });
+
+      // Update local state
+      setCompany({ ...editedCompany });
+
+      // Close modal
+      setIsEditCompanyModalOpen(false);
+
+      // Show success message
+      alert("Company information updated successfully!");
+    } catch (error) {
+      console.error("Error updating company:", error);
+      alert("Failed to update company information. Please try again.");
+    }
+  };
 
   if (loading) return <Loader variation="linear" />;
   if (error) return <div>{error}</div>;
@@ -190,9 +333,14 @@ function Users({ SSuser }) {
       <Flex direction="column" padding="medium">
         <Flex justifyContent="space-between" alignItems="center">
           <h1>Users</h1>
-          <Button variation="primary" onClick={handleInviteClick}>
-            Invite User
-          </Button>
+          <Flex gap="small">
+            <Button variation="primary" onClick={handleInviteClick}>
+              Invite User
+            </Button>
+            <Button variation="primary" onClick={() => handleEditCompany()}>
+              Edit Company
+            </Button>
+          </Flex>
         </Flex>
 
         <Table caption="" highlightOnHover={true} variation="striped">
@@ -236,6 +384,101 @@ function Users({ SSuser }) {
           onSuccess={handleEditSuccess}
           initialData={selectedUser}
         />
+        {/* Edit Company Modal */}
+        {isEditCompanyModalOpen && (
+          <View
+            position="fixed"
+            top="0"
+            left="0"
+            right="0"
+            bottom="0"
+            backgroundColor="rgba(0, 0, 0, 0.5)"
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            zindex={1000}
+          >
+            <Card
+              variation="elevated"
+              width="600px"
+              padding="large"
+              backgroundColor="white"
+            >
+              <View position="relative">
+                <Button
+                  onClick={() => setIsEditCompanyModalOpen(false)}
+                  size="small"
+                  variation="link"
+                  style={{
+                    position: "absolute",
+                    top: "0",
+                    right: "0",
+                  }}
+                >
+                  &times;
+                </Button>
+                <Heading level={3}>Edit Company Information</Heading>
+
+                <form onSubmit={handleUpdateCompany}>
+                  <Flex direction="column" gap="medium">
+                    <TextField
+                      label="Company Name"
+                      name="companyName"
+                      value={company.name || ""}
+                      onChange={(e) =>
+                        setEditedCompany({
+                          ...editedCompany,
+                          name: e.target.value,
+                        })
+                      }
+                      required
+                    />
+
+                    <TextField
+                      label="Company Address"
+                      name="address"
+                      value={company.address || ""}
+                      onChange={(e) =>
+                        setEditedCompany({
+                          ...editedCompany,
+                          address: e.target.value,
+                        })
+                      }
+                    />
+
+                    <View>
+                      <Text>Company Types</Text>
+                      <Flex direction="column" gap="small">
+                        {companyTypes.map((type) => (
+                          <CheckboxField
+                            key={type}
+                            name={type}
+                            value={type}
+                            label={type.replace("_", " ")}
+                            onChange={() => handleCheckboxChange(type)}
+                          />
+                        ))}
+                      </Flex>
+                    </View>
+
+                    <Flex gap="small" justifyContent="flex-end">
+                      <Button
+                        onClick={() => setIsEditCompanyModalOpen(false)}
+                        variation="destructive"
+                        type="button"
+                      >
+                        Cancel
+                      </Button>
+                      <Button type="submit" variation="primary">
+                        Update Company
+                      </Button>
+                    </Flex>
+                  </Flex>
+                </form>
+              </View>
+            </Card>
+          </View>
+        )}
 
         {/* Invite User Modal */}
         {isInviteModalOpen && (

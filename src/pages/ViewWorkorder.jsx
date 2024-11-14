@@ -34,6 +34,8 @@ import { getWorkOrder } from "../graphql/queries";
 import { list, remove, getUrl } from "aws-amplify/storage";
 import styles from "./WOForm.module.css";
 import { generateClient } from "aws-amplify/api";
+import WorkflowTracking from "./OrderUpdate/WorkflowStageTracking";
+import WorkflowStageUpdator from "./OrderUpdate/WorkflowStageUpdator";
 
 const ViewEditWorkOrder = ({ workOrderItem, SSuser }) => {
   const [showFiles, setShowFiles] = useState(true);
@@ -172,6 +174,14 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser }) => {
   };
   return (
     <Flex>
+      <Card variation="elevated" padding="large" width="40%">
+        {/* <WorkflowTracking workOrderId={workOrderItem.id} /> */}
+        Current stage : {editedWorkOrder.currentStage}
+        <WorkflowStageUpdator
+          SSuser={{ SSuser }}
+          workOrderId={workOrderItem.id}
+        />
+      </Card>
       <Card variation="elevated" padding="large" width="60%">
         <Section title="Work Order Information">
           <InfoItem

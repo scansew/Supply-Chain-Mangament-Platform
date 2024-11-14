@@ -5,6 +5,7 @@ import {
   createWorkOrder,
   incrementCounter,
   updateWorkOrder,
+  createWorkflowStage,
 } from "../graphql/mutations";
 import { listUsers, listCompanies } from "../graphql/queries";
 import { list, remove, getUrl } from "aws-amplify/storage";
@@ -43,7 +44,7 @@ const CreateWorkOrderForm = ({
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [displayedFiles, setDisplayedFiles] = useState([]);
-  const [showFiles, setShowFiles] = useState(true);
+  const [showFiles, setShowFiles] = useState(false);
   const [formState, setFormState] = useState({
     woNumber: "N/A",
     createdById: "",
@@ -63,6 +64,7 @@ const CreateWorkOrderForm = ({
     customerName: "",
     customerDropShippingAddress: "",
     filesFolder: "",
+    currentStage: "SCANNING",
   });
   const workOrderTypes = [
     "Ratchet_Mooring",
@@ -70,7 +72,7 @@ const CreateWorkOrderForm = ({
     "Ratchet_Winter_Storage",
     "Snap_or_hardware_Full",
     "Snap_or_hardware_separate_bow_and_cockpit",
-    "RV_Skirt",
+    "OTHER",
     "Boat_Seat_Covers",
   ];
 
@@ -182,7 +184,7 @@ const CreateWorkOrderForm = ({
         businessShippingAddress: "",
         customerName: "",
         customerDropShippingAddress: "",
-        // files: [],
+        currentStage: "SCANNING",
       });
       setShowForm(false);
     } else {
@@ -195,6 +197,7 @@ const CreateWorkOrderForm = ({
             createdById: SSuser.id,
             assignedToId: SSuser.id,
             companyId: SSuser.companyId,
+            currentStage: "SCANNING",
           }));
         } else if (button == "edit") {
           setFormState(() => ({
@@ -286,12 +289,26 @@ const CreateWorkOrderForm = ({
       const input = {
         input: formState,
       };
-      if (button === "create")
-        await client.graphql({
+      if (button === "create") {
+        //Create work order stage
+        const workOrder = await client.graphql({
           query: createWorkOrder,
           variables: input,
         });
-      else if (button === "edit")
+
+        const workflowStage = await client.graphql({
+          query: createWorkflowStage,
+          variables: {
+            input: {
+              workOrderId: workOrder.data.createWorkOrder.id,
+              stage: "SCANNING",
+              companyId: formState.companyId,
+              status: "QUEUED",
+              notes: "Testing",
+            },
+          },
+        });
+      } else if (button === "edit")
         await client.graphql({
           query: updateWorkOrder,
           variables: input,
@@ -360,7 +377,9 @@ const CreateWorkOrderForm = ({
               <div className="work-order-form-columns">
                 <div className="work-order-form-left">
                   <Card variation="elevated" style={{ marginBottom: "20px" }}>
-                    <Heading level={5}>General Details</Heading>
+                    <Heading level={5} style={{ marginBottom: "10px" }}>
+                      General Details
+                    </Heading>
                     <div className="form-group">
                       <label htmlFor="type">Work Order Type</label>
                       <select
@@ -400,7 +419,9 @@ const CreateWorkOrderForm = ({
                 />
               </div> */}
                   <Card variation="elevated" style={{ marginBottom: "20px" }}>
-                    <Heading level={5}>Vehicle Information</Heading>
+                    <Heading level={5} style={{ marginBottom: "10px" }}>
+                      Vehicle Information
+                    </Heading>
                     <div className="form-group">
                       <label htmlFor="make" className="required-field">
                         Make
@@ -449,69 +470,9 @@ const CreateWorkOrderForm = ({
                     </div>
                   </Card>
                   <Card variation="elevated" style={{ marginBottom: "20px" }}>
-                    <Heading level={5}>CNC/WCNC Information</Heading>
-                    <div className="form-group">
-                      <label htmlFor="CNCId" className="required-field">
-                        CNC Company
-                      </label>
-                      <select
-                        id="companyId"
-                        value={formState.companyId}
-                        onChange={(e) => setInput("CNCId", e.target.value)}
-                      >
-                        <option value="">Select CNC Company</option>
-                        {companies.map((company) => (
-                          <option key={company.id} value={company.id}>
-                            {company.name}
-                          </option>
-                        ))}
-                      </select>
-                      <span className={styles.orText}>OR</span>
-                      <label htmlFor="businessName">Business Name</label>
-                      <input
-                        id="businessName"
-                        type="text"
-                        value={formState.businessName}
-                        onChange={(e) =>
-                          setInput("businessName", e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="attnName">Attention Name</label>
-                      <input
-                        id="attnName"
-                        type="text"
-                        value={formState.attnName}
-                        onChange={(e) => setInput("attnName", e.target.value)}
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="businessPhone">Business Phone</label>
-                      <input
-                        id="businessPhone"
-                        type="tel"
-                        value={formState.businessPhone}
-                        onChange={(e) =>
-                          setInput("businessPhone", e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="businessShippingAddress">
-                        Business Shipping Address
-                      </label>
-                      <textarea
-                        id="businessShippingAddress"
-                        value={formState.businessShippingAddress}
-                        onChange={(e) =>
-                          setInput("businessShippingAddress", e.target.value)
-                        }
-                      />
-                    </div>
-                  </Card>
-                  <Card variation="elevated" style={{ marginBottom: "20px" }}>
-                    <Heading level={5}>Customer Information</Heading>
+                    <Heading level={5} style={{ marginBottom: "10px" }}>
+                      Customer Information
+                    </Heading>
                     <div className="form-group">
                       <label htmlFor="customerName" className="required-field">
                         Customer Name
@@ -530,7 +491,7 @@ const CreateWorkOrderForm = ({
                         htmlFor="customerDropShippingAddress"
                         className="required-field"
                       >
-                        Customer Drop Shipping Address
+                        Customer Shipping Address
                       </label>
                       <textarea
                         id="customerDropShippingAddress"
@@ -544,26 +505,104 @@ const CreateWorkOrderForm = ({
                       />
                     </div>
                   </Card>
+                  <Card variation="elevated" style={{ marginBottom: "20px" }}>
+                    <Heading level={5} style={{ marginBottom: "10px" }}>
+                      Process Information
+                    </Heading>
+                    <div className="form-group">
+                      <label htmlFor="attnName">Attention</label>
+                      <input
+                        id="attnName"
+                        type="text"
+                        value={formState.attnName}
+                        onChange={(e) => setInput("attnName", e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="CNCId" className="required-field">
+                        CNC Company
+                      </label>
+                      <select
+                        id="companyId"
+                        value={formState.companyId}
+                        onChange={(e) => setInput("CNCId", e.target.value)}
+                      >
+                        <option value="">Select CNC Company</option>
+                        {companies.map((company) => (
+                          <option key={company.id} value={company.id}>
+                            {company.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    {/* <span className={styles.orText}>OR</span> */}
 
-                  <Button type="submit" variation="primary">
-                    Submit
-                  </Button>
+                    {/* <div className="form-group">
+                      <label htmlFor="businessPhone">Business Phone</label>
+                      <input
+                        id="businessPhone"
+                        type="tel"
+                        value={formState.businessPhone}
+                        onChange={(e) =>
+                          setInput("businessPhone", e.target.value)
+                        }
+                      />
+                    </div> */}
+                    <div className="form-group">
+                      <label htmlFor="businessName" className="required-field">
+                        Manufacturer Name
+                      </label>
+                      <input
+                        id="businessName"
+                        type="text"
+                        value={formState.businessName}
+                        onChange={(e) =>
+                          setInput("businessName", e.target.value)
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label
+                        htmlFor="businessShippingAddress"
+                        className="required-field"
+                      >
+                        Manufacturer Shipping Address
+                      </label>
+                      <textarea
+                        id="businessShippingAddress"
+                        value={formState.businessShippingAddress}
+                        onChange={(e) =>
+                          setInput("businessShippingAddress", e.target.value)
+                        }
+                        required
+                      />
+                    </div>
+                  </Card>
                 </div>
 
                 <div className="work-order-form-right">
                   <div className="form-group">
-                    <FileUploader3
-                      onUploadSuccess={handleUploadSuccess}
-                      workorderNumber={formState.woNumber}
-                      SSuser={SSuser}
-                    />
+                    <Card variation="elevated" padding="1.5rem">
+                      <label>Upload Image Files</label>
+                      <FileUploader3
+                        onUploadSuccess={handleUploadSuccess}
+                        workorderNumber={formState.woNumber}
+                        SSuser={SSuser}
+                      />
 
-                    <Card variation="elevated" style={{ marginTop: "20px" }}>
-                      <div className={styles.header}>
-                        <label>Uploaded Files</label>
+                      {/* <Card
+                      variation="elevated"
+                      style={{ marginTop: "20px", marginBottom: "20px" }}
+                    > */}
+                      <div
+                        className={styles.header}
+                        style={{ marginTop: "20px", marginBottom: "20px" }}
+                      >
+                        <label>Uploaded Image Files</label>
                         <div className={styles.headerActions}>
                           <Button
-                            variation="primary"
+                            variation="info"
                             onClick={fetchS3Files}
                             size="small"
                           >
@@ -571,7 +610,7 @@ const CreateWorkOrderForm = ({
                             Refresh
                           </Button>
                           <Button
-                            variation="primary"
+                            variation="info"
                             size="small"
                             disabled={displayedFiles.length === 0}
                           >
@@ -637,6 +676,104 @@ const CreateWorkOrderForm = ({
                           No files uploaded yet
                         </div>
                       )}
+                    </Card>
+                    <Card
+                      variation="elevated"
+                      padding="1.5rem"
+                      style={{ marginTop: "20px", marginBottom: "20px" }}
+                    >
+                      <label>Upload Design Files</label>
+                      <FileUploader3
+                        onUploadSuccess={handleUploadSuccess}
+                        workorderNumber={formState.woNumber}
+                        SSuser={SSuser}
+                      />
+                      <div
+                        className={styles.header}
+                        style={{ marginTop: "20px" }}
+                      >
+                        <label>Uploaded Design Files</label>
+                        <div className={styles.headerActions}>
+                          <Button
+                            variation="info"
+                            onClick={fetchS3Files}
+                            size="small"
+                          >
+                            <MdRefresh className={styles.actionIcon} />
+                            Refresh
+                          </Button>
+                          <Button
+                            variation="info"
+                            size="small"
+                            disabled={displayedFiles.length === 0}
+                          >
+                            <MdCloudDownload className={styles.actionIcon} />
+                            Download
+                          </Button>
+                          <Button
+                            variation="warning"
+                            size="small"
+                            disabled={displayedFiles.length === 0}
+                          >
+                            <MdDeleteSweep className={styles.actionIcon} />
+                            Delete
+                          </Button>
+                          <Button
+                            variation="info"
+                            onClick={toggleFileList}
+                            size="small"
+                          >
+                            {showFiles ? <MdExpandLess /> : <MdExpandMore />}
+                            {showFiles ? "Hide" : "Show"}
+                          </Button>
+                        </div>
+                      </div>
+                      <p className={styles.totalFiles}>
+                        {displayedFiles.length} file(s) attached to work order
+                      </p>
+                      {showFiles && displayedFiles.length > 0 && (
+                        <div>
+                          <ul className={styles.fileList}>
+                            {displayedFiles.map((file, index) => (
+                              <li key={index} className={styles.fileItem}>
+                                <MdInsertDriveFile
+                                  className={styles.fileIcon}
+                                />
+                                <span className={styles.fileName}>
+                                  {getFileName(file.path)}
+                                </span>
+                                <div className={styles.fileActions}>
+                                  <Button
+                                    className={styles.actionButton}
+                                    onClick={() => handleDownload(file.path)}
+                                    title="Download"
+                                  >
+                                    <MdDownload />
+                                  </Button>
+                                  <Button
+                                    className={styles.actionButton}
+                                    onClick={() => handleDelete(file.path)}
+                                    title="Delete"
+                                  >
+                                    <MdDelete />
+                                  </Button>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {showFiles && displayedFiles.length === 0 && (
+                        <div className={styles.noFiles}>
+                          No files uploaded yet
+                        </div>
+                      )}
+                    </Card>
+                    <Card variation="elevated" style={{ marginTop: "20px" }}>
+                      <Button type="submit" variation="primary">
+                        Submit
+                      </Button>
                     </Card>
                   </div>
                 </div>

@@ -16,7 +16,30 @@ type Company @model {
   CNCWorkOrders: [WorkOrder] @hasMany(indexName: "byCNC", fields: ["id"])
   materialPricings: [MaterialPricing]
     @hasMany(indexName: "byCompany", fields: ["id"])
-  userRoles: [UserRole] @hasMany(indexName: "byCompany", fields: ["id"])
+  companyRoles: [CompanyRole] @hasMany(indexName: "byCompany", fields: ["id"])
+  workflowStages: [WorkflowStage]
+    @hasMany(indexName: "byCompany", fields: ["id"])
+}
+enum CompanyType {
+  CNC
+  SCAN
+  MANUFACTURE
+  CUSTOMER
+  WHOLESALE
+  DEALER
+  RV_DEALER
+}
+
+type CompanyRole @model {
+  id: ID! @primaryKey
+  roleId: CompanyType
+  companyId: ID! @index(name: "byCompany")
+  shippingAddress: String
+  private: Boolean
+  isActive: Boolean
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  company: Company @belongsTo(fields: ["companyId"])
 }
 
 type User @model {
@@ -35,37 +58,14 @@ type User @model {
   filesUploaded: [File] @hasMany(indexName: "byUploader", fields: ["id"])
   auditLogs: [AuditLog] @hasMany(indexName: "byUser", fields: ["id"])
   companyId: ID @index(name: "byCompany")
-  companyName: String 
+  companyName: String
+  stageUpdates: [StageUpdate] @hasMany(indexName: "byUser", fields: ["id"])
 }
 enum roleType {
   new
   sAdmin
   cAdmin
   emp
-}
-type Role @model {
-  id: ID! @primaryKey
-  name: String!
-  description: String
-  permissions: [Permission] @hasMany(indexName: "byRole", fields: ["id"])
-}
-
-type UserRole @model {
-  id: ID! @primaryKey
-  userId: ID! @index(name: "byUser")
-  roleId: ID! @index(name: "byRole")
-  companyId: ID! @index(name: "byCompany")
-  createdAt: AWSDateTime
-  updatedAt: AWSDateTime
-  company: Company @belongsTo(fields: ["companyId"])
-}
-
-type Permission @model {
-  id: ID! @primaryKey
-  roleId: ID! @index(name: "byRole")
-  action: String!
-  description: String
-  role: Role @belongsTo(fields: ["roleId"])
 }
 
 enum WorkOrderStatus {
@@ -80,8 +80,8 @@ enum WorkOrderType {
   Ratchet_Winter_Storage
   Snap_or_hardware_Full
   Snap_or_hardware_separate_bow_and_cockpit
-  RV_Skirt
   Boat_Seat_Covers
+  OTHER
 }
 
 type WorkOrder @model {
@@ -132,6 +132,63 @@ type WorkOrder @model {
   crmClient: User @belongsTo(fields: ["crmClientId"])
   files: [File] @hasMany(indexName: "byWorkOrder", fields: ["id"])
   payments: [Payment] @hasMany(indexName: "byWorkOrder", fields: ["id"])
+  currentStage: WorkflowStages
+  currentStageId: ID
+  estimatedCompletionDate: AWSDateTime
+  workflowStages: [WorkflowStage]
+    @hasMany(indexName: "byWorkOrder", fields: ["id"])
+  stageUpdates: [StageUpdate]
+    @hasMany(indexName: "byWorkflowStage", fields: ["id"])
+}
+
+enum WorkflowStages {
+  SCANNING
+  DESIGN
+  CNC_CUTTING
+  MANUFACTURING
+  WAREHOUSE
+  CUSTOMER_DELIVERY
+}
+
+enum StageStatus {
+  QUEUED
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+  EXCEPTION
+}
+
+type WorkflowStage @model {
+  id: ID! @primaryKey
+  workOrderId: ID! @index(name: "byWorkOrder")
+  stage: WorkflowStages!
+  status: StageStatus!
+  companyId: ID! @index(name: "byCompany")
+  startDate: AWSDateTime
+  completionDate: AWSDateTime
+  estimatedCompletionDate: AWSDateTime
+  notes: String
+  attn: String
+  qualityCheck: Boolean
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  priority: Int
+  estimatedDuration: Int
+  workOrder: WorkOrder @belongsTo(fields: ["workOrderId"])
+  company: Company @belongsTo(fields: ["companyId"])
+  stageUpdates: [StageUpdate]
+    @hasMany(indexName: "byWorkflowStage", fields: ["id"])
+}
+
+type StageUpdate @model {
+  id: ID! @primaryKey
+  workflowStageId: ID! @index(name: "byWorkflowStage")
+  status: StageStatus!
+  notes: String
+  timestamp: AWSDateTime!
+  updatedById: ID! @index(name: "byUser")
+  updatedBy: User @belongsTo(fields: ["updatedById"])
+  workflowStage: WorkflowStage @belongsTo(fields: ["workflowStageId"])
 }
 
 type File @model {
@@ -253,6 +310,24 @@ type Total @model {
   id: ID! @primaryKey
   name: String!
   quantity: Float
+}
+
+type Permission @model {
+  id: ID! @primaryKey
+  name: String!
+  description: String
+}
+
+type Role @model {
+  id: ID! @primaryKey
+  name: String!
+  description: String
+}
+type UserRole @model {
+  id: ID! @primaryKey
+  name: String!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
 }
 
 type WorkOrderCounter @model {
