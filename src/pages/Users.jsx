@@ -2,7 +2,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { generateClient } from "aws-amplify/api";
 import { listUsers, getCompany, listCompanyRoles } from "../graphql/queries";
-import { createCompanyRole, updateCompany } from "../graphql/mutations";
+import {
+  createCompanyRole,
+  updateCompany,
+  deleteCompanyRole,
+} from "../graphql/mutations";
 import {
   Table,
   TableCell,
@@ -21,7 +25,6 @@ import {
   CheckboxField,
 } from "@aws-amplify/ui-react";
 import CreateUser from "./createUser";
-import { Menu, MenuItem } from "@aws-amplify/ui-react";
 
 const client = generateClient();
 
@@ -38,7 +41,6 @@ function Users({ SSuser }) {
   const [editedCompany, setEditedCompany] = useState(null);
   const [showSecret, setShowSecret] = useState(false);
   const [isEditCompanyModalOpen, setIsEditCompanyModalOpen] = useState(false);
-  // Add this state at the top with other state declarations
   const [companyRoles, setCompanyRoles] = useState([]);
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [isDataFetched, setIsDataFetched] = useState(false);
@@ -52,25 +54,28 @@ function Users({ SSuser }) {
     "DEALER",
     "RV_DEALER",
   ];
+
   useEffect(() => {
     fetchUsers();
     fetchCompanyDetails();
   }, []);
+
   const toggleSecretVisibility = () => {
     setShowSecret(!showSecret);
   };
+
   const maskCompanySecret = (secret) => {
     if (!secret) return "Not available";
     return showSecret
       ? secret
       : secret.substring(0, 4) + "*".repeat(secret.length - 4);
   };
+
   async function fetchCompanyDetails() {
     if (!SSuser.companyId) {
       console.log("No company ID available");
       return;
     }
-
     try {
       const companyData = await client.graphql({
         query: getCompany,
@@ -82,6 +87,39 @@ function Users({ SSuser }) {
       setError("An error occurred while fetching company details.");
     }
   }
+
+  // Add this function to handle role deletion
+  const handleDeleteUnselectedRoles = async () => {
+    try {
+      // Find roles that exist in companyRoles but not in selectedTypes
+      const rolesToDelete = companyRoles.filter(
+        (role) => !selectedTypes.includes(role.roleId)
+      );
+
+      // Delete each unselected role
+      const deletePromises = rolesToDelete.map(async (role) => {
+        await client.graphql({
+          query: deleteCompanyRole,
+          variables: {
+            input: {
+              id: role.id,
+            },
+          },
+        });
+      });
+
+      // Wait for all deletions to complete
+      await Promise.all(deletePromises);
+
+      // Refresh the roles list
+      await fetchCompanyTypes();
+
+      console.log("Successfully deleted unselected roles");
+    } catch (error) {
+      console.error("Error deleting roles:", error);
+      alert("Failed to delete roles. Please try again.");
+    }
+  };
 
   // Add this function to fetch company types
   const fetchCompanyTypes = async () => {
@@ -102,6 +140,8 @@ function Users({ SSuser }) {
       }
       console.log(companyRoles);
 
+      setSelectedTypes(companyRoles1.map((role) => role.roleId));
+
       setIsDataFetched(true);
     } catch (error) {
       console.error("Error fetching company types:", error);
@@ -109,37 +149,37 @@ function Users({ SSuser }) {
     }
   };
 
-  // Inside your Users.jsx component
-
-
   const handleCreateRoles = async () => {
     try {
-      // Array to store all creation promises
+      // First, delete unselected roles
+      await handleDeleteUnselectedRoles();
+      // Then create new roles (your existing creation logic)
       const rolePromises = selectedTypes.map(async (type) => {
-        const roleData = {
-          companyId: SSuser.companyId,
-          roleId: type,
-        };
+        // Check if role already exists to avoid duplicates
+        const existingRole = companyRoles.find((role) => role.roleId === type);
+        if (!existingRole) {
+          const roleData = {
+            companyId: SSuser.companyId,
+            roleId: type,
+          };
 
-        const response = await client.graphql({
-          query: createCompanyRole,
-          variables: {
-            input: roleData,
-          },
-        });
+          const response = await client.graphql({
+            query: createCompanyRole,
+            variables: {
+              input: roleData,
+            },
+          });
 
-        return response.data.createCompanyRole;
+          return response.data.createCompanyRole;
+        }
       });
 
       // Wait for all roles to be created
-      const createdRoles = await Promise.all(rolePromises);
+      const createdRoles = (await Promise.all(rolePromises)).filter(Boolean);
       console.log("Created roles:", createdRoles);
 
       // Refresh the roles list
       fetchCompanyTypes();
-
-      // Show success message
-      alert("Roles created successfully!");
     } catch (error) {
       console.error("Error creating roles:", error);
       alert("Failed to create roles. Please try again.");
@@ -155,15 +195,6 @@ function Users({ SSuser }) {
         return [...prev, type];
       }
     });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (selectedTypes.length === 0) {
-      alert("Please select at least one role type");
-      return;
-    }
-    await handleCreateRoles(selectedTypes);
   };
 
   // Add useEffect to fetch company types when component mounts
@@ -280,19 +311,12 @@ function Users({ SSuser }) {
     alert("User updated successfully!");
   };
 
-  const handleSearchUser = async (e) => {
-    e.preventDefault();
-    if (!inviteEmail || !inviteEmail.includes("@")) {
-      alert("Please enter a valid email address");
-      return;
-    }
-  };
   const handleEditCompany = () => {
     // Add your company editing logic here
     // For example, you could open a modal similar to the invite modal
     setIsEditCompanyModalOpen(true);
   };
-  const handleSwitchRoles = () => {};
+
   const handleUpdateCompany = async (e) => {
     e.preventDefault();
     if (selectedTypes.length === 0) {
@@ -318,7 +342,7 @@ function Users({ SSuser }) {
       setIsEditCompanyModalOpen(false);
 
       // Show success message
-      alert("Company information updated successfully!");
+      alert("Company roles and information updated successfully!");
     } catch (error) {
       console.error("Error updating company:", error);
       alert("Failed to update company information. Please try again.");
@@ -456,6 +480,7 @@ function Users({ SSuser }) {
                             value={type}
                             label={type.replace("_", " ")}
                             onChange={() => handleCheckboxChange(type)}
+                            checked={selectedTypes.includes(type)}
                           />
                         ))}
                       </Flex>
@@ -548,34 +573,6 @@ function Users({ SSuser }) {
                     </Flex>
                   </Flex>
                 </Flex>
-                {/* <Flex direction="column" gap="medium">
-                <Heading level={3}>Invite User</Heading>
-                <form onSubmit={handleSearchUser}>
-                  <Flex direction="column" gap="medium">
-                    <TextField
-                      label="Email Address"
-                      type="email"
-                      value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
-                      placeholder="Enter email address"
-                      required
-                    />
-                    <Flex gap="medium" justifyContent="flex-end">
-                      <Button
-                        onClick={() => {
-                          setIsInviteModalOpen(false);
-                          setInviteEmail("");
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                      <Button variation="primary" type="submit">
-                        Search
-                      </Button>
-                    </Flex>
-                  </Flex>
-                </form>
-              </Flex> */}
               </View>
             </Card>
           </View>
