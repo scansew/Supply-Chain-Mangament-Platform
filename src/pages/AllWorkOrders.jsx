@@ -41,6 +41,31 @@ function AllWorkOrders({ SSuser }) {
   const [companyRoles, setCompanyRoles] = useState([]);
   const [isDataFetched, setIsDataFetched] = useState(false);
   const [currentRole, setCurrentRoles] = useState(null);
+  const getStatusColor = (status) => {
+    const statusColors = {
+      SCANNING: "rgb(179, 207, 255)", // Pastel Blue
+      DESIGN: "rgb(208, 186, 255)", // Pastel Purple
+      CNC_CUTTING: "rgb(255, 198, 173)", // Pastel Orange
+      MANUFACTURING: "rgb(255, 223, 186)", // Pastel Yellow
+      WAREHOUSE: "rgb(190, 233, 190)", // Pastel Green
+      CUSTOMER_DELIVERY: "rgb(178, 223, 219)", // Pastel Teal
+    };
+    return statusColors[status] || tokens.colors.neutral[60];
+  };
+
+  // Add this function for text colors to ensure readability
+  const getTextColor = (status) => {
+    const textColors = {
+      SCANNING: "rgb(41, 84, 155)", // Darker Blue
+      DESIGN: "rgb(96, 60, 158)", // Darker Purple
+      CNC_CUTTING: "rgb(184, 91, 40)", // Darker Orange
+      MANUFACTURING: "rgb(158, 119, 33)", // Darker Yellow
+      WAREHOUSE: "rgb(54, 124, 54)", // Darker Green
+      CUSTOMER_DELIVERY: "rgb(40, 110, 104)", // Darker Teal
+    };
+    return textColors[status] || tokens.colors.neutral[90];
+  };
+
   useEffect(() => {
     fetchWorkOrders();
 
@@ -210,148 +235,190 @@ function AllWorkOrders({ SSuser }) {
     setSelectedWorkOrder(workOrder);
     setIsModalOpen(true);
   };
-
+  const cardStyles = {
+    boxShadow: "0 1px 4px rgba(0, 0, 0, 0.05)",
+    transition: "all 0.2s ease-in-out",
+    border: "1px solid rgba(0, 0, 0, 0.08)",
+  };
   return (
-    <View width="100%">
-      <CreateWorkOrderForm SSuser={SSuser} button="create" />
-      {renderRoleSwitcher()}
-      <Flex direction="row" width="100%">
-        {Object.entries(groupedWorkOrders).map(([status, items]) => (
-          <Card
-            key={status}
-            // backgroundColor={tokens.colors.neutral[20]}
-            padding={tokens.space.zero}
-            width="350px" // Set a fixed width for each column
-          >
-            <Heading level={5}>{status.replace("_", " ")}</Heading>
+    <View
+      width="100%"
+      style={{
+        backgroundColor: "rgb(250, 250, 252)",
+      }}
+    >
+      {" "}
+      <Flex direction="column" gap={tokens.space.large}>
+        {/* Header Section */}
+        <Flex
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          padding={tokens.space.medium}
+          backgroundColor={tokens.colors.neutral[10]}
+          borderRadius={tokens.radii.medium}
+        >
+          <CreateWorkOrderForm SSuser={SSuser} button="create" />
+          {renderRoleSwitcher()}
+        </Flex>
 
-            <Flex
+        {/* Work Orders Grid */}
+        <Flex
+          direction="row"
+          width="100%"
+          gap={tokens.space.medium}
+          overflow="auto"
+          padding={tokens.space.small}
+        >
+          {Object.entries(groupedWorkOrders).map(([status, items]) => (
+            <Card
+              key={status}
+              padding={tokens.space.medium}
+              width={`${80 / Object.keys(groupedWorkOrders).length}%`} // This makes all columns equal width
+              minWidth="150px" // Ensures columns don't get too narrow
+              maxWidth="500px" // Ensures columns don't get too wide
+              backgroundColor={tokens.colors.neutral[10]}
               variation="outlined"
-              width="100%" // Changed from fixed 350px to 100%
-              height="100%"
-              minheight="100vh"
-              // backgroundColor={tokens.colors.neutral[20]}
               borderRadius={tokens.radii.medium}
-              overflow="hidden"
-              paddingTop={tokens.space.small}
+              style={{
+                flex: "1 0 auto", // This helps with equal width distribution
+              }}
             >
+              <Heading
+                level={6}
+                padding={tokens.space.small}
+                backgroundColor={getStatusColor(status)}
+                color={getTextColor(status)}
+                borderRadius={tokens.radii.small}
+                textAlign="center"
+                style={{
+                  fontWeight: "600",
+                  marginBottom: "20px",
+                }}
+              >
+                {status.replace("_", " ")}
+              </Heading>
+
               <Collection
                 items={items}
                 type="list"
                 direction="column"
                 gap={tokens.space.small}
                 wrap="nowrap"
-                height="calc(100% - 60px)"
-                padding={tokens.space.small}
               >
-                {(item, handleCardClick) => (
+                {(item) => (
                   <Card
                     key={item.id}
                     variation="elevated"
                     width="100%"
-                    padding={tokens.space.zero}
+                    padding={tokens.space.medium}
                     borderRadius={tokens.radii.medium}
+                    backgroundColor={tokens.colors.white}
+                    onClick={() => handleViewDetails(item)}
                     style={{
-                      backgroundImage: `url(${
-                        item.filesFolder ||
-                        "https://scanandsewapp-storage-442a3489f0bf1-deve.s3.us-east-1.amazonaws.com/public/1729644765508_DSC02411.JPG?response-content-disposition=inline&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEI7%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJHMEUCIAvYqnCKUsH2pqMzoTPI53qGGK1LKj8WAlWXZclsz9ACAiEA9L4qiL%2FvZSDUzszE5o%2BL9tqM2eZXYch2cEYEdtVCrTQq5wMI9%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw2Mzc0MjM0OTgyNjkiDHzsszitIagwrk1xOCq7A61f81FlX%2BUtSCelv1VOLsaNabVd%2Fv0nJMT5n2pvSzygUgkAWuCYdggv6jcXwEf32z%2B0xgSvkfHoIl%2FvLkqlG60BYu4EMqiJ1DKK5yfAWTZItvw3ZGz7OKQYpBkHZJ%2BkxQkVUK57Oqf0inib2RUeU5vTwc%2F%2F%2BZen6v5JogvzJZGD33LoPTx0p%2FDfHV3ZGxLRsgUz0blz4lE99VV7k3k08hF0KCmnqrSrfqX%2FH5IZaBOn76rvwMmoTVVlJ9%2BSb0jJlhjYaTHq83HzeFVKO7hjzt03gVfLUl%2F5VBzNrfNFitIGlxSonaER7rYHPDZ2tCTCTREUm2irbn5642bZb5dSitOxkPQtsX5MWHzVkJJvAgRMDEjyXQKzHCddftMs5prrFkjZZabBmEgPyPpzQoat3ve6jleAOGf5xHezjUK4u6HIWMGcsl4%2Bj8qxcGn885L0O9QNSeDWte2qaWWAL80sexZbvyoBFOUwFfFENnmn%2BD5kbUf5Vzhlax9vbiRA2ffm4547wR6WY57XeGpJEeATXnUp%2BGnES5o7Llz5I6vsEcuC9qmU5U8tevfyPxVG1XSUoDA3jAS%2FH7Z8yOchMNzj7bgGOuQCX1m8TXf8g2A%2FtDiW1RfhfLsgGjb634v0lMqg9yufdZj8E7yagzTVdInpkqTp4JuUgq0mqU%2FccOsaNpissj9CYcS%2FbsPZCh54cPp3RTJiTStW%2BFNRG%2BpAIY8FH%2B71eo019KLfOHl%2BkDFHABAjXi%2F%2FKpsMK8srKiQPdIjUjTBYvWIEwh0OUnLucTkJbbtqnj2IRYKmk9ZJOfXGj%2B5Cn3hRMVUNYm0cgc3fxWI47wFMCRRHrYCk1G3LWkSLU7iB6cTJ7aevEXRESTAAC77TbR3nbsKOnCKsReXqzKSI8hp%2BzJfQsqzaTGDmEtoOe5e%2BFk05a%2B%2F%2BHd6mp4OlorvRyClFLo70tOOYJbVg2xKD27%2Bb3q976Wj6WUBIl8LRz7SfapBwaJz36yIe8gBkfwea8g1N425bmOex0g8RypS%2BVkLBcLup0wOf1paIE%2Bivxa%2BJHJJNYS1MeS6MHrMj7PywEFalZrii2%2Bs%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAZI2LGWQOTY7HN5OF%2F20241025%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20241025T214951Z&X-Amz-Expires=36000&X-Amz-SignedHeaders=host&X-Amz-Signature=4450577051c1d23d71a427477cd760f9767ca6d0004b824240b612f6a8fb8981"
-                      })`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      backgroundRepeat: "no-repeat",
+                      transition: "all 0.2s ease-in-out",
+                      cursor: "pointer",
+                      borderLeft: `4px solid ${getStatusColor(status)}`,
+                      boxShadow: "0 1px 4px rgba(0, 0, 0, 0.05)",
+                      ":hover": {
+                        transform: "translateY(-2px)",
+                        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                        backgroundColor: `${getStatusColor(status)}15`, // Adding slight background tint on hover
+                      },
                     }}
                   >
-                    <Flex
-                      direction="column"
-                      gap={tokens.space.zero}
-                      backgroundColor="rgba(255, 255, 255, 0.6)"
-                      height="100%"
-                    >
-                      {item.imageUrl && (
-                        <Image
-                          src={item.imageUrl}
-                          alt="Work Order Preview"
-                          objectFit="cover"
-                          width="100%"
-                          height="100px"
-                          borderTopLeftRadius={tokens.radii.medium}
-                          borderTopRightRadius={tokens.radii.medium}
-                        />
-                      )}
-                      <Flex
-                        direction="column"
-                        padding={tokens.space.small}
-                        gap={tokens.space.xxs}
-                      >
-                        <Flex
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
-                          <Text
-                            fontSize={tokens.fontSizes.small}
-                            fontWeight="bold"
-                          >
-                            Work Order {item.woNumber}
-                          </Text>
-                          <Badge variation="info" size="small">
-                            {item.process}
-                          </Badge>
-                        </Flex>
+                    <Flex direction="column" gap={tokens.space.xs}>
+                      <Flex justifyContent="space-between" alignItems="center">
                         <Text
-                          fontSize={tokens.fontSizes.xs}
-                          variation="secondary"
+                          fontSize={tokens.fontSizes.medium}
+                          fontWeight={tokens.fontWeights.bold}
+                          color={getTextColor(status)}
+                        >
+                          Work Order {item.woNumber}
+                        </Text>
+                        <Badge
+                          backgroundColor={getStatusColor(status)}
+                          color={getTextColor(status)}
+                          size="small"
+                          style={{
+                            padding: "4px 12px",
+                            fontWeight: "500",
+                          }}
+                        >
+                          {item.process}
+                        </Badge>
+                      </Flex>
+
+                      <Flex
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        marginTop={tokens.space.xs}
+                      >
+                        <Text
+                          fontSize={tokens.fontSizes.small}
+                          color={tokens.colors.neutral[80]}
                         >
                           {item.createdAt
                             ? format(parseISO(item.createdAt), "MMM dd, yyyy")
                             : "No date"}
                         </Text>
+                      </Flex>
+
+                      {item.details && (
                         <Text
-                          fontSize={tokens.fontSizes.xs}
-                          variation="secondary"
-                          lineclamp={2}
+                          fontSize={tokens.fontSizes.small}
+                          color={tokens.colors.neutral[80]}
+                          lineHeight={tokens.lineHeights.medium}
+                          marginTop={tokens.space.xs}
                         >
                           {item.details}
                         </Text>
-                        <Text
-                          fontSize={tokens.fontSizes.xs}
-                          variation="secondary"
-                          lineclamp={1}
-                        >
-                          Ship to: {item.shippingAddress}
-                        </Text>
+                      )}
+
+                      {item.shippingAddress && (
                         <Flex
-                          wrap="wrap"
-                          gap={tokens.space.xxs}
                           alignItems="center"
-                        >
-                          <Text
-                            fontSize={tokens.fontSizes.xs}
-                            variation="secondary"
-                          >
-                            Company: {item.companyId}
-                          </Text>
-                          <Badge variation="info" size="small">
-                            {item.type}
-                          </Badge>
-                        </Flex>
-                        <Button
-                          variation="info"
-                          size="small"
-                          onClick={() => handleViewDetails(item)}
+                          gap={tokens.space.xs}
                           marginTop={tokens.space.xs}
                         >
-                          View Details
-                        </Button>
-                      </Flex>
+                          <Text
+                            fontSize={tokens.fontSizes.small}
+                            color={tokens.colors.neutral[60]}
+                          >
+                            Ship to:
+                          </Text>
+                          <Text
+                            fontSize={tokens.fontSizes.small}
+                            color={tokens.colors.neutral[80]}
+                          >
+                            {item.shippingAddress}
+                          </Text>
+                        </Flex>
+                      )}
                     </Flex>
                   </Card>
                 )}
               </Collection>
-            </Flex>
-          </Card>
-        ))}
-      </Flex>
 
+              {items.length === 0 && (
+                <Flex
+                  direction="column"
+                  alignItems="center"
+                  padding={tokens.space.large}
+                  backgroundColor={`${getStatusColor(status)}20`}
+                  borderRadius={tokens.radii.medium}
+                  marginTop={tokens.space.small}
+                >
+                  <Text color={getTextColor(status)}>
+                    No work orders in this stage
+                  </Text>
+                </Flex>
+              )}
+            </Card>
+          ))}
+        </Flex>
+      </Flex>
       {isModalOpen === true && (
         <View
           position="fixed"
