@@ -60,6 +60,10 @@ export const getCompany = /* GraphQL */ `
         nextToken
         __typename
       }
+      ManWorkOrders {
+        nextToken
+        __typename
+      }
       materialPricings {
         nextToken
         __typename
@@ -241,6 +245,7 @@ export const getWorkOrder = /* GraphQL */ `
       assignedToId
       companyId
       CNCId
+      manId
       status
       filesFolder
       type
@@ -321,6 +326,16 @@ export const getWorkOrder = /* GraphQL */ `
         updatedAt
         __typename
       }
+      ManCompany {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
       crmClient {
         id
         username
@@ -379,6 +394,7 @@ export const listWorkOrders = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -448,6 +464,7 @@ export const getWorkflowStage = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -637,6 +654,7 @@ export const getFile = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -795,6 +813,7 @@ export const getPayment = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -1688,6 +1707,7 @@ export const workOrdersByCreatedById = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -1754,6 +1774,7 @@ export const workOrdersByAssignedToId = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -1820,6 +1841,7 @@ export const workOrdersByCompanyId = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -1886,6 +1908,74 @@ export const workOrdersByCNCId = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
+        status
+        filesFolder
+        type
+        details
+        materialSelection
+        estimatedPrice
+        msrp
+        createdAt
+        updatedAt
+        process
+        make
+        model
+        year
+        crmClientId
+        rawImages
+        rawDesignImages
+        description
+        materialPrice
+        manufacturePrice
+        raw3dModel
+        designPhotos
+        outline3dModel
+        approved3dModel
+        main2dPattern
+        billOfMaterials
+        cnc2dPattern
+        scanInfo
+        businessName
+        attnName
+        businessPhone
+        businessShippingAddress
+        customerName
+        customerDropShippingAddress
+        shippingTrackingInfo
+        currentStage
+        currentStageId
+        estimatedCompletionDate
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const workOrdersByManId = /* GraphQL */ `
+  query WorkOrdersByManId(
+    $manId: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelWorkOrderFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    workOrdersByManId(
+      manId: $manId
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        woNumber
+        createdById
+        assignedToId
+        companyId
+        CNCId
+        manId
         status
         filesFolder
         type

@@ -14,6 +14,7 @@ type Company @model {
   users: [User] @hasMany(indexName: "byCompany", fields: ["id"])
   workOrders: [WorkOrder] @hasMany(indexName: "byCompany", fields: ["id"])
   CNCWorkOrders: [WorkOrder] @hasMany(indexName: "byCNC", fields: ["id"])
+  ManWorkOrders: [WorkOrder] @hasMany(indexName: "byMan", fields: ["id"])
   materialPricings: [MaterialPricing]
     @hasMany(indexName: "byCompany", fields: ["id"])
   companyRoles: [CompanyRole] @hasMany(indexName: "byCompany", fields: ["id"])
@@ -91,6 +92,7 @@ type WorkOrder @model {
   assignedToId: ID @index(name: "byAssignee")
   companyId: ID @index(name: "byCompany")
   CNCId: ID @index(name: "byCNC")
+  manId: ID @index(name: "byMan")
   status: WorkOrderStatus
   filesFolder: String
   type: WorkOrderType
@@ -129,6 +131,7 @@ type WorkOrder @model {
   assignedTo: User @belongsTo(fields: ["assignedToId"])
   company: Company @belongsTo(fields: ["companyId"])
   CNCCompany: Company @belongsTo(fields: ["CNCId"])
+  ManCompany: Company @belongsTo(fields: ["manId"])
   crmClient: User @belongsTo(fields: ["crmClientId"])
   files: [File] @hasMany(indexName: "byWorkOrder", fields: ["id"])
   payments: [Payment] @hasMany(indexName: "byWorkOrder", fields: ["id"])

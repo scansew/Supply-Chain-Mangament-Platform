@@ -6,6 +6,7 @@ import {
   listWorkflowStages,
   getWorkOrder,
 } from "../../graphql/queries";
+import { Button } from "@aws-amplify/ui-react";
 
 const StageStatusUpdater = ({ SSuser, workOrderId }) => {
   const [formData, setFormData] = useState({
@@ -153,17 +154,23 @@ const StageStatusUpdater = ({ SSuser, workOrderId }) => {
 
   return (
     <div className="stage-status-updater">
-      <h2>Update Stage Status</h2>
-
       {error && <div className="error-message">{error}</div>}
       {success && (
         <div className="success-message">
           Stage status updated successfully!
         </div>
       )}
+      <Button
+        type="submit"
+        variation="primary"
+        disabled={loading}
+        onClick={moveToNextStage}
+      >
+        {loading ? "Updating..." : "Complete Work Order"}
+      </Button>
 
-      <form onSubmit={moveToNextStage}>
-        {/* <div className="form-group">
+      {/* <form onSubmit={moveToNextStage}>
+         <div className="form-group">
           <label htmlFor="stageId">Stage ID:</label>
           <input
             type="text"
@@ -173,7 +180,7 @@ const StageStatusUpdater = ({ SSuser, workOrderId }) => {
             onChange={handleInputChange}
             required
           />
-        </div> */}
+        </div> 
 
         <div className="form-group">
           <label htmlFor="status">Status:</label>
@@ -218,7 +225,7 @@ const StageStatusUpdater = ({ SSuser, workOrderId }) => {
         <button type="submit" disabled={loading}>
           {loading ? "Updating..." : "Update Stage Status"}
         </button>
-      </form>
+      </form> */}
 
       <style jsx>{`
         .stage-status-updater {

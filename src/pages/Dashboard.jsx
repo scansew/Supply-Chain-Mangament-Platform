@@ -104,7 +104,7 @@ function Dashboard({ SSuser }) {
         </View>
       ) : (
         <Flex direction="row" wrap="wrap" gap="1rem">
-          <Card variation="elevated">
+          {/* <Card variation="elevated">
             <Heading level={5}>Work Orders</Heading>
             <Text>Total: 25</Text>
             <Text>Pending: 10</Text>
@@ -128,7 +128,7 @@ function Dashboard({ SSuser }) {
             <Text>New work order created - 2 hours ago</Text>
             <Text>Work order #1234 completed - 1 day ago</Text>
             <Text>New user added - 2 days ago</Text>
-          </Card>
+          </Card> */}
         </Flex>
       )}
     </div>

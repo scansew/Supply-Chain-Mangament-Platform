@@ -53,14 +53,11 @@ const CreateWorkOrderForm = ({
     CNCId: "",
     status: "PENDING",
     type: "",
-    details: "",
+    description: "",
     make: "",
     model: "",
     year: "",
-    businessName: "",
     attnName: "",
-    businessPhone: "",
-    businessShippingAddress: "",
     customerName: "",
     customerDropShippingAddress: "",
     filesFolder: "",
@@ -75,7 +72,15 @@ const CreateWorkOrderForm = ({
     "OTHER",
     "Boat_Seat_Covers",
   ];
-
+  const companyTypes = [
+    "CNC",
+    "SCAN",
+    "MANUFACTURE",
+    "CUSTOMER",
+    "WHOLESALE",
+    "DEALER",
+    "RV_DEALER",
+  ];
   useEffect(() => {
     // fetchUser();
     // console.log("SSuser is", SSuser);
@@ -172,16 +177,14 @@ const CreateWorkOrderForm = ({
         assignedToId: "",
         companyId: "",
         CNCId: "",
+        manId: "",
         status: "PENDING",
         type: "",
-        details: "",
+        description: "",
         make: "",
         model: "",
         year: "",
-        businessName: "",
         attnName: "",
-        businessPhone: "",
-        businessShippingAddress: "",
         customerName: "",
         customerDropShippingAddress: "",
         currentStage: "SCANNING",
@@ -198,6 +201,7 @@ const CreateWorkOrderForm = ({
             assignedToId: SSuser.id,
             companyId: SSuser.companyId,
             currentStage: "SCANNING",
+            attnName: `SCAN AND SEW, ${newWorkOrderNumber}`,
           }));
         } else if (button == "edit") {
           setFormState(() => ({
@@ -212,13 +216,12 @@ const CreateWorkOrderForm = ({
             make: workOrderItem.make,
             model: workOrderItem.model,
             year: workOrderItem.year,
-            businessName: workOrderItem.businessName,
             attnName: workOrderItem.attnName,
-            businessPhone: workOrderItem.businessPhone,
-            businessShippingAddress: workOrderItem.businessShippingAddress,
             customerName: workOrderItem.customerName,
             customerDropShippingAddress:
               workOrderItem.customerDropShippingAddres,
+            description: workOrderItem.description,
+            manId: workOrderItem.manId,
           }));
         }
         // fetchUsers();
@@ -277,18 +280,10 @@ const CreateWorkOrderForm = ({
   async function handleSubmit(event) {
     event.preventDefault();
     try {
-      // if (
-      //   !formState.createdById ||
-      //   !formState.assignedToId ||
-      //   !formState.companyId ||
-      //   !formState.type
-      // ) {
-      //   alert("Please fill in all required fields.");
-      //   return;
-      // }
       const input = {
         input: formState,
       };
+      console.log("input is", input);
       if (button === "create") {
         //Create work order stage
         const workOrder = await client.graphql({
@@ -321,16 +316,14 @@ const CreateWorkOrderForm = ({
         companyId: "",
         status: "",
         type: "",
-        details: "",
+        description: "",
         make: "",
         model: "",
         year: "",
-        businessName: "",
         attnName: "",
-        businessPhone: "",
-        businessShippingAddress: "",
         customerName: "",
         customerDropShippingAddress: "",
+        manId: "",
       });
       if (typeof handleViewSuccess === "function") {
         handleViewSuccess();
@@ -368,7 +361,7 @@ const CreateWorkOrderForm = ({
         <div className="work-order-form-wrapper" onClick={toggleForm}>
           <div className="work-order-form" onClick={(e) => e.stopPropagation()}>
             <div className="form-header">
-              <h2>Create Work Order {formState.woNumber}</h2>
+              <h2>Work Order {formState.woNumber}</h2>
               <Button onClick={() => toggleForm()} className="close-button">
                 &times;
               </Button>
@@ -396,28 +389,7 @@ const CreateWorkOrderForm = ({
                         ))}
                       </select>
                     </div>
-
-                    <div className="form-group">
-                      <label htmlFor="details">Details</label>
-                      <textarea
-                        id="details"
-                        value={formState.details}
-                        onChange={(e) => setInput("details", e.target.value)}
-                        required
-                      />
-                    </div>
                   </Card>
-
-                  {/* <div className="form-group">
-                <label htmlFor="process">Process</label>
-                <input
-                  id="process"
-                  type="text"
-                  value={formState.process}
-                  onChange={(e) => setInput("process", e.target.value)}
-                  required
-                />
-              </div> */}
                   <Card variation="elevated" style={{ marginBottom: "20px" }}>
                     <Heading level={5} style={{ marginBottom: "10px" }}>
                       Vehicle Information
@@ -461,6 +433,7 @@ const CreateWorkOrderForm = ({
                       <label htmlFor="description">Description</label>
                       <textarea
                         id="description"
+                        className="required-field"
                         value={formState.details}
                         onChange={(e) =>
                           setInput("description", e.target.value)
@@ -474,9 +447,7 @@ const CreateWorkOrderForm = ({
                       Customer Information
                     </Heading>
                     <div className="form-group">
-                      <label htmlFor="customerName" className="required-field">
-                        Customer Name
-                      </label>
+                      <label htmlFor="customerName">Customer Name</label>
                       <input
                         id="customerName"
                         type="text"
@@ -487,10 +458,7 @@ const CreateWorkOrderForm = ({
                       />
                     </div>
                     <div className="form-group">
-                      <label
-                        htmlFor="customerDropShippingAddress"
-                        className="required-field"
-                      >
+                      <label htmlFor="customerDropShippingAddress">
                         Customer Shipping Address
                       </label>
                       <textarea
@@ -513,9 +481,8 @@ const CreateWorkOrderForm = ({
                       <label htmlFor="attnName">Attention</label>
                       <input
                         id="attnName"
-                        type="text"
                         value={formState.attnName}
-                        onChange={(e) => setInput("attnName", e.target.value)}
+                        readOnly
                       />
                     </div>
                     <div className="form-group">
@@ -523,8 +490,8 @@ const CreateWorkOrderForm = ({
                         CNC Company
                       </label>
                       <select
-                        id="companyId"
-                        value={formState.companyId}
+                        id="CNCId"
+                        value={formState.CNCId}
                         onChange={(e) => setInput("CNCId", e.target.value)}
                       >
                         <option value="">Select CNC Company</option>
@@ -535,48 +502,22 @@ const CreateWorkOrderForm = ({
                         ))}
                       </select>
                     </div>
-                    {/* <span className={styles.orText}>OR</span> */}
-
-                    {/* <div className="form-group">
-                      <label htmlFor="businessPhone">Business Phone</label>
-                      <input
-                        id="businessPhone"
-                        type="tel"
-                        value={formState.businessPhone}
-                        onChange={(e) =>
-                          setInput("businessPhone", e.target.value)
-                        }
-                      />
-                    </div> */}
                     <div className="form-group">
-                      <label htmlFor="businessName" className="required-field">
-                        Manufacturer Name
+                      <label htmlFor="ManId" className="required-field">
+                        Select Manufacturing Company
                       </label>
-                      <input
-                        id="businessName"
-                        type="text"
-                        value={formState.businessName}
-                        onChange={(e) =>
-                          setInput("businessName", e.target.value)
-                        }
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label
-                        htmlFor="businessShippingAddress"
-                        className="required-field"
+                      <select
+                        id="ManId"
+                        value={formState.manId}
+                        onChange={(e) => setInput("manId", e.target.value)}
                       >
-                        Manufacturer Shipping Address
-                      </label>
-                      <textarea
-                        id="businessShippingAddress"
-                        value={formState.businessShippingAddress}
-                        onChange={(e) =>
-                          setInput("businessShippingAddress", e.target.value)
-                        }
-                        required
-                      />
+                        <option value=""> Select Manufacturing Company</option>
+                        {companies.map((company) => (
+                          <option key={company.id} value={company.id}>
+                            {company.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </Card>
                 </div>

@@ -30,14 +30,13 @@ import {
 } from "react-icons/md";
 import {} from "react-icons/md";
 import CreateWorkOrderForm from "./CreateWorkOrderForm";
-import { getWorkOrder } from "../graphql/queries";
+import { getWorkOrder, getCompany } from "../graphql/queries";
 import { list, remove, getUrl } from "aws-amplify/storage";
 import styles from "./WOForm.module.css";
 import { generateClient } from "aws-amplify/api";
-import WorkflowTracking from "./OrderUpdate/WorkflowStageTracking";
 import WorkflowStageUpdator from "./OrderUpdate/WorkflowStageUpdator";
 
-const ViewEditWorkOrder = ({ workOrderItem, SSuser }) => {
+const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
   const [showFiles, setShowFiles] = useState(true);
   const [files, setFiles] = useState([]);
   const [displayedFiles, setDisplayedFiles] = useState([]);
@@ -45,12 +44,19 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [editedWorkOrder, setEditedWorkOrder] = useState(workOrderItem);
   const client = generateClient();
+  const [companyName, setCompanyName] = useState("");
+  console.log("ss", currentRole);
 
   if (!workOrderItem) {
     return <div>Loading...</div>;
   }
   useEffect(() => {
-    if (workOrderItem && workOrderItem.id) {
+    if (
+      workOrderItem &&
+      workOrderItem.id &&
+      currentRole !== "CNC" &&
+      currentRole !== "MANUFACTURE"
+    ) {
       // setEditedWorkOrder(workOrderItem);
       fetchS3Files();
       console.log("Work order item Called:", workOrderItem);
@@ -172,110 +178,116 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser }) => {
       await fetchS3Files(workOrderItem.id);
     }
   };
+
+  // Styled components
+  const StyledSection = ({ title, children, ...props }) => (
+    <div
+      style={{
+        backgroundColor: "#f8f9fa",
+        padding: "1.5rem",
+        borderRadius: "8px",
+        marginBottom: "1.5rem",
+      }}
+      {...props}
+    >
+      <Heading
+        level={3}
+        style={{
+          marginBottom: "1.25rem",
+          color: "#2c3e50",
+          fontSize: "1.5rem",
+          fontWeight: "600",
+        }}
+      >
+        {title}
+      </Heading>
+      {children}
+    </div>
+  );
+
+  const StyledInfoItem = ({ icon, label, value }) => (
+    <Flex
+      direction="row"
+      alignItems="center"
+      gap="medium"
+      style={{
+        padding: "0.75rem",
+        borderRadius: "6px",
+        transition: "background-color 0.2s ease",
+        ":hover": {
+          backgroundColor: "rgba(0, 0, 0, 0.02)",
+        },
+      }}
+    >
+      <div style={{ color: "#2196f3", fontSize: "1.5rem" }}>{icon}</div>
+      <div>
+        <Text
+          style={{
+            fontWeight: "600",
+            color: "#495057",
+            fontSize: "0.9rem",
+            marginBottom: "0.25rem",
+          }}
+        >
+          {label}
+        </Text>
+        <Text
+          style={{
+            color: "#212529",
+            fontSize: "1.1rem",
+          }}
+        >
+          {value || "N/A"}
+        </Text>
+      </div>
+    </Flex>
+  );
+
+  const StyledDivider = () => (
+    <Divider
+      style={{
+        margin: "1.5rem 0",
+        height: "2px",
+        backgroundColor: "#e9ecef",
+      }}
+    />
+  );
+
+  const fetchCompany = async (companyId) => {
+    try {
+      const response = await client.graphql({
+        query: getCompany,
+        variables: {
+          id: companyId,
+        },
+      });
+
+      return response.data.getCompany;
+    } catch (error) {
+      console.error("Error fetching company:", error);
+      throw error;
+    }
+  };
+  useEffect(() => {
+    const getCompanyData = async () => {
+      if (editedWorkOrder.CNCId) {
+        try {
+          const companyData = await fetchCompany(editedWorkOrder.CNCId);
+          setCompanyName(companyData.name); // or whatever field you want to display
+        } catch (error) {
+          console.error("Error fetching company:", error);
+          setCompanyName("Error loading company");
+        }
+      }
+    };
+
+    getCompanyData();
+  }, [editedWorkOrder.CNCId]);
   return (
     <Flex>
       <Card variation="elevated" padding="large" width="40%">
         {/* <WorkflowTracking workOrderId={workOrderItem.id} /> */}
-        Current stage : {editedWorkOrder.currentStage}
-        <WorkflowStageUpdator
-          SSuser={{ SSuser }}
-          workOrderId={workOrderItem.id}
-        />
-      </Card>
-      <Card variation="elevated" padding="large" width="60%">
-        <Section title="Work Order Information">
-          <InfoItem
-            icon={MdAssignment}
-            label="Work Order Number"
-            value={editedWorkOrder.woNumber}
-          />
-          <InfoItem
-            icon={MdSettings}
-            label="Process"
-            value={editedWorkOrder.process}
-          />
-          <InfoItem
-            icon={MdAssignment}
-            label="Status"
-            value={editedWorkOrder.status}
-          />
-          <InfoItem
-            icon={MdAssignment}
-            label="Type"
-            value={editedWorkOrder.type}
-          />
-          <InfoItem
-            icon={MdAssignment}
-            label="Details"
-            value={editedWorkOrder.details}
-          />
-        </Section>
-
-        <Divider marginy="medium" />
-
-        <Section title="Vehicle Information">
-          <InfoItem icon={MdBuild} label="Make" value={editedWorkOrder.make} />
-          <InfoItem
-            icon={MdBuild}
-            label="Model"
-            value={editedWorkOrder.model}
-          />
-          <InfoItem icon={MdBuild} label="Year" value={editedWorkOrder.year} />
-        </Section>
-
-        <Divider marginy="medium" />
-
-        <Section title="Business Information">
-          <InfoItem
-            icon={MdBusiness}
-            label="Business Name"
-            value={editedWorkOrder.businessName}
-          />
-          <InfoItem
-            icon={MdPerson}
-            label="Attention Name"
-            value={editedWorkOrder.attnName}
-          />
-          <InfoItem
-            icon={MdPhone}
-            label="Business Phone"
-            value={editedWorkOrder.businessPhone}
-          />
-          <InfoItem
-            icon={MdLocationOn}
-            label="Business Shipping Address"
-            value={editedWorkOrder.businessShippingAddress}
-          />
-        </Section>
-
-        <Divider marginy="medium" />
-
-        <Section title="Customer Information">
-          <InfoItem
-            icon={MdPerson}
-            label="Customer Name"
-            value={editedWorkOrder.customerName}
-          />
-          <InfoItem
-            icon={MdLocationOn}
-            label="Customer Drop Shipping Address"
-            value={editedWorkOrder.customerDropShippingAddress}
-          />
-        </Section>
-
-        <Divider marginy="medium" />
-
-        <Section title="CNC Information">
-          <InfoItem
-            icon={MdBusiness}
-            label="CNC Company"
-            value={editedWorkOrder.CNCId}
-          />
-        </Section>
-      </Card>
-
-      <Card variation="elevated" style={{ margintop: "20px" }}>
-        <Flex margintop="large">
+        {currentRole !== "CNC" && currentRole !== "MANUFACTURE" && (
           <CreateWorkOrderForm
             SSuser={SSuser}
             workOrderItem={editedWorkOrder}
@@ -285,9 +297,140 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser }) => {
               await handleViewSuccess();
             }}
           />
-        </Flex>
+        )}
+        {/* <CreateWorkOrderForm
+          SSuser={SSuser}
+          workOrderItem={editedWorkOrder}
+          button="edit"
+          handleViewSuccess={async () => {
+            console.log("handleViewSuccess");
+            await handleViewSuccess();
+          }}
+        /> */}
+        <WorkflowStageUpdator
+          SSuser={{ SSuser }}
+          workOrderId={workOrderItem.id}
+        />
+      </Card>
+      <Card
+        variation="elevated"
+        style={{
+          width: "60%",
+          padding: "2rem",
+          backgroundColor: "white",
+          borderRadius: "12px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          transition: "all 0.3s ease",
+          ":hover": {
+            transform: "translateY(-2px)",
+            boxShadow: "0 6px 12px rgba(0, 0, 0, 0.15)",
+          },
+        }}
+      >
+        <StyledSection title="Work Order Information">
+          <Grid templateColumns="1fr 1fr" gap="medium">
+            <StyledInfoItem
+              icon={<MdAssignment />}
+              label="Work Order Number"
+              value={editedWorkOrder.woNumber}
+            />
+            <StyledInfoItem
+              icon={<MdAssignment />}
+              label="Current Stage"
+              value={editedWorkOrder.currentStage}
+            />
+            <StyledInfoItem
+              icon={<MdAssignment />}
+              label="Type"
+              value={editedWorkOrder.type}
+            />
+            <StyledInfoItem
+              icon={<MdAssignment />}
+              label="Details"
+              value={editedWorkOrder.details}
+            />
+          </Grid>
+        </StyledSection>
+
+        <StyledDivider />
+
+        <StyledSection title="Vehicle Information">
+          <Grid templateColumns="1fr 1fr 1fr" gap="medium">
+            <StyledInfoItem
+              icon={<MdBuild />}
+              label="Make"
+              value={editedWorkOrder.make}
+            />
+            <StyledInfoItem
+              icon={<MdBuild />}
+              label="Model"
+              value={editedWorkOrder.model}
+            />
+            <StyledInfoItem
+              icon={<MdBuild />}
+              label="Year"
+              value={editedWorkOrder.year}
+            />
+          </Grid>
+        </StyledSection>
+
+        <StyledDivider />
+
+        <StyledSection title="CNC Information">
+          <Grid templateColumns="1fr" gap="medium">
+            <StyledInfoItem
+              icon={<MdBusiness />}
+              label="CNC Company"
+              value={companyName || "Loading..."}
+            />
+          </Grid>
+        </StyledSection>
+        {currentRole !== "CNC" && (
+          <>
+            <StyledDivider />
+
+            <StyledSection title="Customer Information">
+              <Grid templateColumns="1fr 1fr" gap="medium">
+                <StyledInfoItem
+                  icon={<MdPerson />}
+                  label="Customer Name"
+                  value={editedWorkOrder.customerName}
+                />
+                <StyledInfoItem
+                  icon={<MdLocationOn />}
+                  label="Customer Shipping Address"
+                  value={editedWorkOrder.customerDropShippingAddress}
+                />
+              </Grid>
+            </StyledSection>
+          </>
+        )}
+        <StyledDivider />
+
+        <StyledSection title="Manufacturer Information">
+          <Grid templateColumns="1fr 1fr" gap="medium">
+            <StyledInfoItem
+              icon={<MdBusiness />}
+              label="Company Name"
+              value={editedWorkOrder.businessName}
+            />
+            <StyledInfoItem
+              icon={<MdPerson />}
+              label="Attention"
+              value={editedWorkOrder.attnName}
+            />
+            <StyledInfoItem
+              icon={<MdLocationOn />}
+              label="Company Shipping Address"
+              value={editedWorkOrder.businessShippingAddress}
+            />
+          </Grid>
+        </StyledSection>
+      </Card>
+
+      <Card variation="elevated" style={{ margintop: "20px" }}>
+        <Flex margintop="large"></Flex>
         <div className={styles.header}>
-          <label>Uploaded Files</label>
           <div className={styles.headerActions}>
             <Button variation="primary" onClick={fetchS3Files} size="small">
               <MdRefresh className={styles.actionIcon} />

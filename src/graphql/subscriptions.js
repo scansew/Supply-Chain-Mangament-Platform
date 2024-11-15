@@ -23,6 +23,10 @@ export const onCreateCompany = /* GraphQL */ `
         nextToken
         __typename
       }
+      ManWorkOrders {
+        nextToken
+        __typename
+      }
       materialPricings {
         nextToken
         __typename
@@ -61,6 +65,10 @@ export const onUpdateCompany = /* GraphQL */ `
         nextToken
         __typename
       }
+      ManWorkOrders {
+        nextToken
+        __typename
+      }
       materialPricings {
         nextToken
         __typename
@@ -96,6 +104,10 @@ export const onDeleteCompany = /* GraphQL */ `
         __typename
       }
       CNCWorkOrders {
+        nextToken
+        __typename
+      }
+      ManWorkOrders {
         nextToken
         __typename
       }
@@ -318,6 +330,7 @@ export const onCreateWorkOrder = /* GraphQL */ `
       assignedToId
       companyId
       CNCId
+      manId
       status
       filesFolder
       type
@@ -389,6 +402,16 @@ export const onCreateWorkOrder = /* GraphQL */ `
         __typename
       }
       CNCCompany {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      ManCompany {
         id
         name
         address
@@ -445,6 +468,7 @@ export const onUpdateWorkOrder = /* GraphQL */ `
       assignedToId
       companyId
       CNCId
+      manId
       status
       filesFolder
       type
@@ -516,6 +540,16 @@ export const onUpdateWorkOrder = /* GraphQL */ `
         __typename
       }
       CNCCompany {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      ManCompany {
         id
         name
         address
@@ -572,6 +606,7 @@ export const onDeleteWorkOrder = /* GraphQL */ `
       assignedToId
       companyId
       CNCId
+      manId
       status
       filesFolder
       type
@@ -643,6 +678,16 @@ export const onDeleteWorkOrder = /* GraphQL */ `
         __typename
       }
       CNCCompany {
+        id
+        name
+        address
+        companySecret
+        stripeConnectId
+        createdAt
+        updatedAt
+        __typename
+      }
+      ManCompany {
         id
         name
         address
@@ -715,6 +760,7 @@ export const onCreateWorkflowStage = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -799,6 +845,7 @@ export const onUpdateWorkflowStage = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -883,6 +930,7 @@ export const onDeleteWorkflowStage = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -1101,6 +1149,7 @@ export const onCreateFile = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -1174,6 +1223,7 @@ export const onUpdateFile = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -1247,6 +1297,7 @@ export const onDeleteFile = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -1398,6 +1449,7 @@ export const onCreatePayment = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -1458,6 +1510,7 @@ export const onUpdatePayment = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type
@@ -1518,6 +1571,7 @@ export const onDeletePayment = /* GraphQL */ `
         assignedToId
         companyId
         CNCId
+        manId
         status
         filesFolder
         type

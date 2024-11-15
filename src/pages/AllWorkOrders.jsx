@@ -175,8 +175,7 @@ function AllWorkOrders({ SSuser }) {
       if (companyRoles1) {
         setCompanyRoles(companyRoles1);
       }
-      console.log(companyRoles);
-
+      console.log("cc", companyRoles1[0].roleId);
       setIsDataFetched(true);
     } catch (error) {
       console.error("Error fetching company types:", error);
@@ -202,7 +201,6 @@ function AllWorkOrders({ SSuser }) {
 
   const renderRoleSwitcher = () => {
     if (!isDataFetched) return null;
-
     return (
       <Table>
         <TableBody>
@@ -259,6 +257,7 @@ function AllWorkOrders({ SSuser }) {
           borderRadius={tokens.radii.medium}
         >
           <CreateWorkOrderForm SSuser={SSuser} button="create" />
+          <Text>Select your View here: </Text>
           {renderRoleSwitcher()}
         </Flex>
 
@@ -457,6 +456,7 @@ function AllWorkOrders({ SSuser }) {
             <ViewEditWorkOrder
               workOrderItem={selectedWorkOrder}
               SSuser={SSuser}
+              currentRole={currentRole}
             />
           </Flex>
         </View>
