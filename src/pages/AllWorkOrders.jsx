@@ -364,36 +364,15 @@ function AllWorkOrders({ SSuser }) {
                         </Text>
                       </Flex>
 
-                      {item.details && (
+                      {item.description && (
                         <Text
                           fontSize={tokens.fontSizes.small}
                           color={tokens.colors.neutral[80]}
                           lineHeight={tokens.lineHeights.medium}
                           marginTop={tokens.space.xs}
                         >
-                          {item.details}
+                          {item.description}
                         </Text>
-                      )}
-
-                      {item.shippingAddress && (
-                        <Flex
-                          alignItems="center"
-                          gap={tokens.space.xs}
-                          marginTop={tokens.space.xs}
-                        >
-                          <Text
-                            fontSize={tokens.fontSizes.small}
-                            color={tokens.colors.neutral[60]}
-                          >
-                            Ship to:
-                          </Text>
-                          <Text
-                            fontSize={tokens.fontSizes.small}
-                            color={tokens.colors.neutral[80]}
-                          >
-                            {item.shippingAddress}
-                          </Text>
-                        </Flex>
                       )}
                     </Flex>
                   </Card>
