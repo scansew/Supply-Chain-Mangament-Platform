@@ -37,7 +37,7 @@ import { generateClient } from "aws-amplify/api";
 import WorkflowStageUpdator from "./OrderUpdate/WorkflowStageUpdator";
 
 const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
-  const [showFiles, setShowFiles] = useState(true);
+  const [showFiles, setShowFiles] = useState(false);
   const [files, setFiles] = useState([]);
   const [displayedFiles, setDisplayedFiles] = useState([]);
   const [error, setError] = useState(null);
@@ -284,9 +284,9 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
   }, [editedWorkOrder.CNCId]);
   return (
     <Flex>
-      {workOrderItem.currentStage === "SCANNING" && (
-        <Card variation="elevated" padding="large" width="40%">
-          {/* <WorkflowTracking workOrderId={workOrderItem.id} /> */}
+      <Card variation="elevated" padding="large" width="40%">
+        {/* <WorkflowTracking workOrderId={workOrderItem.id} /> */}
+        {workOrderItem.currentStage === "SCANNING" && (
           <CreateWorkOrderForm
             SSuser={SSuser}
             workOrderItem={editedWorkOrder}
@@ -296,14 +296,18 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
               await handleViewSuccess();
             }}
           />
+        )}
+
+        {(workOrderItem.currentStage === "SCANNING" ||
+          workOrderItem.currentStage === "DESIGN") && (
           <WorkflowStageUpdator
             SSuser={{ SSuser }}
             workOrderId={workOrderItem.id}
             currentRole={currentRole}
             filesFolder={editedWorkOrder.filesFolder}
           />
-        </Card>
-      )}
+        )}
+      </Card>
       <Card
         variation="elevated"
         style={{
@@ -429,7 +433,7 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
                 <MdRefresh className={styles.actionIcon} />
                 Refresh
               </Button>
-              <Button
+              {/* <Button
                 variation="primary"
                 size="small"
                 disabled={displayedFiles.length === 0}
@@ -448,7 +452,7 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
               <Button variation="info" onClick={toggleFileList} size="small">
                 {showFiles ? <MdExpandLess /> : <MdExpandMore />}
                 {showFiles ? "Hide" : "Show"}
-              </Button>
+              </Button> */}
             </div>
           </div>
           <p className={styles.totalFiles}>

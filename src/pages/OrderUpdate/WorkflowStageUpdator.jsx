@@ -64,13 +64,6 @@ const StageStatusUpdater = ({
             },
           },
         });
-        try {
-          console.log("Current Role is ", currentRole, filesFolder);
-          if (currentRole === "SCAN") {
-          }
-        } catch {
-          console.log("Error at files");
-        }
 
         await client.graphql({
           query: updateWorkOrder,
