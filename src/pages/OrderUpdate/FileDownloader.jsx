@@ -10,23 +10,30 @@ const S3Downloader = ({ filesFolder }) => {
     try {
       setDownloading(true);
       // List all files in Storage
-      const fileList = await list(filesFolder);
+      const fileList = await list({
+        path: filesFolder,
+        options: {
+          accessLevel: "public",
+          listAll: true,
+        },
+      });
       const totalFiles = fileList.items.length;
+      console.log("Files Folder is", filesFolder, fileList);
+
       let downloadedFiles = 0;
 
       // Download each file
       for (const item of fileList.items) {
         try {
-          if (!item.key.endsWith("/")) {
+          if (!item.path.endsWith("/")) {
             // Skip folders
             // Get the signed URL for the file
             const { url } = await getUrl({
-              key: item.key,
+              path: item.path,
               options: {
                 validateObjectExistence: true,
               },
             });
-
             // Download file using fetch
             const response = await fetch(url);
             const blob = await response.blob();
@@ -35,7 +42,7 @@ const S3Downloader = ({ filesFolder }) => {
             const downloadUrl = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = downloadUrl;
-            a.download = item.key.split("/").pop(); // Extract filename from key
+            a.download = item.path.split("/").pop(); // Extract filename from key
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(downloadUrl);
@@ -45,7 +52,7 @@ const S3Downloader = ({ filesFolder }) => {
             setProgress((downloadedFiles / totalFiles) * 100);
           }
         } catch (error) {
-          console.error(`Error downloading file ${item.key}:`, error);
+          console.error(`Error downloading file ${item.path}:`, error);
         }
       }
 

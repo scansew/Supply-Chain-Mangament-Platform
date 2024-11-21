@@ -24,6 +24,7 @@ type Company @model {
 enum CompanyType {
   CNC
   SCAN
+  DESIGN
   MANUFACTURE
   CUSTOMER
   WHOLESALE
