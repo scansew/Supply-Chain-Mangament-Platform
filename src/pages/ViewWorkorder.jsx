@@ -45,7 +45,6 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
   const [editedWorkOrder, setEditedWorkOrder] = useState(workOrderItem);
   const client = generateClient();
   const [companyName, setCompanyName] = useState("");
-  console.log("ss", currentRole);
 
   if (!workOrderItem) {
     return <div>Loading...</div>;

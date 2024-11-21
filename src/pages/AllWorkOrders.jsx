@@ -175,7 +175,6 @@ function AllWorkOrders({ SSuser }) {
       if (companyRoles1) {
         setCompanyRoles(companyRoles1);
       }
-      console.log("cc", companyRoles1[0].roleId);
       setIsDataFetched(true);
     } catch (error) {
       console.error("Error fetching company types:", error);
