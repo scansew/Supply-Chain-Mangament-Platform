@@ -12,6 +12,8 @@ export { default as DRingCreateForm } from "./DRingCreateForm";
 export { default as DRingUpdateForm } from "./DRingUpdateForm";
 export { default as EdgeCreateForm } from "./EdgeCreateForm";
 export { default as EdgeUpdateForm } from "./EdgeUpdateForm";
+export { default as Frame1171275590 } from "./Frame1171275590";
+export { default as Frame1171275594 } from "./Frame1171275594";
 export { default as MaterialCreateForm } from "./MaterialCreateForm";
 export { default as MaterialUpdateForm } from "./MaterialUpdateForm";
 export { default as MiscellaneousCreateForm } from "./MiscellaneousCreateForm";

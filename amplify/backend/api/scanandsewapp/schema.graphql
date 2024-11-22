@@ -23,13 +23,12 @@ type Company @model {
 }
 enum CompanyType {
   CNC
-  SCAN
+  SCANNING
   DESIGN
-  MANUFACTURE
-  CUSTOMER
+  MANUFACTURING
   WHOLESALE
   DEALER
-  RV_DEALER
+  CUSTOMER
 }
 
 type CompanyRole @model {
@@ -148,10 +147,10 @@ type WorkOrder @model {
 enum WorkflowStages {
   SCANNING
   DESIGN
-  CNC_CUTTING
+  CNC
   MANUFACTURING
-  WAREHOUSE
-  CUSTOMER_DELIVERY
+  WHOLESALE
+  CUSTOMER
 }
 
 enum StageStatus {

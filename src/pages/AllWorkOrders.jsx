@@ -45,10 +45,10 @@ function AllWorkOrders({ SSuser }) {
     const statusColors = {
       SCANNING: "rgb(179, 207, 255)", // Pastel Blue
       DESIGN: "rgb(208, 186, 255)", // Pastel Purple
-      CNC_CUTTING: "rgb(255, 198, 173)", // Pastel Orange
+      CNC: "rgb(255, 198, 173)", // Pastel Orange
       MANUFACTURING: "rgb(255, 223, 186)", // Pastel Yellow
-      WAREHOUSE: "rgb(190, 233, 190)", // Pastel Green
-      CUSTOMER_DELIVERY: "rgb(178, 223, 219)", // Pastel Teal
+      WHOLESALE: "rgb(190, 233, 190)", // Pastel Green
+      CUSTOMER: "rgb(178, 223, 219)", // Pastel Teal
     };
     return statusColors[status] || tokens.colors.neutral[60];
   };
@@ -58,10 +58,10 @@ function AllWorkOrders({ SSuser }) {
     const textColors = {
       SCANNING: "rgb(41, 84, 155)", // Darker Blue
       DESIGN: "rgb(96, 60, 158)", // Darker Purple
-      CNC_CUTTING: "rgb(184, 91, 40)", // Darker Orange
+      CNC: "rgb(184, 91, 40)", // Darker Orange
       MANUFACTURING: "rgb(158, 119, 33)", // Darker Yellow
-      WAREHOUSE: "rgb(54, 124, 54)", // Darker Green
-      CUSTOMER_DELIVERY: "rgb(40, 110, 104)", // Darker Teal
+      WHOLESALE: "rgb(54, 124, 54)", // Darker Green
+      CUSTOMER: "rgb(40, 110, 104)", // Darker Teal
     };
     return textColors[status] || tokens.colors.neutral[90];
   };
@@ -119,6 +119,11 @@ function AllWorkOrders({ SSuser }) {
       if (SSuser.role === "sAdmin") {
         const userData = await client.graphql({
           query: listWorkOrders,
+          variables: {
+            filter: {
+              companyId: { eq: SSuser.companyId },
+            },
+          },
         });
         setWorkOrders(userData.data.listWorkOrders.items);
       } else {
@@ -140,21 +145,17 @@ function AllWorkOrders({ SSuser }) {
   const stageSequence = [
     "SCANNING",
     "DESIGN",
-    "CNC_CUTTING",
+    "CNC",
     "MANUFACTURING",
-    "WAREHOUSE",
-    "CUSTOMER_DELIVERY",
+    "WHOLESALE",
+    "CUSTOMER",
   ];
   const getStagesForCompanyType = (companyType) => {
     switch (companyType?.toUpperCase()) {
-      case "SCAN":
+      case "SCANNING":
         return stageSequence; // Show all stages
-      case "CNC":
-        return ["CNC_CUTTING"]; // Show only CNC_CUTTING stage
-      case "MANUFACTURE":
-        return ["MANUFACTURING"]; // Show only MANUFACTURING stage
       default:
-        return [];
+        return [companyType?.toUpperCase()]; // Show only CNC_CUTTING stage
     }
   };
 

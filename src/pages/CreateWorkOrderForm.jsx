@@ -530,6 +530,7 @@ const CreateWorkOrderForm = ({
                         onUploadSuccess={handleUploadSuccess}
                         workorderNumber={formState.woNumber}
                         SSuser={SSuser}
+                        type="images"
                       />
 
                       {/* <Card
@@ -618,99 +619,225 @@ const CreateWorkOrderForm = ({
                         </div>
                       )}
                     </Card>
-                    <Card
-                      variation="elevated"
-                      padding="1.5rem"
-                      style={{ marginTop: "20px", marginBottom: "20px" }}
-                    >
-                      <label>Upload Design Files</label>
-                      <FileUploader3
-                        onUploadSuccess={handleUploadSuccess}
-                        workorderNumber={formState.woNumber}
-                        SSuser={SSuser}
-                      />
-                      <div
-                        className={styles.header}
-                        style={{ marginTop: "20px" }}
-                      >
-                        <label>Uploaded Design Files</label>
-                        <div className={styles.headerActions}>
-                          <Button
-                            variation="info"
-                            onClick={fetchS3Files}
-                            size="small"
-                          >
-                            <MdRefresh className={styles.actionIcon} />
-                            Refresh
-                          </Button>
-                          <Button
-                            variation="info"
-                            size="small"
-                            disabled={displayedFiles.length === 0}
-                          >
-                            <MdCloudDownload className={styles.actionIcon} />
-                            Download
-                          </Button>
-                          <Button
-                            variation="warning"
-                            size="small"
-                            disabled={displayedFiles.length === 0}
-                          >
-                            <MdDeleteSweep className={styles.actionIcon} />
-                            Delete
-                          </Button>
-                          <Button
-                            variation="info"
-                            onClick={toggleFileList}
-                            size="small"
-                          >
-                            {showFiles ? <MdExpandLess /> : <MdExpandMore />}
-                            {showFiles ? "Hide" : "Show"}
-                          </Button>
-                        </div>
-                      </div>
-                      <p className={styles.totalFiles}>
-                        {displayedFiles.length} file(s) attached to work order
-                      </p>
-                      {showFiles && displayedFiles.length > 0 && (
+                    {button === "edit" &&
+                      workOrderItem.currentStage === "DESIGN" && (
                         <div>
-                          <ul className={styles.fileList}>
-                            {displayedFiles.map((file, index) => (
-                              <li key={index} className={styles.fileItem}>
-                                <MdInsertDriveFile
-                                  className={styles.fileIcon}
-                                />
-                                <span className={styles.fileName}>
-                                  {getFileName(file.path)}
-                                </span>
-                                <div className={styles.fileActions}>
-                                  <Button
-                                    className={styles.actionButton}
-                                    onClick={() => handleDownload(file.path)}
-                                    title="Download"
-                                  >
-                                    <MdDownload />
-                                  </Button>
-                                  <Button
-                                    className={styles.actionButton}
-                                    onClick={() => handleDelete(file.path)}
-                                    title="Delete"
-                                  >
-                                    <MdDelete />
-                                  </Button>
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                          <Card
+                            variation="elevated"
+                            padding="1.5rem"
+                            style={{ marginTop: "20px", marginBottom: "20px" }}
+                          >
+                            <label>Upload Design Files</label>
+                            <FileUploader3
+                              onUploadSuccess={handleUploadSuccess}
+                              workorderNumber={formState.woNumber}
+                              SSuser={SSuser}
+                              type="designs"
+                            />
+                            <div
+                              className={styles.header}
+                              style={{ marginTop: "20px" }}
+                            >
+                              <label>Uploaded Design Files</label>
+                              <div className={styles.headerActions}>
+                                <Button
+                                  variation="info"
+                                  onClick={fetchS3Files}
+                                  size="small"
+                                >
+                                  <MdRefresh className={styles.actionIcon} />
+                                  Refresh
+                                </Button>
+                                <Button
+                                  variation="info"
+                                  size="small"
+                                  disabled={displayedFiles.length === 0}
+                                >
+                                  <MdCloudDownload
+                                    className={styles.actionIcon}
+                                  />
+                                  Download
+                                </Button>
+                                <Button
+                                  variation="warning"
+                                  size="small"
+                                  disabled={displayedFiles.length === 0}
+                                >
+                                  <MdDeleteSweep
+                                    className={styles.actionIcon}
+                                  />
+                                  Delete
+                                </Button>
+                                <Button
+                                  variation="info"
+                                  onClick={toggleFileList}
+                                  size="small"
+                                >
+                                  {showFiles ? (
+                                    <MdExpandLess />
+                                  ) : (
+                                    <MdExpandMore />
+                                  )}
+                                  {showFiles ? "Hide" : "Show"}
+                                </Button>
+                              </div>
+                            </div>
+                            <p className={styles.totalFiles}>
+                              {displayedFiles.length} file(s) attached to work
+                              order
+                            </p>
+                            {showFiles && displayedFiles.length > 0 && (
+                              <div>
+                                <ul className={styles.fileList}>
+                                  {displayedFiles.map((file, index) => (
+                                    <li key={index} className={styles.fileItem}>
+                                      <MdInsertDriveFile
+                                        className={styles.fileIcon}
+                                      />
+                                      <span className={styles.fileName}>
+                                        {getFileName(file.path)}
+                                      </span>
+                                      <div className={styles.fileActions}>
+                                        <Button
+                                          className={styles.actionButton}
+                                          onClick={() =>
+                                            handleDownload(file.path)
+                                          }
+                                          title="Download"
+                                        >
+                                          <MdDownload />
+                                        </Button>
+                                        <Button
+                                          className={styles.actionButton}
+                                          onClick={() =>
+                                            handleDelete(file.path)
+                                          }
+                                          title="Delete"
+                                        >
+                                          <MdDelete />
+                                        </Button>
+                                      </div>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
 
-                      {showFiles && displayedFiles.length === 0 && (
-                        <div className={styles.noFiles}>
-                          No files uploaded yet
+                            {showFiles && displayedFiles.length === 0 && (
+                              <div className={styles.noFiles}>
+                                No files uploaded yet
+                              </div>
+                            )}
+                          </Card>
+                          <Card
+                            variation="elevated"
+                            padding="1.5rem"
+                            style={{ marginTop: "20px", marginBottom: "20px" }}
+                          >
+                            <label>Upload Manufacturer Files</label>
+                            <FileUploader3
+                              onUploadSuccess={handleUploadSuccess}
+                              workorderNumber={formState.woNumber}
+                              SSuser={SSuser}
+                              type="manufacturing"
+                            />
+                            <div
+                              className={styles.header}
+                              style={{ marginTop: "20px" }}
+                            >
+                              <label>Uploaded Manufacturer Files</label>
+                              <div className={styles.headerActions}>
+                                <Button
+                                  variation="info"
+                                  onClick={fetchS3Files}
+                                  size="small"
+                                >
+                                  <MdRefresh className={styles.actionIcon} />
+                                  Refresh
+                                </Button>
+                                <Button
+                                  variation="info"
+                                  size="small"
+                                  disabled={displayedFiles.length === 0}
+                                >
+                                  <MdCloudDownload
+                                    className={styles.actionIcon}
+                                  />
+                                  Download
+                                </Button>
+                                <Button
+                                  variation="warning"
+                                  size="small"
+                                  disabled={displayedFiles.length === 0}
+                                >
+                                  <MdDeleteSweep
+                                    className={styles.actionIcon}
+                                  />
+                                  Delete
+                                </Button>
+                                <Button
+                                  variation="info"
+                                  onClick={toggleFileList}
+                                  size="small"
+                                >
+                                  {showFiles ? (
+                                    <MdExpandLess />
+                                  ) : (
+                                    <MdExpandMore />
+                                  )}
+                                  {showFiles ? "Hide" : "Show"}
+                                </Button>
+                              </div>
+                            </div>
+                            <p className={styles.totalFiles}>
+                              {displayedFiles.length} file(s) attached to work
+                              order
+                            </p>
+                            {showFiles && displayedFiles.length > 0 && (
+                              <div>
+                                <ul className={styles.fileList}>
+                                  {displayedFiles.map((file, index) => (
+                                    <li key={index} className={styles.fileItem}>
+                                      <MdInsertDriveFile
+                                        className={styles.fileIcon}
+                                      />
+                                      <span className={styles.fileName}>
+                                        {getFileName(file.path)}
+                                      </span>
+                                      <div className={styles.fileActions}>
+                                        <Button
+                                          className={styles.actionButton}
+                                          onClick={() =>
+                                            handleDownload(file.path)
+                                          }
+                                          title="Download"
+                                        >
+                                          <MdDownload />
+                                        </Button>
+                                        <Button
+                                          className={styles.actionButton}
+                                          onClick={() =>
+                                            handleDelete(file.path)
+                                          }
+                                          title="Delete"
+                                        >
+                                          <MdDelete />
+                                        </Button>
+                                      </div>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            {showFiles && displayedFiles.length === 0 && (
+                              <div className={styles.noFiles}>
+                                No files uploaded yet
+                              </div>
+                            )}
+                          </Card>
                         </div>
                       )}
-                    </Card>
                     <Card variation="elevated" style={{ marginTop: "20px" }}>
                       <Button type="submit" variation="primary">
                         Submit

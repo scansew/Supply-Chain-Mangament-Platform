@@ -75,24 +75,6 @@
       "service": "Lambda"
     }
   },
-  "parameters": {
-    "AMPLIFY_function_scanandsewappPostConfirmation_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "scanandsewappPostConfirmation"
-        }
-      ]
-    },
-    "AMPLIFY_function_scanandsewappPostConfirmation_s3Key": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "scanandsewappPostConfirmation"
-        }
-      ]
-    }
-  },
   "storage": {
     "s3scanandsewappstorage442a3489": {
       "dependsOn": [],

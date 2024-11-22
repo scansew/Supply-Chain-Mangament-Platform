@@ -7,13 +7,7 @@ import {
   getWorkOrder,
 } from "../../graphql/queries";
 import { Button } from "@aws-amplify/ui-react";
-import FileDownloader from "./FileDownloader";
-const StageStatusUpdater = ({
-  SSuser,
-  workOrderId,
-  currentRole,
-  filesFolder,
-}) => {
+const StageStatusUpdater = ({ SSuser, workOrderId, currentRole }) => {
   const [formData, setFormData] = useState({
     stageId: "",
     status: "",
@@ -98,12 +92,10 @@ const StageStatusUpdater = ({
         variation="primary"
         disabled={loading}
         onClick={moveToNextStage}
+        size="medium"
       >
         {loading ? "Updating..." : "Complete Work Order"}
       </Button>
-      <div>
-        <FileDownloader filesFolder={filesFolder} />
-      </div>
 
       <style jsx>{`
         .stage-status-updater {

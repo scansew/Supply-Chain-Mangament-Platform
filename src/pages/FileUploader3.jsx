@@ -12,7 +12,7 @@ import {
 import { uploadData } from "aws-amplify/storage";
 import { MdCloudUpload, MdCheckCircle, MdError } from "react-icons/md";
 
-const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser }) => {
+const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser, type }) => {
   const [files, setFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState({});
   const [uploading, setUploading] = useState(false);
@@ -85,8 +85,7 @@ const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser }) => {
         try {
           const key = `companies/${
             SSuser.companyId
-          }/${workorderNumber}/${Date.now()}_${file.name}`;
-
+          }/${workorderNumber}/${type}/${Date.now()}_${file.name}`;
           const upload = uploadData({
             key: key,
             data: file,

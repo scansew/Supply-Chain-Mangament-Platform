@@ -69,13 +69,14 @@ const S3Downloader = ({ filesFolder }) => {
   return (
     <div style={{ padding: "20px" }}>
       <Button
+      size ="small"
         onClick={downloadFiles}
         isLoading={downloading}
         loadingText="Downloading..."
         variation="primary"
         isDisabled={downloading}
       >
-        Download All Files
+        Download
       </Button>
 
       {downloading && (

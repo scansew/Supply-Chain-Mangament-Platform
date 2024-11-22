@@ -47,12 +47,13 @@ function Users({ SSuser }) {
 
   const companyTypes = [
     "CNC",
-    "SCAN",
-    "MANUFACTURE",
+    "SCANNING",
+    "MANUFACTURING",
     "CUSTOMER",
     "WHOLESALE",
     "DEALER",
     "RV_DEALER",
+    "DESIGN"
   ];
 
   useEffect(() => {

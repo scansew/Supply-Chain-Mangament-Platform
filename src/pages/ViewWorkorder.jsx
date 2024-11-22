@@ -35,6 +35,8 @@ import { list, remove, getUrl } from "aws-amplify/storage";
 import styles from "./WOForm.module.css";
 import { generateClient } from "aws-amplify/api";
 import WorkflowStageUpdator from "./OrderUpdate/WorkflowStageUpdator";
+import FileDownloader from "./FileDownloader";
+import FileUploader3 from "./FileUploader3";
 
 const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
   const [showFiles, setShowFiles] = useState(false);
@@ -69,11 +71,16 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
         variables: { id: id },
       });
       setEditedWorkOrder(workOrderData.data.getWorkOrder);
+      console.log(workOrderData.data.getWorkOrder.companyId);
     } catch (error) {
       console.error("Error fetching work order:", error);
     }
   };
-
+  const handleUploadSuccess = async (fileKeys) => {
+    console.log("Files synced successfully:", fileKeys);
+    await fetchS3Files();
+    // setFormState((prevState) => ({ ...prevState, files }));
+  };
   const fetchS3Files = async () => {
     setFiles("");
     setIsLoading(true);
@@ -287,24 +294,24 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
       <Card variation="elevated" padding="large" width="40%">
         {/* <WorkflowTracking workOrderId={workOrderItem.id} /> */}
         {workOrderItem.currentStage === "SCANNING" && (
-          <CreateWorkOrderForm
-            SSuser={SSuser}
-            workOrderItem={editedWorkOrder}
-            button="edit"
-            handleViewSuccess={async () => {
-              console.log("handleViewSuccess");
-              await handleViewSuccess();
-            }}
-          />
+          <div>
+            <CreateWorkOrderForm
+              SSuser={SSuser}
+              workOrderItem={editedWorkOrder}
+              button="edit"
+              handleViewSuccess={async () => {
+                console.log("handleViewSuccess");
+                await handleViewSuccess();
+              }}
+            />
+          </div>
         )}
 
-        {(workOrderItem.currentStage === "SCANNING" ||
-          workOrderItem.currentStage === "DESIGN") && (
+        {workOrderItem.currentStage === currentRole && (
           <WorkflowStageUpdator
             SSuser={{ SSuser }}
             workOrderId={workOrderItem.id}
             currentRole={currentRole}
-            filesFolder={editedWorkOrder.filesFolder}
           />
         )}
       </Card>
@@ -425,74 +432,194 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
       </Card>
       {(editedWorkOrder.currentStage === "SCANNING" ||
         editedWorkOrder.currentStage === "DESIGN") && (
-        <Card variation="elevated" style={{ margintop: "20px" }}>
-          <Flex margintop="large"></Flex>
-          <div className={styles.header}>
-            <div className={styles.headerActions}>
-              <Button variation="primary" onClick={fetchS3Files} size="small">
-                <MdRefresh className={styles.actionIcon} />
-                Refresh
-              </Button>
-              {/* <Button
-                variation="primary"
+        <div>
+          <Card variation="elevated" style={{ margintop: "20px" }}>
+            <Flex margintop="large">Images</Flex>
+            <div className={styles.header}>
+              <div className={styles.headerActions}>
+                <Button variation="primary" onClick={fetchS3Files} size="small">
+                  <MdRefresh className={styles.actionIcon} />
+                  Refresh
+                </Button>
+              </div>
+              <FileDownloader
                 size="small"
                 disabled={displayedFiles.length === 0}
-              >
-                <MdCloudDownload className={styles.actionIcon} />
-                Download
-              </Button>
-              <Button
-                variation="warning"
-                size="small"
-                disabled={displayedFiles.length === 0}
-              >
-                <MdDeleteSweep className={styles.actionIcon} />
-                Delete
-              </Button>
-              <Button variation="info" onClick={toggleFileList} size="small">
-                {showFiles ? <MdExpandLess /> : <MdExpandMore />}
-                {showFiles ? "Hide" : "Show"}
-              </Button> */}
+                filesFolder={`${editedWorkOrder.filesFolder}/images`}
+              />
             </div>
-          </div>
-          <p className={styles.totalFiles}>
-            {displayedFiles.length} file(s) attached to work order
-          </p>
-          {showFiles && displayedFiles.length > 0 && (
-            <div>
-              <ul className={styles.fileList}>
-                {displayedFiles.map((file, index) => (
-                  <li key={index} className={styles.fileItem}>
-                    <MdInsertDriveFile className={styles.fileIcon} />
-                    <span className={styles.fileName}>
-                      {getFileName(file.path)}
-                    </span>
-                    <div className={styles.fileActions}>
-                      <Button
-                        className={styles.actionButton}
-                        onClick={() => handleDownload(file.path)}
-                        title="Download"
-                      >
-                        <MdDownload />
-                      </Button>
-                      <Button
-                        className={styles.actionButton}
-                        onClick={() => handleDelete(file.path)}
-                        title="Delete"
-                      >
-                        <MdDelete />
-                      </Button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+            <p className={styles.totalFiles}>
+              {displayedFiles.length} file(s) attached to work order
+            </p>
+            {showFiles && displayedFiles.length > 0 && (
+              <div>
+                <ul className={styles.fileList}>
+                  {displayedFiles.map((file, index) => (
+                    <li key={index} className={styles.fileItem}>
+                      <MdInsertDriveFile className={styles.fileIcon} />
+                      <span className={styles.fileName}>
+                        {getFileName(file.path)}
+                      </span>
+                      <div className={styles.fileActions}>
+                        <Button
+                          className={styles.actionButton}
+                          onClick={() => handleDownload(file.path)}
+                          title="Download"
+                        >
+                          <MdDownload />
+                        </Button>
+                        <Button
+                          className={styles.actionButton}
+                          onClick={() => handleDelete(file.path)}
+                          title="Delete"
+                        >
+                          <MdDelete />
+                        </Button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-          {showFiles && displayedFiles.length === 0 && (
-            <div className={styles.noFiles}>No files uploaded yet</div>
+            {showFiles && displayedFiles.length === 0 && (
+              <div className={styles.noFiles}>No files uploaded yet</div>
+            )}
+          </Card>
+        </div>
+      )}
+
+      {(editedWorkOrder.currentStage === "DESIGN" ||
+        editedWorkOrder.currentStage === "CNC") && (
+        <div>
+          {editedWorkOrder.currentStage === "DESIGN" && (
+            <FileUploader3
+              onUploadSuccess={handleUploadSuccess}
+              workorderNumber={editedWorkOrder.woNumber}
+              SSuser={SSuser}
+              type="designs"
+            />
           )}
-        </Card>
+          <Card variation="elevated" style={{ margintop: "20px" }}>
+            <Flex margintop="large"> Designs</Flex>
+            <div className={styles.header}>
+              <div className={styles.headerActions}>
+                <Button variation="primary" onClick={fetchS3Files} size="small">
+                  <MdRefresh className={styles.actionIcon} />
+                  Refresh
+                </Button>
+              </div>
+              <FileDownloader
+                size="small"
+                disabled={displayedFiles.length === 0}
+                filesFolder={`${editedWorkOrder.filesFolder}/designs`}
+              />
+            </div>
+            <p className={styles.totalFiles}>
+              {displayedFiles.length} file(s) attached to work order
+            </p>
+            {showFiles && displayedFiles.length > 0 && (
+              <div>
+                <ul className={styles.fileList}>
+                  {displayedFiles.map((file, index) => (
+                    <li key={index} className={styles.fileItem}>
+                      <MdInsertDriveFile className={styles.fileIcon} />
+                      <span className={styles.fileName}>
+                        {getFileName(file.path)}
+                      </span>
+                      <div className={styles.fileActions}>
+                        <Button
+                          className={styles.actionButton}
+                          onClick={() => handleDownload(file.path)}
+                          title="Download"
+                        >
+                          <MdDownload />
+                        </Button>
+                        <Button
+                          className={styles.actionButton}
+                          onClick={() => handleDelete(file.path)}
+                          title="Delete"
+                        >
+                          <MdDelete />
+                        </Button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {showFiles && displayedFiles.length === 0 && (
+              <div className={styles.noFiles}>No files uploaded yet</div>
+            )}
+          </Card>
+        </div>
+      )}
+      {(editedWorkOrder.currentStage === "MANUFACTURING" ||
+        editedWorkOrder.currentStage === "DESIGN") && (
+        <div>
+          {editedWorkOrder.currentStage === "DESIGN" && (
+            <FileUploader3
+              onUploadSuccess={handleUploadSuccess}
+              workorderNumber={editedWorkOrder.woNumber}
+              SSuser={SSuser}
+              type="manufacturing"
+            />
+          )}
+          <Card variation="elevated" style={{ margintop: "20px" }}>
+            <Flex margintop="large">Manufacturer Files</Flex>
+            <div className={styles.header}>
+              <div className={styles.headerActions}>
+                <Button variation="primary" onClick={fetchS3Files} size="small">
+                  <MdRefresh className={styles.actionIcon} />
+                  Refresh
+                </Button>
+              </div>
+              <FileDownloader
+                size="small"
+                disabled={displayedFiles.length === 0}
+                filesFolder={`${editedWorkOrder.filesFolder}/manufacturing`}
+              />
+            </div>
+            <p className={styles.totalFiles}>
+              {displayedFiles.length} file(s) attached to work order
+            </p>
+            {showFiles && displayedFiles.length > 0 && (
+              <div>
+                <ul className={styles.fileList}>
+                  {displayedFiles.map((file, index) => (
+                    <li key={index} className={styles.fileItem}>
+                      <MdInsertDriveFile className={styles.fileIcon} />
+                      <span className={styles.fileName}>
+                        {getFileName(file.path)}
+                      </span>
+                      <div className={styles.fileActions}>
+                        <Button
+                          className={styles.actionButton}
+                          onClick={() => handleDownload(file.path)}
+                          title="Download"
+                        >
+                          <MdDownload />
+                        </Button>
+                        <Button
+                          className={styles.actionButton}
+                          onClick={() => handleDelete(file.path)}
+                          title="Delete"
+                        >
+                          <MdDelete />
+                        </Button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {showFiles && displayedFiles.length === 0 && (
+              <div className={styles.noFiles}>No files uploaded yet</div>
+            )}
+          </Card>
+        </div>
       )}
     </Flex>
   );
