@@ -53,7 +53,7 @@ function Users({ SSuser }) {
     "WHOLESALE",
     "DEALER",
     "RV_DEALER",
-    "DESIGN"
+    "DESIGN",
   ];
 
   useEffect(() => {
@@ -361,9 +361,6 @@ function Users({ SSuser }) {
           <Flex gap="small">
             <Button variation="primary" onClick={handleInviteClick}>
               Invite User
-            </Button>
-            <Button variation="primary" onClick={() => handleEditCompany()}>
-              Edit Company
             </Button>
           </Flex>
         </Flex>
