@@ -1,4 +1,9 @@
-// Companies.jsx
+/**
+ * Companies Component
+ * This component displays a list of companies and allows users to create or edit companies.
+ * It fetches company data from AWS Amplify and provides a UI for managing company information.
+ */
+
 import React, { useState, useEffect } from "react";
 import { generateClient } from "aws-amplify/api";
 import { listCompanies } from "../graphql/queries";
@@ -16,17 +21,30 @@ import CreateCompany from "./createCompany";
 
 const client = generateClient();
 
+/**
+ * Main component function
+ * @param {Object} props - Component props
+ * @param {Object} props.SSuser - Current authenticated user object
+ */
 function Companies({ SSuser }) {
+  // State to store fetched companies
   const [companies, setCompanies] = useState([]);
+  // State to track loading status
   const [loading, setLoading] = useState(true);
+  // State to store error messages
   const [error, setError] = useState(null);
+  // State to control modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // State to store selected company for editing
   const [selectedCompany, setSelectedCompany] = useState(null);
 
   useEffect(() => {
     fetchCompanies();
   }, []);
 
+  /**
+   * Fetch companies from the server
+   */
   async function fetchCompanies() {
     try {
       const companiesData = await client.graphql({
@@ -41,16 +59,27 @@ function Companies({ SSuser }) {
     }
   }
 
+  /**
+   * Handle create button click
+   */
   const handleCreateClick = () => {
     setSelectedCompany(null);
     setIsModalOpen(true);
   };
 
+  /**
+   * Handle edit button click
+   * @param {Object} company - Company object to edit
+   */
   const handleEditClick = (company) => {
     setSelectedCompany(company);
     setIsModalOpen(true);
   };
 
+  /**
+   * Handle success callback from CreateCompany component
+   * @param {Object} updatedCompany - Updated company object
+   */
   const handleSuccess = (updatedCompany) => {
     if (selectedCompany) {
       // Update existing company

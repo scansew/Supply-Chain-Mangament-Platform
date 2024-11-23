@@ -23,10 +23,10 @@ const StageStatusUpdater = ({ SSuser, workOrderId, currentRole }) => {
   const stageSequence = [
     "SCANNING",
     "DESIGN",
-    "CNC_CUTTING",
+    "CNC",
     "MANUFACTURING",
     "WAREHOUSE",
-    "CUSTOMER_DELIVERY",
+    "CUSTOMER",
   ];
 
   const moveToNextStage = async (e) => {

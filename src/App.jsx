@@ -1,3 +1,9 @@
+/**
+ * Main Application Component
+ * This is the root component of the ScanSew application that handles routing and authentication.
+ * It provides role-based access control and navigation functionality.
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
@@ -36,14 +42,26 @@ import logo from "./assets/scansewlogo.png";
 import { generateClient } from "aws-amplify/api";
 const client = generateClient();
 
+/**
+ * App Component
+ * @param {Object} props - Component props
+ * @param {Function} props.signOut - Function to handle user sign out
+ * @param {Object} props.user - Current authenticated user object
+ */
 function App({ signOut, user }) {
+  // State to control sidebar visibility
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // State to store the current user's details from the database
   const [SSuser, setSSUser] = useState("");
 
+  /**
+   * Toggles the sidebar open/closed state
+   */
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  // Load user data on component mount
   useEffect(() => {
     const loadUser = async () => {
       const userData = await fetchUser();
@@ -66,7 +84,13 @@ function App({ signOut, user }) {
     }
   };
 
-  // Protected Route component
+  /**
+   * Protected Route Component
+   * Handles role-based access control for routes
+   * @param {Object} props - Component props
+   * @param {React.ReactNode} props.children - Child components to render
+   * @param {Array<string>} props.allowedRoles - List of roles allowed to access the route
+   */
   const ProtectedRoute = ({ children, allowedRoles }) => {
     if (!allowedRoles.includes(SSuser.role)) {
       return <Navigate to="/" replace />;
@@ -74,6 +98,14 @@ function App({ signOut, user }) {
     return children;
   };
 
+  /**
+   * Renders navigation links based on user role
+   * Different roles see different navigation options:
+   * - new: only Home
+   * - emp: Home and Work Orders
+   * - cAdmin: Home, Work Orders, and Users
+   * - sAdmin: all routes including Companies
+   */
   const renderNavLinks = () => {
     // All users see Home
     if (SSuser.role === "new") {
@@ -184,6 +216,10 @@ function App({ signOut, user }) {
       );
     }
   };
+
+  /**
+   * Opens feedback form in a new tab
+   */
   const handleFeedbackClick = () => {
     // // Replace this with your Google Sheets URL
     const sheetUrl = "https://forms.gle/vjKUhjNECHL6JTmdA";
@@ -200,6 +236,7 @@ function App({ signOut, user }) {
     //   Loading…
     // </iframe>;
   };
+
   return (
     <Router>
       <Grid

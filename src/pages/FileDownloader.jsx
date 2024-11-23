@@ -1,11 +1,27 @@
+/**
+ * S3Downloader Component
+ * This component provides functionality to download files from an AWS S3 bucket.
+ * It lists files in a specified folder and allows users to download them with progress tracking.
+ */
+
 import React, { useState } from "react";
 import { list, getUrl } from "aws-amplify/storage";
 import { Button } from "@aws-amplify/ui-react";
 
+/**
+ * Main component function
+ * @param {Object} props - Component props
+ * @param {string} props.filesFolder - Folder path in S3 to download files from
+ */
 const S3Downloader = ({ filesFolder }) => {
+  // State to track downloading status
   const [downloading, setDownloading] = useState(false);
+  // State to track download progress
   const [progress, setProgress] = useState(0);
 
+  /**
+   * Download files from S3
+   */
   const downloadFiles = async () => {
     try {
       setDownloading(true);

@@ -26,7 +26,7 @@ enum CompanyType {
   SCANNING
   DESIGN
   MANUFACTURING
-  WHOLESALE
+  WAREHOUSE
   DEALER
   CUSTOMER
 }
@@ -149,8 +149,7 @@ enum WorkflowStages {
   DESIGN
   CNC
   MANUFACTURING
-  WHOLESALE
-  CUSTOMER
+  WAREHOUSE
 }
 
 enum StageStatus {

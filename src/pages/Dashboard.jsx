@@ -1,3 +1,9 @@
+/**
+ * Dashboard Component
+ * This component serves as the main user dashboard, providing a welcome message and profile completion form.
+ * It allows users to verify their company secret and update their profile information.
+ */
+
 import React, { useState } from "react";
 import {
   Card,
@@ -12,47 +18,71 @@ import {
 import { generateClient } from "aws-amplify/api";
 import { updateUserCompany } from "../graphql/mutations";
 
+/**
+ * Main component function
+ * @param {Object} props - Component props
+ * @param {Object} props.SSuser - Current authenticated user object
+ */
 function Dashboard({ SSuser }) {
+  // State to store company secret input
   const [companySecret, setCompanySecret] = useState("");
+  // State to track verification status
   const [isVerifying, setIsVerifying] = useState(false);
+  // State to store error messages
   const [error, setError] = useState(null);
+  // State to track update success
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
   const client = generateClient();
 
+  /**
+   * Retry a promise-based function
+   * @param {Function} fn - The function to retry
+   * @param {number} retriesLeft - Number of retries
+   * @param {number} interval - Retry interval in milliseconds
+   */
+  const retry = async (fn, retriesLeft = 3, interval = 1000) => {
+    try {
+      return await fn();
+    } catch (error) {
+      if (retriesLeft === 0) throw error;
+      await new Promise((resolve) => setTimeout(resolve, interval));
+      return retry(fn, retriesLeft - 1, interval);
+    }
+  };
+
+  /**
+   * Verify company secret and update user profile
+   * @param {Event} e - Form submit event
+   */
   const verifyAndUpdateProfile = async (e) => {
     e.preventDefault();
     setIsVerifying(true);
     setError(null);
 
     try {
-      // Update user profile with the company ID
-      const result = await client.graphql({
-        query: updateUserCompany,
-        variables: {
-          userId: SSuser.id,
-          companySecret: companySecret,
-        },
-      });
-      console.log(
-        "Successfully updated user company:",
-        result.data.updateUserCompany
+      // Retry the GraphQL request up to 3 times
+      const result = await retry(() =>
+        client.graphql({
+          query: updateUserCompany,
+          variables: {
+            userId: SSuser.id,
+            companySecret: companySecret,
+          },
+        })
       );
-      // return result.data.updateUserCompany;
 
       if (result.data.updateUserCompany) {
         setUpdateSuccess(true);
         setError(null);
-        // You might want to trigger a refresh of the user data here
-        // Show success message briefly before refreshing
         setTimeout(() => {
           window.location.reload(); // Refresh the page
         }, 1500); // Wait 1.5 seconds before refreshing
       }
     } catch (err) {
-      console.error("Error:", err);
+      console.error("Error during verification:", err);
       setError(
-        err.message || "Failed to verify company secret. Please try again."
+        err.message || "Failed to verify company secret. Please try again later."
       );
     } finally {
       setIsVerifying(false);
@@ -104,31 +134,7 @@ function Dashboard({ SSuser }) {
         </View>
       ) : (
         <Flex direction="row" wrap="wrap" gap="1rem">
-          {/* <Card variation="elevated">
-            <Heading level={5}>Work Orders</Heading>
-            <Text>Total: 25</Text>
-            <Text>Pending: 10</Text>
-            <Text>Completed: 15</Text>
-          </Card>
-
-          <Card variation="elevated">
-            <Heading level={5}>Companies</Heading>
-            <Text>Total: 5</Text>
-            <Text>Active: 4</Text>
-          </Card>
-
-          <Card variation="elevated">
-            <Heading level={5}>Users</Heading>
-            <Text>Total: 20</Text>
-            <Text>Active: 18</Text>
-          </Card>
-
-          <Card variation="elevated">
-            <Heading level={5}>Recent Activity</Heading>
-            <Text>New work order created - 2 hours ago</Text>
-            <Text>Work order #1234 completed - 1 day ago</Text>
-            <Text>New user added - 2 days ago</Text>
-          </Card> */}
+          {/* Additional dashboard content can be added here */}
         </Flex>
       )}
     </div>

@@ -1,3 +1,9 @@
+/**
+ * FileUploader3 Component
+ * This component provides functionality to upload files to an AWS S3 bucket.
+ * It allows users to select files and upload them with progress tracking.
+ */
+
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Button,
@@ -12,13 +18,28 @@ import {
 import { uploadData } from "aws-amplify/storage";
 import { MdCloudUpload, MdCheckCircle, MdError } from "react-icons/md";
 
+/**
+ * Main component function
+ * @param {Object} props - Component props
+ * @param {Function} props.onUploadSuccess - Callback function to handle successful uploads
+ * @param {string} props.workorderNumber - Work order number for file categorization
+ * @param {Object} props.SSuser - Current authenticated user object
+ * @param {string} props.type - File type for categorization
+ */
 const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser, type }) => {
+  // State to track selected files
   const [files, setFiles] = useState([]);
+  // State to track upload progress for each file
   const [uploadProgress, setUploadProgress] = useState({});
+  // State to track uploading status
   const [uploading, setUploading] = useState(false);
+  // State to track failed uploads
   const [failedUploads, setFailedUploads] = useState(false);
+  // State to track successful uploads
   const [successUploads, setSuccessUploads] = useState(false);
+  // State to track if all uploads are complete
   const [allUploadsComplete, setAllUploadsComplete] = useState(false);
+  // State to track drag-and-drop status
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -26,6 +47,11 @@ const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser, type }) => {
     console.log("Work Order Number is", workorderNumber);
   }, []);
 
+  /**
+   * Handle progress of file upload
+   * @param {string} fileName - Name of the file being uploaded
+   * @param {Object} progress - Progress object containing transferred and total bytes
+   */
   const handleProgress = useCallback((fileName, progress) => {
     const percent = (progress.transferredBytes / progress.totalBytes) * 100;
     setUploadProgress((prev) => ({
@@ -34,6 +60,10 @@ const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser, type }) => {
     }));
   }, []);
 
+  /**
+   * Handle file selection
+   * @param {Event} event - File input change event
+   */
   const handleFileChange = (event) => {
     if (event.target.files.length > 2000) {
       alert("You can only upload 2000 files at a time");
@@ -48,23 +78,40 @@ const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser, type }) => {
     setUploadProgress(initialProgress);
     setSuccessUploads([]);
   };
+
+  /**
+   * Handle drag enter event
+   * @param {Event} e - Drag event
+   */
   const handleDragEnter = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
   };
 
+  /**
+   * Handle drag leave event
+   * @param {Event} e - Drag event
+   */
   const handleDragLeave = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
   };
 
+  /**
+   * Handle drag over event
+   * @param {Event} e - Drag event
+   */
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
   };
 
+  /**
+   * Handle drop event
+   * @param {Event} e - Drop event
+   */
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -79,6 +126,12 @@ const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser, type }) => {
     setUploadProgress(initialProgress);
     setSuccessUploads([]);
   };
+
+  /**
+   * Upload a single file to S3
+   * @param {File} file - File object to upload
+   * @returns {Promise<Object>} - Promise resolving to upload result
+   */
   const uploadFile = useCallback(
     (file) => {
       return new Promise(async (resolve, reject) => {
@@ -122,6 +175,10 @@ const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser, type }) => {
     [handleProgress]
   );
 
+  /**
+   * Upload multiple files to S3
+   * @param {Array<File>} files - Array of File objects to upload
+   */
   const uploadFiles = useCallback(
     async (files) => {
       setFailedUploads([]); // Reset the failedUploads state
@@ -152,10 +209,17 @@ const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser, type }) => {
     [uploadFile, files]
   );
 
+  /**
+   * Re-upload failed files
+   */
   const reuploadFailedFiles = async () => {
     await uploadFiles(failedUploads);
   };
 
+  /**
+   * Calculate total upload progress
+   * @returns {number} - Total upload progress percentage
+   */
   const calculateTotalProgress = () => {
     const totalBytes = files.reduce((acc, file) => acc + file.size, 0);
     const uploadedBytes = files.reduce((acc, file) => {
@@ -244,41 +308,6 @@ const FileUploader3 = ({ onUploadSuccess, workorderNumber, SSuser, type }) => {
       >
         {uploading ? "Uploading..." : "Upload Files"}
       </Button>
-      {/* {files.length > 0 && (
-          <Card>
-            <Heading level={5}>Selected Files</Heading>
-            <View className="file-grid">
-              {files.map((file) => (
-                <Card key={file.name} padding="1rem" className="file-card">
-                  <Flex direction="column" gap="0.5rem">
-                    <Text fontWeight="bold" fontSize="0.9rem">
-                      {file.name}
-                    </Text>
-                    <View height="4px" backgroundColor="lightgray">
-                      <View
-                        backgroundColor="blue"
-                        height="100%"
-                        width={`${uploadProgress[file.name] || 0}%`}
-                        style={{ transition: "width 0.3s ease-in-out" }}
-                      />
-                    </View>
-                    <Flex justifyContent="space-between" alignItems="center">
-                      <Text fontSize="0.8rem">{`${Math.round(
-                        uploadProgress[file.name] || 0
-                      )}%`}</Text>
-                      {uploadProgress[file.name] === 100 ? (
-                        <Icon as={MdCheckCircle} color="green" />
-                      ) : failedUploads.length > 0 &&
-                        successUploads.length < files.length ? (
-                        <Icon as={MdError} color="red" />
-                      ) : null}
-                    </Flex>
-                  </Flex>
-                </Card>
-              ))}
-            </View>
-          </Card>
-        )} */}
     </Flex>
   );
 };

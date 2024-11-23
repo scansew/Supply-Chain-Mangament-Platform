@@ -27,10 +27,14 @@
     "aliasAttributes": [],
     "userpoolClientGenerateSecret": false,
     "userpoolClientRefreshTokenValidity": 30,
-    "userpoolClientWriteAttributes": [],
+    "userpoolClientWriteAttributes": [
+      "family_name",
+      "given_name",
+      "phone_number"
+    ],
     "userpoolClientReadAttributes": [],
     "userpoolClientLambdaRole": "scanan7a028ba8_userpoolclient_lambda_role",
-    "userpoolClientSetAttributes": false,
+    "userpoolClientSetAttributes": true,
     "sharedId": "7a028ba8",
     "resourceName": "scanandsewapp",
     "authSelections": "identityPoolAndUserPool",

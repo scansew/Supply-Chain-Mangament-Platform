@@ -1,3 +1,10 @@
+/**
+ * AllWorkOrders Component
+ * This component displays a list of work orders and allows users to view, create, and manage them.
+ * It utilizes AWS Amplify for data fetching and subscriptions to keep the data updated in real-time.
+ * The component also provides role-based access to different stages of work orders.
+ */
+
 import React, { useEffect, useState } from "react";
 import {
   Collection,
@@ -33,37 +40,116 @@ import { MdClose } from "react-icons/md";
 
 const client = generateClient();
 
+/**
+ * Main component function
+ * @param {Object} props - Component props
+ * @param {Object} props.SSuser - Current authenticated user object
+ */
 function AllWorkOrders({ SSuser }) {
+  // State to store fetched work orders
   const [workOrders, setWorkOrders] = useState([]);
   const { tokens } = useTheme();
+  // State to control modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // State to store selected work order
   const [selectedWorkOrder, setSelectedWorkOrder] = useState(null);
+  // State to store company roles
   const [companyRoles, setCompanyRoles] = useState([]);
+  // State to track data fetching status
   const [isDataFetched, setIsDataFetched] = useState(false);
+  // State to store current role
   const [currentRole, setCurrentRoles] = useState(null);
+
+  /**
+   * Get status color based on the status
+   * @param {String} status - Status of the work order
+   * @returns {String} Color code for the status
+   */
   const getStatusColor = (status) => {
     const statusColors = {
       SCANNING: "rgb(179, 207, 255)", // Pastel Blue
       DESIGN: "rgb(208, 186, 255)", // Pastel Purple
       CNC: "rgb(255, 198, 173)", // Pastel Orange
       MANUFACTURING: "rgb(255, 223, 186)", // Pastel Yellow
-      WHOLESALE: "rgb(190, 233, 190)", // Pastel Green
+      WAREHOUSE: "rgb(190, 233, 190)", // Pastel Green
       CUSTOMER: "rgb(178, 223, 219)", // Pastel Teal
     };
     return statusColors[status] || tokens.colors.neutral[60];
   };
 
-  // Add this function for text colors to ensure readability
+  /**
+   * Get text color based on the status
+   * @param {String} status - Status of the work order
+   * @returns {String} Color code for the text
+   */
   const getTextColor = (status) => {
     const textColors = {
       SCANNING: "rgb(41, 84, 155)", // Darker Blue
       DESIGN: "rgb(96, 60, 158)", // Darker Purple
       CNC: "rgb(184, 91, 40)", // Darker Orange
       MANUFACTURING: "rgb(158, 119, 33)", // Darker Yellow
-      WHOLESALE: "rgb(54, 124, 54)", // Darker Green
+      WAREHOUSE: "rgb(54, 124, 54)", // Darker Green
       CUSTOMER: "rgb(40, 110, 104)", // Darker Teal
     };
     return textColors[status] || tokens.colors.neutral[90];
+  };
+
+  /**
+   * Fetch work orders from the server
+   */
+  const fetchWorkOrders = async () => {
+    try {
+      if (SSuser.role === "sAdmin") {
+        const userData = await client.graphql({
+          query: listWorkOrders,
+          variables: {
+            filter: {
+              companyId: { eq: SSuser.companyId },
+            },
+          },
+        });
+        setWorkOrders(userData.data.listWorkOrders.items);
+      } else {
+        const userData = await client.graphql({
+          query: listWorkOrders,
+          variables: {
+            filter: {
+              companyId: { eq: SSuser.companyId },
+            },
+          },
+        });
+        setWorkOrders(userData.data.listWorkOrders.items);
+      }
+      console.log("fetched Work Orders");
+    } catch (err) {
+      console.log("error fetching WO", err);
+    }
+  };
+
+  /**
+   * Fetch company types from the server
+   */
+  const fetchCompanyTypes = async () => {
+    try {
+      const response = await client.graphql({
+        query: listCompanyRoles,
+        variables: {
+          filter: {
+            companyId: { eq: SSuser.companyId },
+          },
+        },
+      });
+
+      // Get the company types from the attributes
+      const companyRoles1 = response.data.listCompanyRoles.items;
+      if (companyRoles1) {
+        setCompanyRoles(companyRoles1);
+      }
+      setIsDataFetched(true);
+    } catch (error) {
+      console.error("Error fetching company types:", error);
+      setIsDataFetched(false);
+    }
   };
 
   useEffect(() => {
@@ -114,42 +200,30 @@ function AllWorkOrders({ SSuser }) {
     };
   }, []);
 
-  const fetchWorkOrders = async () => {
-    try {
-      if (SSuser.role === "sAdmin") {
-        const userData = await client.graphql({
-          query: listWorkOrders,
-          variables: {
-            filter: {
-              companyId: { eq: SSuser.companyId },
-            },
-          },
-        });
-        setWorkOrders(userData.data.listWorkOrders.items);
-      } else {
-        const userData = await client.graphql({
-          query: listWorkOrders,
-          variables: {
-            filter: {
-              companyId: { eq: SSuser.companyId },
-            },
-          },
-        });
-        setWorkOrders(userData.data.listWorkOrders.items);
-      }
-      console.log("fetched Work Orders");
-    } catch (err) {
-      console.log("error fetching WO", err);
-    }
+  useEffect(() => {
+    fetchCompanyTypes();
+  });
+
+  /**
+   * Handle role switching
+   * @param {Object} role - Role object
+   */
+  const handleSwitchRoles = (role) => {
+    setCurrentRoles(role.roleId);
   };
+
   const stageSequence = [
     "SCANNING",
     "DESIGN",
     "CNC",
-    "MANUFACTURING",
-    "WHOLESALE",
-    "CUSTOMER",
+    "MANUFACTURING"
   ];
+
+  /**
+   * Get stages for company type
+   * @param {String} companyType - Company type
+   * @returns {Array} Stages for the company type
+   */
   const getStagesForCompanyType = (companyType) => {
     switch (companyType?.toUpperCase()) {
       case "SCANNING":
@@ -157,36 +231,6 @@ function AllWorkOrders({ SSuser }) {
       default:
         return [companyType?.toUpperCase()]; // Show only CNC_CUTTING stage
     }
-  };
-
-  // Add this function to fetch company types
-  const fetchCompanyTypes = async () => {
-    try {
-      const response = await client.graphql({
-        query: listCompanyRoles,
-        variables: {
-          filter: {
-            companyId: { eq: SSuser.companyId },
-          },
-        },
-      });
-
-      // Get the company types from the attributes
-      const companyRoles1 = response.data.listCompanyRoles.items;
-      if (companyRoles1) {
-        setCompanyRoles(companyRoles1);
-      }
-      setIsDataFetched(true);
-    } catch (error) {
-      console.error("Error fetching company types:", error);
-      setIsDataFetched(false);
-    }
-  };
-  useEffect(() => {
-    fetchCompanyTypes();
-  });
-  const handleSwitchRoles = (role) => {
-    setCurrentRoles(role.roleId);
   };
 
   const relevantStages = getStagesForCompanyType(currentRole);
@@ -199,6 +243,10 @@ function AllWorkOrders({ SSuser }) {
     return acc;
   }, {});
 
+  /**
+   * Render role switcher
+   * @returns {JSX.Element} Role switcher component
+   */
   const renderRoleSwitcher = () => {
     if (!isDataFetched) return null;
     return (
@@ -228,16 +276,23 @@ function AllWorkOrders({ SSuser }) {
       </Table>
     );
   };
+
+  /**
+   * Handle view details
+   * @param {Object} workOrder - Work order object
+   */
   const handleViewDetails = (workOrder) => {
     console.log("Viewing details for work order ID:", workOrder);
     setSelectedWorkOrder(workOrder);
     setIsModalOpen(true);
   };
+
   const cardStyles = {
     boxShadow: "0 1px 4px rgba(0, 0, 0, 0.05)",
     transition: "all 0.2s ease-in-out",
     border: "1px solid rgba(0, 0, 0, 0.08)",
   };
+
   return (
     <View
       width="100%"
@@ -256,7 +311,9 @@ function AllWorkOrders({ SSuser }) {
           backgroundColor={tokens.colors.neutral[10]}
           borderRadius={tokens.radii.medium}
         >
-          <CreateWorkOrderForm SSuser={SSuser} button="create" />
+          {currentRole === "SCANNING" && (
+            <CreateWorkOrderForm SSuser={SSuser} button="create" />
+          )}
           <Text>Select your View here: </Text>
           {renderRoleSwitcher()}
         </Flex>

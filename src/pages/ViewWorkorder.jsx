@@ -14,19 +14,12 @@ import {
   MdAssignment,
   MdBusiness,
   MdPerson,
-  MdPhone,
   MdLocationOn,
   MdBuild,
-  MdSettings,
-  MdAttachFile,
   MdRefresh,
   MdInsertDriveFile,
   MdDownload,
   MdDelete,
-  MdExpandMore,
-  MdExpandLess,
-  MdCloudDownload,
-  MdDeleteSweep,
 } from "react-icons/md";
 import {} from "react-icons/md";
 import CreateWorkOrderForm from "./CreateWorkOrderForm";
@@ -46,7 +39,8 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [editedWorkOrder, setEditedWorkOrder] = useState(workOrderItem);
   const client = generateClient();
-  const [companyName, setCompanyName] = useState("");
+  const [company, setCompany] = useState("");
+  const [company2, setCompany2] = useState("");
 
   if (!workOrderItem) {
     return <div>Loading...</div>;
@@ -56,9 +50,10 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
       workOrderItem &&
       workOrderItem.id &&
       currentRole !== "CNC" &&
-      currentRole !== "MANUFACTURE"
+      currentRole !== "MANUFACTURING"
     ) {
       // setEditedWorkOrder(workOrderItem);
+      setEditedWorkOrder(workOrderItem);
       fetchS3Files();
       console.log("Work order item Called:", workOrderItem);
     }
@@ -68,7 +63,7 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
     try {
       const workOrderData = await client.graphql({
         query: getWorkOrder,
-        variables: { id: id },
+        variables: { id: editedWorkOrder.id },
       });
       setEditedWorkOrder(workOrderData.data.getWorkOrder);
       console.log(workOrderData.data.getWorkOrder.companyId);
@@ -279,7 +274,10 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
       if (editedWorkOrder.CNCId) {
         try {
           const companyData = await fetchCompany(editedWorkOrder.CNCId);
-          setCompanyName(companyData.name); // or whatever field you want to display
+          const companyData2 = await fetchCompany(editedWorkOrder.manId);
+
+          setCompany(companyData);
+          setCompany2(companyData2);
         } catch (error) {
           console.error("Error fetching company:", error);
           setCompanyName("Error loading company");
@@ -342,41 +340,45 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
               label="Current Stage"
               value={editedWorkOrder.currentStage}
             />
-            <StyledInfoItem
-              icon={<MdAssignment />}
-              label="Type"
-              value={editedWorkOrder.type}
-            />
-            <StyledInfoItem
-              icon={<MdAssignment />}
-              label="Details"
-              value={editedWorkOrder.details}
-            />
+            {currentRole !== "CNC" && (
+              <StyledInfoItem
+                icon={<MdAssignment />}
+                label="Type"
+                value={editedWorkOrder.type}
+              />
+            )}
           </Grid>
         </StyledSection>
+        {currentRole !== "CNC" && (
+          <>
+            <StyledDivider />
 
-        <StyledDivider />
-
-        <StyledSection title="Vehicle Information">
-          <Grid templateColumns="1fr 1fr 1fr" gap="medium">
-            <StyledInfoItem
-              icon={<MdBuild />}
-              label="Make"
-              value={editedWorkOrder.make}
-            />
-            <StyledInfoItem
-              icon={<MdBuild />}
-              label="Model"
-              value={editedWorkOrder.model}
-            />
-            <StyledInfoItem
-              icon={<MdBuild />}
-              label="Year"
-              value={editedWorkOrder.year}
-            />
-          </Grid>
-        </StyledSection>
-
+            <StyledSection title="Vehicle Information">
+              <Grid templateColumns="1fr 1fr 1fr" gap="medium">
+                <StyledInfoItem
+                  icon={<MdBuild />}
+                  label="Make"
+                  value={editedWorkOrder.make}
+                />
+                <StyledInfoItem
+                  icon={<MdBuild />}
+                  label="Model"
+                  value={editedWorkOrder.model}
+                />
+                <StyledInfoItem
+                  icon={<MdBuild />}
+                  label="Year"
+                  value={editedWorkOrder.year}
+                />
+                <StyledInfoItem
+                  icon={<MdAssignment />}
+                  label="Description"
+                  value={editedWorkOrder.description}
+                />
+              </Grid>
+            </StyledSection>
+          </>
+        )}
         <StyledDivider />
 
         <StyledSection title="CNC Information">
@@ -384,7 +386,17 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
             <StyledInfoItem
               icon={<MdBusiness />}
               label="CNC Company"
-              value={companyName || "Loading..."}
+              value={company.name || "Loading..."}
+            />
+            <StyledInfoItem
+              icon={<MdLocationOn />}
+              label="Company Shipping Address"
+              value={company.address}
+            />
+            <StyledInfoItem
+              icon={<MdPerson />}
+              label="Attention"
+              value={editedWorkOrder.attnName}
             />
           </Grid>
         </StyledSection>
@@ -415,7 +427,7 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
             <StyledInfoItem
               icon={<MdBusiness />}
               label="Company Name"
-              value={editedWorkOrder.businessName}
+              value={company2.name}
             />
             <StyledInfoItem
               icon={<MdPerson />}
@@ -425,7 +437,7 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
             <StyledInfoItem
               icon={<MdLocationOn />}
               label="Company Shipping Address"
-              value={editedWorkOrder.businessShippingAddress}
+              value={company2.address}
             />
           </Grid>
         </StyledSection>
@@ -490,137 +502,147 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
       )}
 
       {(editedWorkOrder.currentStage === "DESIGN" ||
-        editedWorkOrder.currentStage === "CNC") && (
-        <div>
-          {editedWorkOrder.currentStage === "DESIGN" && (
-            <FileUploader3
-              onUploadSuccess={handleUploadSuccess}
-              workorderNumber={editedWorkOrder.woNumber}
-              SSuser={SSuser}
-              type="designs"
-            />
-          )}
-          <Card variation="elevated" style={{ margintop: "20px" }}>
-            <Flex margintop="large"> Designs</Flex>
-            <div className={styles.header}>
-              <div className={styles.headerActions}>
-                <Button variation="primary" onClick={fetchS3Files} size="small">
-                  <MdRefresh className={styles.actionIcon} />
-                  Refresh
-                </Button>
-              </div>
-              <FileDownloader
-                size="small"
-                disabled={displayedFiles.length === 0}
-                filesFolder={`${editedWorkOrder.filesFolder}/designs`}
+        editedWorkOrder.currentStage === "CNC") &&
+        currentRole !== "SCANNING" && (
+          <div>
+            {editedWorkOrder.currentStage === "DESIGN" && (
+              <FileUploader3
+                onUploadSuccess={handleUploadSuccess}
+                workorderNumber={editedWorkOrder.woNumber}
+                SSuser={SSuser}
+                type="designs"
               />
-            </div>
-            <p className={styles.totalFiles}>
-              {displayedFiles.length} file(s) attached to work order
-            </p>
-            {showFiles && displayedFiles.length > 0 && (
-              <div>
-                <ul className={styles.fileList}>
-                  {displayedFiles.map((file, index) => (
-                    <li key={index} className={styles.fileItem}>
-                      <MdInsertDriveFile className={styles.fileIcon} />
-                      <span className={styles.fileName}>
-                        {getFileName(file.path)}
-                      </span>
-                      <div className={styles.fileActions}>
-                        <Button
-                          className={styles.actionButton}
-                          onClick={() => handleDownload(file.path)}
-                          title="Download"
-                        >
-                          <MdDownload />
-                        </Button>
-                        <Button
-                          className={styles.actionButton}
-                          onClick={() => handleDelete(file.path)}
-                          title="Delete"
-                        >
-                          <MdDelete />
-                        </Button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+            )}
+            <Card variation="elevated" style={{ margintop: "20px" }}>
+              <Flex margintop="large">CNC</Flex>
+              <div className={styles.header}>
+                <div className={styles.headerActions}>
+                  <Button
+                    variation="primary"
+                    onClick={fetchS3Files}
+                    size="small"
+                  >
+                    <MdRefresh className={styles.actionIcon} />
+                    Refresh
+                  </Button>
+                </div>
+                <FileDownloader
+                  size="small"
+                  disabled={displayedFiles.length === 0}
+                  filesFolder={`${editedWorkOrder.filesFolder}/designs`}
+                />
               </div>
-            )}
+              <p className={styles.totalFiles}>
+                {displayedFiles.length} file(s) attached to work order
+              </p>
+              {showFiles && displayedFiles.length > 0 && (
+                <div>
+                  <ul className={styles.fileList}>
+                    {displayedFiles.map((file, index) => (
+                      <li key={index} className={styles.fileItem}>
+                        <MdInsertDriveFile className={styles.fileIcon} />
+                        <span className={styles.fileName}>
+                          {getFileName(file.path)}
+                        </span>
+                        <div className={styles.fileActions}>
+                          <Button
+                            className={styles.actionButton}
+                            onClick={() => handleDownload(file.path)}
+                            title="Download"
+                          >
+                            <MdDownload />
+                          </Button>
+                          <Button
+                            className={styles.actionButton}
+                            onClick={() => handleDelete(file.path)}
+                            title="Delete"
+                          >
+                            <MdDelete />
+                          </Button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-            {showFiles && displayedFiles.length === 0 && (
-              <div className={styles.noFiles}>No files uploaded yet</div>
-            )}
-          </Card>
-        </div>
-      )}
+              {showFiles && displayedFiles.length === 0 && (
+                <div className={styles.noFiles}>No files uploaded yet</div>
+              )}
+            </Card>
+          </div>
+        )}
       {(editedWorkOrder.currentStage === "MANUFACTURING" ||
-        editedWorkOrder.currentStage === "DESIGN") && (
-        <div>
-          {editedWorkOrder.currentStage === "DESIGN" && (
-            <FileUploader3
-              onUploadSuccess={handleUploadSuccess}
-              workorderNumber={editedWorkOrder.woNumber}
-              SSuser={SSuser}
-              type="manufacturing"
-            />
-          )}
-          <Card variation="elevated" style={{ margintop: "20px" }}>
-            <Flex margintop="large">Manufacturer Files</Flex>
-            <div className={styles.header}>
-              <div className={styles.headerActions}>
-                <Button variation="primary" onClick={fetchS3Files} size="small">
-                  <MdRefresh className={styles.actionIcon} />
-                  Refresh
-                </Button>
-              </div>
-              <FileDownloader
-                size="small"
-                disabled={displayedFiles.length === 0}
-                filesFolder={`${editedWorkOrder.filesFolder}/manufacturing`}
+        editedWorkOrder.currentStage === "DESIGN") &&
+        currentRole !== "SCANNING" && (
+          <div>
+            {editedWorkOrder.currentStage === "DESIGN" && (
+              <FileUploader3
+                onUploadSuccess={handleUploadSuccess}
+                workorderNumber={editedWorkOrder.woNumber}
+                SSuser={SSuser}
+                type="manufacturing"
               />
-            </div>
-            <p className={styles.totalFiles}>
-              {displayedFiles.length} file(s) attached to work order
-            </p>
-            {showFiles && displayedFiles.length > 0 && (
-              <div>
-                <ul className={styles.fileList}>
-                  {displayedFiles.map((file, index) => (
-                    <li key={index} className={styles.fileItem}>
-                      <MdInsertDriveFile className={styles.fileIcon} />
-                      <span className={styles.fileName}>
-                        {getFileName(file.path)}
-                      </span>
-                      <div className={styles.fileActions}>
-                        <Button
-                          className={styles.actionButton}
-                          onClick={() => handleDownload(file.path)}
-                          title="Download"
-                        >
-                          <MdDownload />
-                        </Button>
-                        <Button
-                          className={styles.actionButton}
-                          onClick={() => handleDelete(file.path)}
-                          title="Delete"
-                        >
-                          <MdDelete />
-                        </Button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+            )}
+            <Card variation="elevated" style={{ margintop: "20px" }}>
+              <Flex margintop="large">Manufacturer SewPack</Flex>
+              <div className={styles.header}>
+                <div className={styles.headerActions}>
+                  <Button
+                    variation="primary"
+                    onClick={fetchS3Files}
+                    size="small"
+                  >
+                    <MdRefresh className={styles.actionIcon} />
+                    Refresh
+                  </Button>
+                </div>
+                <FileDownloader
+                  size="small"
+                  disabled={displayedFiles.length === 0}
+                  filesFolder={`${editedWorkOrder.filesFolder}/manufacturing`}
+                />
               </div>
-            )}
+              <p className={styles.totalFiles}>
+                {displayedFiles.length} file(s) attached to work order
+              </p>
+              {showFiles && displayedFiles.length > 0 && (
+                <div>
+                  <ul className={styles.fileList}>
+                    {displayedFiles.map((file, index) => (
+                      <li key={index} className={styles.fileItem}>
+                        <MdInsertDriveFile className={styles.fileIcon} />
+                        <span className={styles.fileName}>
+                          {getFileName(file.path)}
+                        </span>
+                        <div className={styles.fileActions}>
+                          <Button
+                            className={styles.actionButton}
+                            onClick={() => handleDownload(file.path)}
+                            title="Download"
+                          >
+                            <MdDownload />
+                          </Button>
+                          <Button
+                            className={styles.actionButton}
+                            onClick={() => handleDelete(file.path)}
+                            title="Delete"
+                          >
+                            <MdDelete />
+                          </Button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-            {showFiles && displayedFiles.length === 0 && (
-              <div className={styles.noFiles}>No files uploaded yet</div>
-            )}
-          </Card>
-        </div>
-      )}
+              {showFiles && displayedFiles.length === 0 && (
+                <div className={styles.noFiles}>No files uploaded yet</div>
+              )}
+            </Card>
+          </div>
+        )}
     </Flex>
   );
 };

@@ -49,9 +49,8 @@ function CreateCompany({ isOpen, onClose, onSuccess, initialData }) {
     "SCANNING",
     "MANUFACTURING",
     "CUSTOMER",
-    "WHOLESALE",
+    "WAREHOUSE",
     "DEALER",
-    "RV_DEALER",
     "DESIGN",
   ];
 

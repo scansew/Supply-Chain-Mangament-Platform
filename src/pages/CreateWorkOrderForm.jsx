@@ -77,7 +77,7 @@ const CreateWorkOrderForm = ({
     "SCAN",
     "MANUFACTURE",
     "CUSTOMER",
-    "WHOLESALE",
+    "WAREHOUSE",
     "DEALER",
     "RV_DEALER",
   ];
@@ -374,7 +374,7 @@ const CreateWorkOrderForm = ({
                       General Details
                     </Heading>
                     <div className="form-group">
-                      <label htmlFor="type">Work Order Type</label>
+                      <label htmlFor="type" className="required-field">Work Order Type</label>
                       <select
                         id="type"
                         value={formState.type}
@@ -430,7 +430,9 @@ const CreateWorkOrderForm = ({
                       />
                     </div>
                     <div className="form-group">
-                      <label htmlFor="description">Description</label>
+                      <label htmlFor="description" className="required-field">
+                        Description
+                      </label>
                       <textarea
                         id="description"
                         className="required-field"
@@ -840,7 +842,7 @@ const CreateWorkOrderForm = ({
                       )}
                     <Card variation="elevated" style={{ marginTop: "20px" }}>
                       <Button type="submit" variation="primary">
-                        Submit
+                        {button === "create" ? "Create Draft" : "Save Draft"}
                       </Button>
                     </Card>
                   </div>
