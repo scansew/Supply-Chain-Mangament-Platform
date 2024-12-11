@@ -102,11 +102,11 @@ function AllWorkOrders({ SSuser }) {
       if (SSuser.role === "sAdmin") {
         const userData = await client.graphql({
           query: listWorkOrders,
-          variables: {
-            filter: {
-              companyId: { eq: SSuser.companyId },
-            },
-          },
+          // variables: {
+          //   filter: {
+          //     companyId: { eq: SSuser.companyId }, //quick fix for design not showing up
+          //   },
+          // },
         });
         setWorkOrders(userData.data.listWorkOrders.items);
       } else {
@@ -212,12 +212,7 @@ function AllWorkOrders({ SSuser }) {
     setCurrentRoles(role.roleId);
   };
 
-  const stageSequence = [
-    "SCANNING",
-    "DESIGN",
-    "CNC",
-    "MANUFACTURING"
-  ];
+  const stageSequence = ["SCANNING", "DESIGN", "CNC", "MANUFACTURING"];
 
   /**
    * Get stages for company type
