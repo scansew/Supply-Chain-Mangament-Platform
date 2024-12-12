@@ -46,7 +46,7 @@ const CreateWorkOrderForm = ({
   const [displayedFiles, setDisplayedFiles] = useState([]);
   const [showFiles, setShowFiles] = useState(false);
   // State to store company roles
-  const [companyRoles, setCompanyRoles] = useState([]);
+  // const [companyRoles, setCompanyRoles] = useState([]);
   const [CNCCompanies, setCNCCompanies] = useState([]);
   const [ManCompanies, setManCompanies] = useState([]);
   const [formState, setFormState] = useState({
@@ -87,13 +87,13 @@ const CreateWorkOrderForm = ({
   ];
   useEffect(() => {
     // fetchUser();
-    // console.log("SSuser is", SSuser);
     if (button === "create") setCreateButton(true);
     else if (button === "edit") setEditButton(true);
+    fetchCompanies();
+    fetchCompanyTypes();
   }, []);
 
   const handleUploadSuccess = async (fileKeys) => {
-    console.log("Files synced successfully:", fileKeys);
     await fetchS3Files();
     // setFormState((prevState) => ({ ...prevState, files }));
   };
@@ -114,12 +114,10 @@ const CreateWorkOrderForm = ({
       });
       if (fetchedFiles.items.length > 0) {
         setFormState((prevState) => ({ ...prevState, filesFolder: key }));
-        console.log("Key is", formState.filesFolder);
       }
       setFiles(fetchedFiles.items);
       // setFormState((prevState) => ({ ...prevState, files }));
       setDisplayedFiles(fetchedFiles.items);
-      console.log("Updating table", fetchedFiles.items);
     } catch (error) {
       console.error("Error fetching files:", error);
       setError("Failed to fetch files. Please try again later.");
@@ -165,9 +163,6 @@ const CreateWorkOrderForm = ({
       // Clean up
       document.body.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
-
-      console.log("Download URL:", getUrlResult.url);
-      console.log("URL expires at:", getUrlResult.expiresAt);
     } catch (error) {
       console.error("Error generating download URL:", error);
     }
@@ -242,7 +237,6 @@ const CreateWorkOrderForm = ({
       const companyData = await client.graphql({
         query: listCompanies,
       });
-      console.log("companies:", companyData.data.listCompanies.items);
       setCompanies(companyData.data.listCompanies.items);
     } catch (err) {
       console.log("error fetching companies", err);
@@ -258,7 +252,7 @@ const CreateWorkOrderForm = ({
       // Get the company types from the attributes
       const companyRoles1 = response.data.listCompanyRoles.items;
       if (companyRoles1) {
-        setCompanyRoles(companyRoles1);
+        // setCompanyRoles(companyRoles1);
         // Filter companyRoles to get the company IDs with the role 'cnc'
         const cncCompanyIds = companyRoles1
           .filter((companyRole) => companyRole.roleId === "CNC")
@@ -267,6 +261,7 @@ const CreateWorkOrderForm = ({
           cncCompanyIds.includes(company.id)
         );
         setCNCCompanies(cncCompanies1);
+        console.log("Companies set", cncCompanies1);
 
         // Filter companyRoles to get the company IDs with the role 'cnc'
         const ManCompanyIds = companyRoles1
@@ -275,6 +270,7 @@ const CreateWorkOrderForm = ({
         const ManCompanies1 = companies.filter((company) =>
           ManCompanyIds.includes(company.id)
         );
+        console.log("Companies set", ManCompanies1);
         setManCompanies(ManCompanies1);
       }
       // setIsDataFetched(true);
@@ -283,18 +279,6 @@ const CreateWorkOrderForm = ({
       setIsDataFetched(false);
     }
   };
-
-  // const fetchUsers = async () => {
-  //   try {
-  //     const userData = await client.graphql({
-  //       query: listUsers,
-  //     });
-  //     console.log("Users:", userData.data.listUsers.items);
-  //     setUsers(userData.data.listUsers.items);
-  //   } catch (err) {
-  //     console.log("error fetching users", err);
-  //   }
-  // };
 
   async function generateWorkOrderNumber() {
     try {
@@ -305,7 +289,6 @@ const CreateWorkOrderForm = ({
 
       const newWorkOrderNumber = result.data.incrementCounter;
 
-      console.log("New work order number:", newWorkOrderNumber);
       return newWorkOrderNumber;
     } catch (error) {
       console.error("Error generating work order number:", error);
@@ -323,7 +306,6 @@ const CreateWorkOrderForm = ({
       const input = {
         input: formState,
       };
-      console.log("input is", input);
       if (button === "create") {
         //Create work order stage
         const workOrder = await client.graphql({

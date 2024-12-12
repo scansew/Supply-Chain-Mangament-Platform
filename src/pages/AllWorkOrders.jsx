@@ -120,7 +120,6 @@ function AllWorkOrders({ SSuser }) {
         });
         setWorkOrders(userData.data.listWorkOrders.items);
       }
-      console.log("fetched Work Orders");
     } catch (err) {
       console.log("error fetching WO", err);
     }
@@ -277,7 +276,6 @@ function AllWorkOrders({ SSuser }) {
    * @param {Object} workOrder - Work order object
    */
   const handleViewDetails = (workOrder) => {
-    console.log("Viewing details for work order ID:", workOrder);
     setSelectedWorkOrder(workOrder);
     setIsModalOpen(true);
   };
