@@ -7,7 +7,7 @@ import {
   updateWorkOrder,
   createWorkflowStage,
 } from "../graphql/mutations";
-import { listUsers, listCompanies } from "../graphql/queries";
+import { listUsers, listCompanies, listCompanyRoles } from "../graphql/queries";
 import { list, remove, getUrl } from "aws-amplify/storage";
 
 import FileUploader3 from "./FileUploader3";
@@ -45,6 +45,10 @@ const CreateWorkOrderForm = ({
   const [isLoading, setIsLoading] = useState(true);
   const [displayedFiles, setDisplayedFiles] = useState([]);
   const [showFiles, setShowFiles] = useState(false);
+  // State to store company roles
+  const [companyRoles, setCompanyRoles] = useState([]);
+  const [CNCCompanies, setCNCCompanies] = useState([]);
+  const [ManCompanies, setManCompanies] = useState([]);
   const [formState, setFormState] = useState({
     woNumber: "N/A",
     createdById: "",
@@ -226,6 +230,7 @@ const CreateWorkOrderForm = ({
         }
         // fetchUsers();
         await fetchCompanies();
+        await fetchCompanyTypes();
         await fetchS3Files();
       }
       setShowForm(!showForm);
@@ -244,17 +249,52 @@ const CreateWorkOrderForm = ({
     }
   };
 
-  const fetchUsers = async () => {
+  const fetchCompanyTypes = async () => {
     try {
-      const userData = await client.graphql({
-        query: listUsers,
+      const response = await client.graphql({
+        query: listCompanyRoles,
       });
-      console.log("Users:", userData.data.listUsers.items);
-      setUsers(userData.data.listUsers.items);
-    } catch (err) {
-      console.log("error fetching users", err);
+
+      // Get the company types from the attributes
+      const companyRoles1 = response.data.listCompanyRoles.items;
+      if (companyRoles1) {
+        setCompanyRoles(companyRoles1);
+        // Filter companyRoles to get the company IDs with the role 'cnc'
+        const cncCompanyIds = companyRoles1
+          .filter((companyRole) => companyRole.roleId === "CNC")
+          .map((companyRole) => companyRole.companyId); // Get the company details from the companies array using the filtered company IDs
+        const cncCompanies1 = companies.filter((company) =>
+          cncCompanyIds.includes(company.id)
+        );
+        setCNCCompanies(cncCompanies1);
+
+        // Filter companyRoles to get the company IDs with the role 'cnc'
+        const ManCompanyIds = companyRoles1
+          .filter((companyRole) => companyRole.roleId === "MANUFACTURING")
+          .map((companyRole) => companyRole.companyId); // Get the company details from the companies array using the filtered company IDs
+        const ManCompanies1 = companies.filter((company) =>
+          ManCompanyIds.includes(company.id)
+        );
+        setManCompanies(ManCompanies1);
+      }
+      // setIsDataFetched(true);
+    } catch (error) {
+      console.error("Error fetching company types:", error);
+      setIsDataFetched(false);
     }
   };
+
+  // const fetchUsers = async () => {
+  //   try {
+  //     const userData = await client.graphql({
+  //       query: listUsers,
+  //     });
+  //     console.log("Users:", userData.data.listUsers.items);
+  //     setUsers(userData.data.listUsers.items);
+  //   } catch (err) {
+  //     console.log("error fetching users", err);
+  //   }
+  // };
 
   async function generateWorkOrderNumber() {
     try {
@@ -374,7 +414,9 @@ const CreateWorkOrderForm = ({
                       General Details
                     </Heading>
                     <div className="form-group">
-                      <label htmlFor="type" className="required-field">Work Order Type</label>
+                      <label htmlFor="type" className="required-field">
+                        Work Order Type
+                      </label>
                       <select
                         id="type"
                         value={formState.type}
@@ -497,7 +539,7 @@ const CreateWorkOrderForm = ({
                         onChange={(e) => setInput("CNCId", e.target.value)}
                       >
                         <option value="">Select CNC Company</option>
-                        {companies.map((company) => (
+                        {CNCCompanies.map((company) => (
                           <option key={company.id} value={company.id}>
                             {company.name}
                           </option>
@@ -514,7 +556,7 @@ const CreateWorkOrderForm = ({
                         onChange={(e) => setInput("manId", e.target.value)}
                       >
                         <option value=""> Select Manufacturing Company</option>
-                        {companies.map((company) => (
+                        {ManCompanies.map((company) => (
                           <option key={company.id} value={company.id}>
                             {company.name}
                           </option>
