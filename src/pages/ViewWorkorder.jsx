@@ -372,8 +372,8 @@ const ViewEditWorkOrder = ({ workOrderItem, SSuser, currentRole }) => {
                 />
                 <StyledInfoItem
                   icon={<MdAssignment />}
-                  label="Description"
-                  value={editedWorkOrder.description}
+                  label="Details"
+                  value={editedWorkOrder.details}
                 />
               </Grid>
             </StyledSection>
