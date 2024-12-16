@@ -414,14 +414,14 @@ function AllWorkOrders({ SSuser }) {
                         </Text>
                       </Flex>
 
-                      {item.description && (
+                      {item.details && (
                         <Text
                           fontSize={tokens.fontSizes.small}
                           color={tokens.colors.neutral[80]}
                           lineHeight={tokens.lineHeights.medium}
                           marginTop={tokens.space.xs}
                         >
-                          {item.description}
+                          {item.details}
                         </Text>
                       )}
                     </Flex>
