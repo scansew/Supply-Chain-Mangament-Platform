@@ -57,7 +57,7 @@ const CreateWorkOrderForm = ({
     CNCId: "",
     status: "PENDING",
     type: "",
-    description: "",
+    details: "",
     make: "",
     model: "",
     year: "",
@@ -66,6 +66,8 @@ const CreateWorkOrderForm = ({
     customerDropShippingAddress: "",
     filesFolder: "",
     currentStage: "SCANNING",
+    manId: "",
+    CNCId: "",
   });
   const workOrderTypes = [
     "Ratchet_Mooring",
@@ -179,7 +181,7 @@ const CreateWorkOrderForm = ({
         manId: "",
         status: "PENDING",
         type: "",
-        description: "",
+        details: "",
         make: "",
         model: "",
         year: "",
@@ -187,6 +189,8 @@ const CreateWorkOrderForm = ({
         customerName: "",
         customerDropShippingAddress: "",
         currentStage: "SCANNING",
+        manId: "",
+        CNCId: "",
       });
       setShowForm(false);
     } else {
@@ -208,7 +212,6 @@ const CreateWorkOrderForm = ({
             createdById: SSuser.id,
             woNumber: workOrderItem.woNumber,
             assignedToId: workOrderItem.assignedToId,
-            CNCId: workOrderItem.CNCId,
             status: workOrderItem.status,
             type: workOrderItem.type,
             details: workOrderItem.details,
@@ -218,9 +221,9 @@ const CreateWorkOrderForm = ({
             attnName: workOrderItem.attnName,
             customerName: workOrderItem.customerName,
             customerDropShippingAddress:
-              workOrderItem.customerDropShippingAddres,
-            description: workOrderItem.description,
+              workOrderItem.customerDropShippingAddress,
             manId: workOrderItem.manId,
+            CNCId: workOrderItem.CNCId,
           }));
         }
         // fetchUsers();
@@ -338,7 +341,7 @@ const CreateWorkOrderForm = ({
         companyId: "",
         status: "",
         type: "",
-        description: "",
+        details: "",
         make: "",
         model: "",
         year: "",
@@ -346,12 +349,13 @@ const CreateWorkOrderForm = ({
         customerName: "",
         customerDropShippingAddress: "",
         manId: "",
+        CNCId: "",
       });
       if (typeof handleViewSuccess === "function") {
         handleViewSuccess();
       }
       setShowForm(false);
-      alert("Work order created successfully!");
+      alert("Work order created successfully.");
     } catch (err) {
       console.log("error creating work order:", err);
       alert("Error creating work order. Please try again.");
@@ -454,16 +458,14 @@ const CreateWorkOrderForm = ({
                       />
                     </div>
                     <div className="form-group">
-                      <label htmlFor="description" className="required-field">
-                        Description
+                      <label htmlFor="details" className="required-field">
+                        Details
                       </label>
                       <textarea
-                        id="description"
+                        id="details"
                         className="required-field"
                         value={formState.details}
-                        onChange={(e) =>
-                          setInput("description", e.target.value)
-                        }
+                        onChange={(e) => setInput("details", e.target.value)}
                         required
                       />
                     </div>
