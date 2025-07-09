@@ -1,0 +1,345 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+// Enums
+enum CompanyType {
+  CNC
+  SCANNING
+  DESIGN
+  MANUFACTURING
+  WAREHOUSE
+  DEALER
+  CUSTOMER
+}
+
+enum roleType {
+  new
+  sAdmin
+  cAdmin
+  emp
+}
+
+enum WorkOrderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum WorkOrderType {
+  Ratchet_Mooring
+  Ratchet_Travel
+  Ratchet_Winter_Storage
+  Snap_or_hardware_Full
+  Snap_or_hardware_separate_bow_and_cockpit
+  Boat_Seat_Covers
+  OTHER
+}
+
+enum WorkflowStages {
+  SCANNING
+  DESIGN
+  CNC
+  MANUFACTURING
+  WAREHOUSE
+}
+
+enum StageStatus {
+  QUEUED
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+  EXCEPTION
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+// Models
+model Company {
+  id                String           @id @default(uuid())
+  name              String
+  address           String
+  companySecret     String           @unique
+  stripeConnectId   String?
+  createdAt         DateTime?        @default(now())
+  updatedAt         DateTime?        @updatedAt
+  users             User[]
+  workOrders        WorkOrder[]
+  CNCWorkOrders     WorkOrder[]      @relation("CNCCompany")
+  ManWorkOrders     WorkOrder[]      @relation("ManCompany")
+  materialPricings  MaterialPricing[]
+  companyRoles      CompanyRole[]
+  workflowStages    WorkflowStage[]
+}
+
+model CompanyRole {
+  id                String           @id @default(uuid())
+  roleId            CompanyType?
+  companyId         String
+  shippingAddress   String?
+  private           Boolean?
+  isActive          Boolean?
+  createdAt         DateTime?        @default(now())
+  updatedAt         DateTime?        @updatedAt
+  company           Company          @relation(fields: [companyId], references: [id])
+}
+
+model User {
+  id                String           @id @default(uuid())
+  username          String           @unique
+  email             String           @unique
+  family_name       String?
+  given_name        String?
+  createdAt         DateTime?        @default(now())
+  updatedAt         DateTime?        @updatedAt
+  role              roleType?
+  workOrdersCreated WorkOrder[]      @relation("CreatedBy")
+  workOrdersAssigned WorkOrder[]     @relation("AssignedTo")
+  filesUploaded     File[]
+  auditLogs         AuditLog[]
+  companyId         String?
+  companyName       String?
+  company           Company?         @relation(fields: [companyId], references: [id])
+  crmClientFor      WorkOrder[]      @relation("crmClient")
+  stageUpdatesUpdated StageUpdate[]  @relation("UserUpdatedStageUpdates")
+}
+model WorkOrder {
+  id                String           @id @default(uuid())
+  woNumber          Int
+  createdById       String
+  assignedToId      String?
+  companyId         String?
+  CNCId             String?
+  manId             String?
+  status            WorkOrderStatus?
+  filesFolder       String?
+  type              WorkOrderType?
+  details           String?
+  materialSelection Json?
+  estimatedPrice    Float?
+  msrp              Float?
+  createdAt         DateTime?        @default(now())
+  updatedAt         DateTime?        @updatedAt
+  process           String?
+  make              String?
+  model             String?
+  year              Int?
+  crmClientId       String?
+  rawImages         String[]
+  rawDesignImages   String[]
+  description       String?
+  materialPrice     Float?
+  manufacturePrice  Float?
+  raw3dModel        String?
+  designPhotos      String[]
+  outline3dModel    String?
+  approved3dModel   String?
+  main2dPattern     String?
+  billOfMaterials   Json?
+  cnc2dPattern      String?
+  scanInfo          Json?
+  businessName      String?
+  attnName          String?
+  businessPhone     String?
+  businessShippingAddress String?
+  customerName      String?
+  customerDropShippingAddress String?
+  shippingTrackingInfo String?
+  createdBy         User             @relation("CreatedBy", fields: [createdById], references: [id])
+  assignedTo        User?            @relation("AssignedTo", fields: [assignedToId], references: [id])
+  company           Company?         @relation(fields: [companyId], references: [id])
+  CNCCompany        Company?         @relation("CNCCompany", fields: [CNCId], references: [id])
+  ManCompany        Company?         @relation("ManCompany", fields: [manId], references: [id])
+  crmClient         User?            @relation("crmClient", fields: [crmClientId], references: [id])
+  files             File[]
+  payments          Payment[]
+  currentStage      WorkflowStages?
+  currentStageId    String?
+  estimatedCompletionDate DateTime?
+  workflowStages    WorkflowStage[]
+}
+
+model WorkflowStage {
+  id                String           @id @default(uuid())
+  workOrderId       String
+  stage             WorkflowStages
+  status            StageStatus
+  companyId         String
+  startDate         DateTime?
+  completionDate    DateTime?
+  estimatedCompletionDate DateTime?
+  notes             String?
+  attn              String?
+  qualityCheck      Boolean?
+  createdAt         DateTime?        @default(now())
+  updatedAt         DateTime?        @updatedAt
+  priority          Int?
+  estimatedDuration Int?
+  workOrder         WorkOrder        @relation(fields: [workOrderId], references: [id])
+  company           Company          @relation(fields: [companyId], references: [id])
+  stageUpdatesCreated StageUpdate[]
+}
+
+model StageUpdate {
+  id                String           @id @default(uuid())
+  workflowStageId   String
+  status            StageStatus
+  notes             String?
+  timestamp         DateTime
+  updatedById       String
+  updatedBy         User             @relation("UserUpdatedStageUpdates", fields: [updatedById], references: [id])
+  workflowStage     WorkflowStage    @relation(fields: [workflowStageId], references: [id])
+}
+
+model File {
+  id                String           @id @default(uuid())
+  workOrderId       String
+  fileType          String
+  url               String
+  uploadedById      String
+  createdAt         DateTime?        @default(now())
+  updatedAt         DateTime?        @updatedAt
+  workOrder         WorkOrder        @relation(fields: [workOrderId], references: [id])
+  uploadedBy        User             @relation(fields: [uploadedById], references: [id])
+}
+
+model AuditLog {
+  id                String           @id @default(uuid())
+  userId            String
+  action            String
+  details           String?
+  createdAt         DateTime?        @default(now())
+  user              User             @relation(fields: [userId], references: [id])
+}
+
+model Payment {
+  id                String           @id @default(uuid())
+  workOrderId       String
+  amount            Float
+  stripePaymentId   String
+  status            PaymentStatus
+  createdAt         DateTime?        @default(now())
+  updatedAt         DateTime?        @updatedAt
+  workOrder         WorkOrder        @relation(fields: [workOrderId], references: [id])
+}
+
+model Material {
+  id                String           @id @default(uuid())
+  materialName      String
+  measurements      Float?
+}
+
+model MaterialPricing {
+  id                String           @id @default(uuid())
+  companyId         String
+  materialName      String
+  pricePerYard      Float
+  createdAt         DateTime?        @default(now())
+  updatedAt         DateTime?        @updatedAt
+  company           Company          @relation(fields: [companyId], references: [id])
+}
+
+model Miscellaneous {
+  id                String           @id @default(uuid())
+  miscName          String
+  quantity          Float?
+}
+
+model Ratchet {
+  id                String           @id @default(uuid())
+  name              String
+  number            Float
+  webbing           Float
+  binding           Float
+  otherA            Float
+  otherB            Float
+}
+
+model Buckle {
+  id                String           @id @default(uuid())
+  name              String
+  number            Float
+  webbing           Float
+  binding           Float
+  otherA            Float
+  otherB            Float
+}
+
+model DRing {
+  id                String           @id @default(uuid())
+  dRingTotal        Float?
+  name              String
+  number            Float
+  webbing           Float
+  strap             Float
+}
+
+model ReleaseBuckle {
+  id                String           @id @default(uuid())
+  name              String
+  number            Float
+}
+
+model Zipper {
+  id                String           @id @default(uuid())
+  name              String
+  size              Float
+  number            Float
+}
+
+model ZipperChain {
+  id                String           @id @default(uuid())
+  name              String
+  quantity          Float
+  measurements      Float
+}
+
+model Edge {
+  id                String           @id @default(uuid())
+  name              String
+  quantity          Float
+}
+
+model Total {
+  id                String           @id @default(uuid())
+  name              String
+  quantity          Float
+}
+
+model Permission {
+  id                String           @id @default(uuid())
+  name              String
+  description       String?
+}
+
+model Role {
+  id                String           @id @default(uuid())
+  name              String
+  description       String?
+}
+
+model UserRole {
+  id                String           @id @default(uuid())
+  name              String
+  createdAt         DateTime?        @default(now())
+  updatedAt         DateTime?        @updatedAt
+}
+
+model WorkOrderCounter {
+  counterName        String           @id
+  currentValue       Int
+}

@@ -16,6 +16,7 @@
     "@aws-sdk/client-s3": "^3.670.0",
     "@aws-sdk/client-ses": "^3.682.0",
     "@aws-sdk/lib-storage": "^3.670.0",
+    "@prisma/client": "^6.11.1",
     "aws-amplify": "^6.6.4",
     "date-fns": "^4.1.0",
     "framer-motion": "^11.11.17",
@@ -37,6 +38,7 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.12",
     "globals": "^15.9.0",
+    "prisma": "^6.11.1",
     "vite": "^5.4.8"
   }
 }

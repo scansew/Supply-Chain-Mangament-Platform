@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    container_name: scansew_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: scansew
+      POSTGRES_PASSWORD: scansewpass
+      POSTGRES_DB: scansewdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    container_name: scansew_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://scansew:scansewpass@postgres:5432/scansewdb
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+    working_dir: /app
+    command: ["npx", "nodemon"]
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+
+
+
+volumes:
+  postgres_data:

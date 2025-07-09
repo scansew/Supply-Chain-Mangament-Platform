@@ -1,0 +1,13 @@
+{
+  "ignore": [
+    "node_modules/*",
+    ".prisma/*",
+    "prisma/generated/*",
+    "generated/*"
+  ],
+  "watch": [
+    "index.js",
+    "src/*",
+    "prisma/schema.prisma"
+  ]
+}

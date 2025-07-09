@@ -19,7 +19,7 @@ This plan details the migration of the Scan & Sew App from AWS services (Amplify
 - Set up a Node.js project with Apollo Server.
 
 ### b. Set Up PostgreSQL & Prisma
-- Install PostgreSQL locally or via Docker.
+- Install PostgreSQL locally.
 - Initialize Prisma (`npx prisma init`).
 - Design your Prisma schema based on your DynamoDB tables (work orders, users, companies, etc.).
 - Run migrations to create tables.
@@ -29,6 +29,7 @@ This plan details the migration of the Scan & Sew App from AWS services (Amplify
 - Implement resolvers using Prisma for DB access.
 - Recreate custom logic from VTL resolvers in JavaScript (e.g., work order counters, byUsername queries).
 
+# todo Continue from here
 ### d. Set Up Supabase Auth
 - Use Supabase Auth (self-hosted or managed) for authentication.
 - Integrate JWT validation in Apollo Server context.
@@ -60,28 +61,24 @@ This plan details the migration of the Scan & Sew App from AWS services (Amplify
 
 ---
 
-## 4. Migrate Data
 
-- Export data from DynamoDB (CSV/JSON).
-- Write migration scripts to import data into PostgreSQL using Prisma.
-
----
-
-## 5. Update DevOps/Deployment
+## 4. Update DevOps/Deployment
 
 - Create a `docker-compose.yml` for local development (Postgres, backend, frontend, MinIO).
 - Update environment variables and configs.
 
 ---
 
-## 6. Testing & Validation
+
+## 5. Testing & Validation
 
 - Write unit/integration tests for new backend logic.
 - Test all user flows: auth, CRUD, file upload, dashboards, etc.
 
 ---
 
-## 7. Documentation
+
+## 6. Documentation
 
 - Update README with new setup, environment variables, and usage instructions.
 
@@ -108,13 +105,28 @@ This plan details the migration of the Scan & Sew App from AWS services (Amplify
 
 ---
 
+
 ## Next Steps
 
 1. Scaffold backend (Apollo Server + Prisma).
-2. Set up PostgreSQL and migrate schema/data.
+2. Set up PostgreSQL and schema.
 3. Integrate Supabase Auth.
 4. Update frontend to use Apollo Client and Supabase.
 5. Implement file storage endpoints.
 6. Test and deploy.
+
+---
+
+## Optional: Optimizations & Best Practices
+
+- **API Layer:** Use DataLoader in Apollo Server to batch and cache DB requests, reducing N+1 query problems. Modularize resolvers and use schema stitching if the API grows.
+- **Database:** Use Prisma’s type safety and migrations for robust schema evolution. Set up regular backups and monitoring for PostgreSQL.
+- **Frontend:** Use React Query or Apollo Client caching for efficient data fetching. Implement optimistic UI updates for a better user experience.
+- **Monitoring:** Set up monitoring (Prometheus, Grafana) and alerting for all services. Track key metrics: API latency, DB performance, auth failures, storage usage.
+- **Error Handling & Logging:** Implement centralized logging (e.g., Winston, Pino) and error tracking (e.g., Sentry).
+- **Security:** Protect all endpoints with authentication and authorization, sanitize all user input, and use HTTPS everywhere.
+- **DevOps:** Use Infrastructure as Code (e.g., Terraform, Ansible) for repeatable deployments. Store secrets in a secure vault.
+- **Testing:** Write unit, integration, and end-to-end tests for all critical paths. Use CI/CD pipelines for automated testing and deployment.
+- **Documentation:** Maintain up-to-date API and architecture docs. Document onboarding and troubleshooting steps for new developers.
 
 ---
