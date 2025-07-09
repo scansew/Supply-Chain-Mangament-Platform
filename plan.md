@@ -30,10 +30,10 @@ This plan details the migration of the Scan & Sew App from AWS services (Amplify
 - Recreate custom logic from VTL resolvers in JavaScript (e.g., work order counters, byUsername queries).
 
 # todo Continue from here
-### d. Set Up Supabase Auth
-- Use Supabase Auth (self-hosted or managed) for authentication.
+### d. Set Up Auth
+- Use Auth (self-hosted or managed) for authentication.
 - Integrate JWT validation in Apollo Server context.
-- Update user management logic to use Supabase Auth’s API.
+- Update user management logic.
 
 ### e. File Storage
 - Start with local file storage for uploads/downloads.

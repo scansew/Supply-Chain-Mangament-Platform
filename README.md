@@ -1,26 +1,31 @@
 # Scan & Sew App
 
-A modern supply chain pipeline tracking and admin application for managing work orders, users, companies, and materials. Built with React, Vite, and AWS Amplify, this app streamlines operations for manufacturing and logistics workflows.
+A modern supply chain pipeline tracking and admin application for managing work orders, users, companies, and materials. Built with a modern tech stack including React, Vite, Node.js, and PostgreSQL, this app streamlines operations for manufacturing and logistics workflows.
 
 ## Features
 
-- **Work Order Management**: Create, view, update, and track work orders with status and counter features.
-- **User & Company Management**: Add, update, and assign users to companies with role-based access.
-- **Material & Inventory Tracking**: Manage materials, components, and inventory items.
-- **File Upload/Download**: Upload and download files related to work orders and users.
-- **Authentication & Authorization**: Secure login, user roles, and company-based access control.
-- **GraphQL API**: Uses AWS AppSync and DynamoDB for scalable, real-time data access.
-- **Custom Resolvers**: Includes custom DynamoDB resolvers for advanced queries and counters.
-- **S3 Storage**: File storage with optional transfer acceleration.
-- **Admin Dashboard**: Visual dashboard for tracking orders, users, and company metrics.
+### Backend Features
+- **GraphQL API**: Built with Apollo Server for efficient data querying
+- **File Storage**: Secure file uploads with MinIO (S3-compatible)
+- **Authentication**: JWT-based authentication with role-based access control
+- **Database**: PostgreSQL with Prisma ORM for type-safe database operations
+- **Containerization**: Docker-based development and deployment
+- **API Documentation**: Comprehensive OpenAPI/Swagger documentation
+
+### Frontend Features
+- **React & Vite**: Modern frontend with fast refresh
+- **Responsive Design**: Works on desktop and mobile devices
+- **User Management**: Create, update, and manage user accounts
+- **Work Order Tracking**: Full CRUD operations for work orders
+- **File Management**: Upload and manage files with progress tracking
 
 ## Getting Started
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v16 or later recommended)
-- [npm](https://www.npmjs.com/)
-- [AWS Amplify CLI](https://docs.amplify.aws/cli/)
-- AWS account with appropriate permissions
+- [Docker](https://www.docker.com/) (v20 or later)
+- [Node.js](https://nodejs.org/) (v18 or later recommended)
+- [npm](https://www.npmjs.com/) (v9 or later)
+- [PostgreSQL](https://www.postgresql.org/) (or use the provided Docker setup)
 
 ### Installation
 
@@ -30,23 +35,42 @@ A modern supply chain pipeline tracking and admin application for managing work 
    cd scansewapp
    ```
 
-2. **Install dependencies**
+2. **Set up environment variables**
    ```sh
-   npm install
+   cd backend
+   cp .env.example .env
+   ```
+   Update the `.env` file with your configuration.
+
+3. **Start the services**
+   ```sh
+   docker-compose up -d
+   ```
+   This will start:
+   - PostgreSQL database
+   - MinIO file storage
+   - Backend API server
+
+4. **Run database migrations**
+   ```sh
+   npx prisma migrate dev
    ```
 
-3. **Configure Amplify**
+5. **Seed the database** (optional)
    ```sh
-   amplify configure
-   amplify pull
+   npx prisma db seed
    ```
-   - Follow the prompts to set up your AWS profile and pull backend resources.
 
-4. **Run the development server**
+6. **Start the development server**
    ```sh
    npm run dev
    ```
-   - The app will be available at `http://localhost:5173` (default Vite port).
+
+## Accessing Services
+
+- **GraphQL Playground**: http://localhost:4000/graphql
+- **API Documentation**: http://localhost:4000/api-docs
+- **MinIO Console**: http://localhost:9001 (default credentials: minioadmin/minioadmin)
 
 ## Project Structure
 
@@ -61,11 +85,60 @@ A modern supply chain pipeline tracking and admin application for managing work 
 - Uses custom DynamoDB resolvers for features like work order counters and user/company lookups.
 - See `README_old.md` for example resolver templates and advanced backend configuration.
 
-## Common Commands
-- `npm install` — Install dependencies
-- `npm run dev` — Start the development server
-- `amplify configure` — Set up AWS Amplify CLI
-- `amplify pull` — Pull backend environment from AWS
+## File Upload Guide
+
+The application supports file uploads through GraphQL mutations. Here's a quick example:
+
+```graphql
+mutation SingleUpload($file: Upload!, $folder: String) {
+  singleUpload(file: $file, folder: $folder) {
+    id
+    filename
+    url
+    size
+  }
+}
+```
+
+### Testing File Uploads
+
+1. **Using the test script**
+   ```sh
+   cd backend
+   node test-file-upload.js
+   ```
+
+2. **Using cURL**
+   ```sh
+   curl -X POST http://localhost:4000/graphql \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+     -F 'operations={"query": "mutation ($file: Upload!) { singleUpload(file: $file) { id filename url } }"}' \
+     -F 'map={"0": ["variables.file"]}' \
+     -F '0=@/path/to/your/file.txt'
+   ```
+
+## API Documentation
+
+For detailed API documentation, visit:
+- Interactive API Docs: http://localhost:4000/api-docs
+- GraphQL Schema: http://localhost:4000/graphql
+
+## Development
+
+### Running Tests
+```sh
+npm test
+```
+
+### Database Management
+- Generate Prisma client: `npx prisma generate`
+- Create migration: `npx prisma migrate dev --name your_migration_name`
+- Reset database: `npx prisma migrate reset`
+
+## Contributing
+
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## License
-This project is proprietary and intended for internal use.
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

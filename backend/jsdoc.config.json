@@ -1,0 +1,47 @@
+{
+  "tags": {
+    "allowUnknownTags": true,
+    "dictionaries": ["jsdoc", "closure"]
+  },
+  "source": {
+    "include": [
+      "./index.js",
+      "./utils",
+      "./resolvers",
+      "./auth",
+      "./config"
+    ],
+    "includePattern": "\\.(js|ts)$",
+    "excludePattern": "(node_modules/|.test.js|.spec.js|dist/)"
+  },
+  "plugins": [
+    "plugins/markdown",
+    "node_modules/better-docs/category"
+  ],
+  "opts": {
+    "template": "node_modules/better-docs",
+    "destination": "./docs/jsdoc/",
+    "recurse": true,
+    "readme": "./README.md",
+    "package": "./package.json",
+    "encoding": "utf8",
+    "verbose": true
+  },
+  "templates": {
+    "better-docs": {
+      "name": "ScanSew API Documentation",
+      "title": "ScanSew API Documentation",
+      "navLinks": [
+        {
+          "label": "GitHub",
+          "href": "https://github.com/yourusername/scansewapp"
+        },
+        {
+          "label": "API Reference",
+          "href": "/api-docs"
+        }
+      ]
+    },
+    "search": true
+  }
+}

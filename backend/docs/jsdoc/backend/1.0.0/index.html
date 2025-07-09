@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScanSew API Documentation Home</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">ScanSew API Documentation</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                 
+                    
+                        <a
+                            class="link user-link "
+                            href="https://github.com/yourusername/scansewapp"
+                        >
+                            GitHub
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="/api-docs"
+                        >
+                            API Reference
+                        </a>
+                    
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+                <div class="search-wrapper">
+                    <input id="search" type="text" placeholder="Search docs..." class="input">
+                </div>
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Modules</h3><ul><li><a href="module-index.html">index</a></li><li><a href="module-utils_fileStorage.html">utils/fileStorage</a></li></ul><h3>Global</h3><ul><li><a href="global.html#processUpload">processUpload</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p></p>
+                    <h1>Home</h1>
+                </header>
+                
+
+
+
+    
+
+
+    <h3>backend 1.0.0</h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>ScanSew Backend</h1>
+<p>A modern Node.js backend for the Scan &amp; Sew application, built with Apollo Server, Prisma, and PostgreSQL. This backend provides a GraphQL API for managing users, companies, work orders, and file storage.</p>
+<h2>Features</h2>
+<ul>
+<li><strong>GraphQL API</strong> with Apollo Server</li>
+<li><strong>Authentication</strong> using JWT</li>
+<li><strong>File Storage</strong> with MinIO (S3-compatible)</li>
+<li><strong>Database</strong> with PostgreSQL and Prisma ORM</li>
+<li><strong>Type Safety</strong> with TypeScript</li>
+<li><strong>Containerized</strong> with Docker</li>
+</ul>
+<h2>Quick Start</h2>
+<ol>
+<li>
+<p><strong>Clone the repository</strong></p>
+<pre class="prettyprint source lang-bash"><code>git clone https://github.com/yourusername/scansewapp.git
+cd scansewapp/backend
+</code></pre>
+</li>
+<li>
+<p><strong>Install dependencies</strong></p>
+<pre class="prettyprint source lang-bash"><code>npm install
+</code></pre>
+</li>
+<li>
+<p><strong>Set up environment variables</strong>
+Copy <code>.env.example</code> to <code>.env</code> and update the values:</p>
+<pre class="prettyprint source lang-bash"><code>cp .env.example .env
+</code></pre>
+</li>
+<li>
+<p><strong>Start the development server</strong></p>
+<pre class="prettyprint source lang-bash"><code>docker-compose up -d
+npm run dev
+</code></pre>
+</li>
+<li>
+<p><strong>Access the GraphQL Playground</strong>
+Open <a href="http://localhost:4000/graphql">http://localhost:4000/graphql</a> in your browser</p>
+</li>
+</ol>
+<h2>Documentation</h2>
+<ul>
+<li><a href="./API_DOCS.md">API Documentation</a> - Complete API reference with examples</li>
+<li><a href="./TESTING.md">Testing Guide</a> - Guidelines for writing and running tests</li>
+<li><a href="./DEPLOYMENT.md">Deployment Guide</a> - Instructions for deploying to different environments</li>
+</ul>
+<h2>Development</h2>
+<h3>Prerequisites</h3>
+<ul>
+<li>Node.js 16+</li>
+<li>Docker and Docker Compose</li>
+<li>PostgreSQL 13+</li>
+<li>MinIO (included in Docker Compose)</li>
+</ul>
+<h3>Available Scripts</h3>
+<ul>
+<li><code>npm run dev</code> - Start development server with hot-reload</li>
+<li><code>npm run build</code> - Build for production</li>
+<li><code>npm start</code> - Start production server</li>
+<li><code>npm test</code> - Run tests</li>
+<li><code>npm run lint</code> - Run ESLint</li>
+<li><code>npm run format</code> - Format code with Prettier</li>
+</ul>
+<h2>Database</h2>
+<p>This project uses Prisma as the ORM. To apply migrations:</p>
+<pre class="prettyprint source lang-bash"><code>npx prisma migrate dev
+</code></pre>
+<p>To open Prisma Studio:</p>
+<pre class="prettyprint source lang-bash"><code>npx prisma studio
+</code></pre>
+<h2>File Storage</h2>
+<p>File uploads are handled by MinIO, an S3-compatible object storage service. The service is pre-configured in the Docker Compose setup.</p>
+<h2>Contributing</h2>
+<ol>
+<li>Fork the repository</li>
+<li>Create a feature branch (<code>git checkout -b feature/AmazingFeature</code>)</li>
+<li>Commit your changes (<code>git commit -m 'Add some AmazingFeature'</code>)</li>
+<li>Push to the branch (<code>git push origin feature/AmazingFeature</code>)</li>
+<li>Open a Pull Request</li>
+</ol>
+<h2>License</h2>
+<p>This project is licensed under the MIT License - see the <a href="LICENSE">LICENSE</a> file for details.</p></article>
+    </section>
+
+
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+<script src="scripts/search.js"> </script>
+
+
+</body>
+</html>

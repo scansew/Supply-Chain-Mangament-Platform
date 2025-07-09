@@ -102,6 +102,7 @@ model User {
   id                String           @id @default(uuid())
   username          String           @unique
   email             String           @unique
+  password          String?
   family_name       String?
   given_name        String?
   createdAt         DateTime?        @default(now())
@@ -207,14 +208,24 @@ model StageUpdate {
 
 model File {
   id                String           @id @default(uuid())
-  workOrderId       String
-  fileType          String
-  url               String
-  uploadedById      String
-  createdAt         DateTime?        @default(now())
-  updatedAt         DateTime?        @updatedAt
-  workOrder         WorkOrder        @relation(fields: [workOrderId], references: [id])
-  uploadedBy        User             @relation(fields: [uploadedById], references: [id])
+  filename          String
+  mimetype          String
+  encoding          String
+  url               String           @unique
+  key               String           @unique
+  size              Int
+  folder            String?
+  workOrderId       String?
+  createdById       String
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  
+  // Relations
+  workOrder         WorkOrder?       @relation(fields: [workOrderId], references: [id])
+  createdBy         User             @relation(fields: [createdById], references: [id])
+  
+  @@index([workOrderId])
+  @@index([createdById])
 }
 
 model AuditLog {

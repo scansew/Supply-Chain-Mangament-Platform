@@ -3,16 +3,18 @@ FROM node:22
 # Set working directory inside the container
 WORKDIR /app
 
-
-# Copy package files and prisma schema
-
-# Copy package files and prisma schema
+# Install dependencies first for better caching
 COPY package.json package-lock.json ./
 COPY prisma ./prisma
-RUN npm ci --omit=dev
 
-# Copy the rest of the backend code after installing dependencies
+# Install all dependencies including devDependencies for development
+RUN npm ci
+
+# Copy the rest of the backend code
 COPY . .
+
+# Generate Prisma client
+RUN npx prisma generate
 
 # Expose the port Apollo Server runs on
 EXPOSE 4000

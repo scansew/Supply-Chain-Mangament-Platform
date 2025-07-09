@@ -1,17 +1,46 @@
 version: '3.8'
+
 services:
   postgres:
     image: postgres:15
     container_name: scansew_postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: scansew
-      POSTGRES_PASSWORD: scansewpass
-      POSTGRES_DB: scansewdb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scansew -d scansewdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scansew-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: scansew_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "9000:9000" # API port
+      - "9001:9001" # Console port
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - scansew-network
 
   backend:
     build:
@@ -19,19 +48,34 @@ services:
     container_name: scansew_backend
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://scansew:scansewpass@postgres:5432/scansewdb
+      NODE_ENV: ${NODE_ENV:-development}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      API_PORT: ${API_PORT:-4000}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME:-scansew-files}
+      MINIO_USE_SSL: "false"
     ports:
       - "4000:4000"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     working_dir: /app
     command: ["npx", "nodemon"]
     volumes:
       - ./backend:/app
       - /app/node_modules
-
-
-
+    networks:
+      - scansew-network
 
 volumes:
   postgres_data:
+  minio_data:
+
+networks:
+  scansew-network:
+    driver: bridge

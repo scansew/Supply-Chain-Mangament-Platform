@@ -1,0 +1,304 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScanSew API Documentation index.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">ScanSew API Documentation</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                 
+                    
+                        <a
+                            class="link user-link "
+                            href="https://github.com/yourusername/scansewapp"
+                        >
+                            GitHub
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="/api-docs"
+                        >
+                            API Reference
+                        </a>
+                    
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+                <div class="search-wrapper">
+                    <input id="search" type="text" placeholder="Search docs..." class="input">
+                </div>
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Modules</h3><ul><li><a href="module-index.html">index</a></li><li><a href="module-utils_fileStorage.html">utils/fileStorage</a></li></ul><h3>Global</h3><ul><li><a href="global.html#processUpload">processUpload</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>index.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file Main application entry point
+ * @module index
+ * @description Configures and starts the GraphQL server with Express
+ * @requires dotenv
+ * @requires apollo-server-express
+ * @requires express
+ * @requires http
+ * @requires @prisma/client
+ * @requires @graphql-tools/schema
+ * @requires graphql-middleware
+ * @requires graphql-upload
+ * @requires stream/promises
+ * @requires ./config/swagger
+ */
+
+require('dotenv').config();
+const { ApolloServer } = require('apollo-server-express');
+const express = require('express');
+const http = require('http');
+const { PrismaClient } = require('@prisma/client');
+const { makeExecutableSchema } = require('@graphql-tools/schema');
+const { applyMiddleware } = require('graphql-middleware');
+const { getAuthUser } = require('./auth/context');
+const { GraphQLUpload } = require('graphql-upload');
+const { graphqlUploadExpress } = require('graphql-upload');
+const { finished } = require('stream/promises');
+const setupSwagger = require('./config/swagger');
+
+// Initialize Prisma Client
+const prisma = new PrismaClient();
+
+// Import resolvers
+const merge = require('lodash.merge');
+const companyResolvers = require('./resolvers/company');
+const userResolvers = require('./resolvers/user');
+const workOrderResolvers = require('./resolvers/workOrder');
+const authResolvers = require('./resolvers/auth');
+const fileResolvers = require('./resolvers/file');
+
+// Import type definitions
+const typeDefs = [
+  require('./typeDefs/company'),
+  require('./typeDefs/user'),
+  require('./typeDefs/workOrder'),
+  require('./typeDefs/root'),
+];
+
+// Merge all resolvers
+const resolvers = merge(
+  {
+    Upload: GraphQLUpload,
+  },
+  companyResolvers,
+  userResolvers,
+  workOrderResolvers,
+  authResolvers,
+  fileResolvers
+);
+
+/**
+ * Express application instance
+ * @type {Object}
+ * @property {Function} use - Add middleware to the app
+ * @property {Function} get - Define a route handler for GET requests
+ * @property {Function} post - Define a route handler for POST requests
+ * @property {Function} listen - Start the server
+ */
+const app = express();
+
+// Apply the graphqlUploadExpress middleware for handling file uploads
+app.use(graphqlUploadExpress({
+  maxFileSize: 10 * 1024 * 1024, // 10MB
+  maxFiles: 10,
+}));
+
+// Setup Swagger documentation
+if (process.env.NODE_ENV !== 'production') {
+  setupSwagger(app);
+}
+
+// Create GraphQL schema
+const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+// Apply middleware
+const schemaWithMiddleware = applyMiddleware(schema);
+
+// Create Apollo Server
+const server = new ApolloServer({
+  schema: schemaWithMiddleware,
+  uploads: false, // Disable built-in upload handling
+  context: async ({ req }) => {
+    // Get the user token from the headers
+    const { user } = await getAuthUser(req);
+    
+    // Add the user and Prisma client to the context
+    return { 
+      prisma,
+      user,
+    };
+  },
+  playground: process.env.NODE_ENV !== 'production',
+  introspection: true,
+  playground: process.env.NODE_ENV !== 'production',
+  introspection: true,
+});
+
+/**
+ * Starts the Apollo Server with Express
+ * @async
+ * @function startApolloServer
+ * @returns {Promise&lt;Object>} Object containing server, app, and httpServer instances
+ * @property {Object} server - Apollo Server instance
+ * @property {Object} app - Express application instance
+ * @property {Object} httpServer - HTTP server instance
+ */
+async function startApolloServer() {
+  await server.start();
+  
+  // Apply the Apollo Server middleware to Express
+  server.applyMiddleware({ 
+    app,
+    // Enable CORS in development
+    cors: process.env.NODE_ENV === 'development' ? {
+      origin: ['http://localhost:3000', 'http://localhost:4000'],
+      credentials: true
+    } : undefined
+  });
+  
+  // Create HTTP server
+  const httpServer = http.createServer(app);
+  
+  // Start the server
+  const PORT = process.env.PORT || 4000;
+  await new Promise(resolve => httpServer.listen({ port: PORT }, resolve));
+  
+  const serverUrl = `http://localhost:${PORT}`;
+  console.log(`🚀 Server ready at ${serverUrl}${server.graphqlPath}`);
+  
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`📚 API Documentation available at ${serverUrl}/api-docs`);
+    console.log(`🔍 GraphQL Playground available at ${serverUrl}${server.graphqlPath}`);
+  }
+  
+  return { server, app, httpServer };
+}
+
+// Start the server
+startApolloServer().catch(error => {
+  console.error('Error starting server:', error);
+  process.exit(1);
+});
+
+// Handle shutdown gracefully
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Shutting down gracefully');
+  server.stop().then(() => {
+    console.log('Server stopped');
+    process.exit(0);
+  });
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+<script src="scripts/search.js"> </script>
+
+
+</body>
+</html>
