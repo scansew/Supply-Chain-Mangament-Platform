@@ -1,143 +1,71 @@
-# Scan and Sew app
+# Scan & Sew App
 
-- npm install
-- amplify configure
-- amplify pull
-- npm run dev
+A modern supply chain pipeline tracking and admin application for managing work orders, users, companies, and materials. Built with React, Vite, and AWS Amplify, this app streamlines operations for manufacturing and logistics workflows.
 
-- npm install
-- npm run dev
+## Features
 
-### edit work order while changing environment of amplify
+- **Work Order Management**: Create, view, update, and track work orders with status and counter features.
+- **User & Company Management**: Add, update, and assign users to companies with role-based access.
+- **Material & Inventory Tracking**: Manage materials, components, and inventory items.
+- **File Upload/Download**: Upload and download files related to work orders and users.
+- **Authentication & Authorization**: Secure login, user roles, and company-based access control.
+- **GraphQL API**: Uses AWS AppSync and DynamoDB for scalable, real-time data access.
+- **Custom Resolvers**: Includes custom DynamoDB resolvers for advanced queries and counters.
+- **S3 Storage**: File storage with optional transfer acceleration.
+- **Admin Dashboard**: Visual dashboard for tracking orders, users, and company metrics.
 
-### Add work order counter item to table
+## Getting Started
 
-### Add work order counter resolver
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v16 or later recommended)
+- [npm](https://www.npmjs.com/)
+- [AWS Amplify CLI](https://docs.amplify.aws/cli/)
+- AWS account with appropriate permissions
 
-### DB private
+### Installation
 
-### Request byUsername
+1. **Clone the repository**
+   ```sh
+   git clone <your-repo-url>
+   cd scansewapp
+   ```
 
-{
-"version": "2018-05-29",
-"operation": "Query",
-"index": "byUsername",
-"query": {
-"expression": "#username = :username",
-"expressionNames": {
-"#username": "username"
-},
-"expressionValues": {
-":username": $util.dynamodb.toDynamoDBJson($ctx.args.username)
-}
-}
-}
+2. **Install dependencies**
+   ```sh
+   npm install
+   ```
 
-### response
+3. **Configure Amplify**
+   ```sh
+   amplify configure
+   amplify pull
+   ```
+   - Follow the prompts to set up your AWS profile and pull backend resources.
 
-#if($ctx.error)
-    $util.error($ctx.error.message, $ctx.error.type)
-#end
+4. **Run the development server**
+   ```sh
+   npm run dev
+   ```
+   - The app will be available at `http://localhost:5173` (default Vite port).
 
-#if($ctx.result.items.size() == 0)
-    null
-#else
-    $util.toJson($ctx.result.items[0])
-#end
+## Project Structure
 
-#### Request
+- `src/` — Main React source code
+  - `pages/` — App pages (Dashboard, Work Orders, Users, Companies, etc.)
+  - `ui-components/` — Reusable UI components and forms
+  - `graphql/` — GraphQL queries, mutations, and schema
+- `amplify/` — AWS Amplify backend configuration
+- `public/` — Static assets
 
-{
-"version" : "2018-05-29",
-"operation" : "UpdateItem",
-"key" : {
-"counterName" : $util.dynamodb.toDynamoDBJson($ctx.args.counterName)
-},
-"update" : {
-"expression" : "SET currentValue = currentValue + :incr",
-"expressionValues" : {
-":incr" : { "N" : 1 }
-}
-}
-}
+## Amplify & GraphQL Notes
+- Uses custom DynamoDB resolvers for features like work order counters and user/company lookups.
+- See `README_old.md` for example resolver templates and advanced backend configuration.
 
-#### response
+## Common Commands
+- `npm install` — Install dependencies
+- `npm run dev` — Start the development server
+- `amplify configure` — Set up AWS Amplify CLI
+- `amplify pull` — Pull backend environment from AWS
 
-    #if($ctx.error)
-        $util.error($ctx.error.message, $ctx.error.type)
-    #end
-    ## Pass back the result from DynamoDB. **
-    $util.toJson($ctx.result.currentValue)
-
-### Enable Transfer acceleration S3
-
-### Update new user profile
-
-## Mutation.updateUserCompany.req.vtl (Pipeline Request Mapping Template)
-
-{
-"version": "2018-05-29",
-"payload": $util.toJson($ctx.args)
-}
-
-## Mutation.updateUserCompany.res.vtl (Pipeline Response Mapping Template)
-
-$util.toJson($ctx.prev.result)
-
-## Function.getCompanyBySecret.req.vtl (First Function Request Mapping Template)
-
-{
-"version": "2018-05-29",
-"operation": "Query",
-"index": "byCompanySecret",
-"query": {
-"expression": "companySecret = :companySecret",
-"expressionValues": {
-":companySecret": $util.dynamodb.toDynamoDBJson($ctx.args.companySecret)
-}
-},
-"scanIndexForward": true,
-"limit": 1
-}
-
-## Function.getCompanyBySecret.res.vtl (First Function Response Mapping Template)
-
-#if(!$ctx.result.items || $ctx.result.items.size() == 0)
-$util.error("Company not found with provided secret")
-#end
-$util.qr($ctx.stash.put("companyId", $ctx.result.items[0].id))
-$util.qr($ctx.stash.put("companyName", $ctx.result.items[0].name))
-$util.toJson($ctx.result.items[0])
-
-## Function.updateUserProfile.req.vtl (Second Function Request Mapping Template)
-
-{
-"version": "2018-05-29",
-"operation": "UpdateItem",
-"key": {
-"id": $util.dynamodb.toDynamoDBJson($ctx.args.userId)
-},
-"update": {
-"expression": "SET companyId = :companyId, companyName = :companyName, #roleAttr = :role",
-"expressionNames": {
-"#roleAttr": "role"
-},
-"expressionValues": {
-":companyId": $util.dynamodb.toDynamoDBJson($ctx.stash.companyId),
-":companyName": $util.dynamodb.toDynamoDBJson($ctx.stash.companyName),
-":role": $util.dynamodb.toDynamoDBJson("emp")
-}
-},
-"condition": {
-"expression": "attribute_exists(id)"
-}
-}
-
-## Function.updateUserProfile.res.vtl (Second Function Response Mapping Template)
-
-#if($ctx.error)
-    $util.error($ctx.error.message, $ctx.error.type)
-#end
-$util.toJson($ctx.result)
-
-## Change signup invite URL
+## License
+This project is proprietary and intended for internal use.
