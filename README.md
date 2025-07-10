@@ -61,10 +61,49 @@ A modern supply chain pipeline tracking and admin application for managing work 
    npx prisma db seed
    ```
 
+6. **Initialize MinIO Storage**
+   Create the required MinIO bucket for file storage:
+   ```sh
+   npm run init-minio
+   ```
+   This will create a bucket named `scansew-files` in your MinIO instance.
+
+6. **Create an admin user**
+   After starting the services, create an admin user by running the following GraphQL mutation in the GraphQL Playground (http://localhost:4000/graphql):
+   
+   ```graphql
+   mutation {
+     signUp(input: { 
+       email: "admin@scansew.com", 
+       password: "admin123", 
+       username: "admin", 
+       givenName: "Admin", 
+       familyName: "User", 
+       role: "sAdmin" 
+     }) { 
+       token 
+       user { 
+         id 
+         email 
+         username 
+         given_name 
+         family_name 
+         role 
+       } 
+     }
+   }
+   ```
+
+   This will create an admin user with the following credentials:
+   - Email: admin@scansew.com
+   - Password: admin123
+   - Role: sAdmin (System Administrator)
+
+<!-- 
 6. **Start the development server**
    ```sh
    npm run dev
-   ```
+   ``` -->
 
 ## Accessing Services
 

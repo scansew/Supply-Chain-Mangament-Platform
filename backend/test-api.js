@@ -128,8 +128,9 @@ async function testCompaniesQuery() {
         companies {
           id
           name
-          email
+          address
           createdAt
+          updatedAt
         }
       }
     `;

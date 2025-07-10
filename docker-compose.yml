@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 
 services:
   postgres:
@@ -65,7 +65,8 @@ services:
       minio:
         condition: service_healthy
     working_dir: /app
-    command: ["npx", "nodemon"]
+    entrypoint: ["/entrypoint.sh"]
+    command: ["npx", "nodemon", "index.js"]
     volumes:
       - ./backend:/app
       - /app/node_modules

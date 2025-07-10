@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 const authResolvers = {
   Mutation: {
     signUp: async (_, { input }) => {
-      const { email, password, username, ...rest } = input;
+      const { email, password, username, givenName, familyName, role, ...rest } = input;
       
       // Check if user already exists
       const existingUser = await prisma.user.findUnique({
@@ -21,12 +21,15 @@ const authResolvers = {
       // Hash password
       const hashedPassword = await hashPassword(password);
 
-      // Create user
+      // Create user with mapped fields
       const user = await prisma.user.create({
         data: {
           email,
           username,
           password: hashedPassword,
+          given_name: givenName,
+          family_name: familyName,
+          role,
           ...rest
         }
       });

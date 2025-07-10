@@ -18,13 +18,15 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "seed": "node prisma/seed.js",
-    "reset-db": "node scripts/reset-db.js"
+    "reset-db": "node scripts/reset-db.js",
+    "init-minio": "node scripts/init-minio.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.540.0",
+    "@aws-sdk/credential-providers": "^3.844.0",
     "@aws-sdk/s3-request-presigner": "^3.540.0",
     "@graphql-tools/schema": "^10.0.23",
     "@prisma/client": "^6.11.1",

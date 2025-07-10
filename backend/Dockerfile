@@ -10,6 +10,16 @@ COPY prisma ./prisma
 # Install all dependencies including devDependencies for development
 RUN npm ci
 
+# Copy the entrypoint script with proper line endings and make it executable
+RUN echo '#!/bin/sh' > /entrypoint.sh && \
+    echo '# Entrypoint for backend container: always generate Prisma client before starting server' >> /entrypoint.sh && \
+    echo 'set -e' >> /entrypoint.sh && \
+    echo 'echo "[Entrypoint] Running: npx prisma generate"' >> /entrypoint.sh && \
+    echo 'npx prisma generate' >> /entrypoint.sh && \
+    echo 'echo "[Entrypoint] Prisma client generated successfully. Starting server..."' >> /entrypoint.sh && \
+    echo 'exec "$@"' >> /entrypoint.sh && \
+    chmod +x /entrypoint.sh
+
 # Copy the rest of the backend code
 COPY . .
 
@@ -19,7 +29,6 @@ RUN npx prisma generate
 # Expose the port Apollo Server runs on
 EXPOSE 4000
 
-# Use volume for code mounting (set in docker-compose, not here)
-# Entrypoint script ensures Prisma client is generated after volume mount
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Use the entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["npx", "nodemon", "index.js"]
