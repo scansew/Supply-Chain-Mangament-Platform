@@ -50,11 +50,13 @@ const CreateWorkOrderForm = ({
   const [CNCCompanies, setCNCCompanies] = useState([]);
   const [ManCompanies, setManCompanies] = useState([]);
   const [formState, setFormState] = useState({
-    woNumber: "N/A",
+    id: "",
+    woNumber: "",
     createdById: "",
     assignedToId: "",
     companyId: "",
     CNCId: "",
+    manId: "",
     status: "PENDING",
     type: "",
     details: "",
@@ -66,8 +68,6 @@ const CreateWorkOrderForm = ({
     customerDropShippingAddress: "",
     filesFolder: "",
     currentStage: "SCANNING",
-    manId: "",
-    CNCId: "",
   });
   const workOrderTypes = [
     "Ratchet_Mooring",
@@ -188,9 +188,7 @@ const CreateWorkOrderForm = ({
         attnName: "",
         customerName: "",
         customerDropShippingAddress: "",
-        currentStage: "SCANNING",
-        manId: "",
-        CNCId: "",
+        currentStage: "SCANNING"
       });
       setShowForm(false);
     } else {

@@ -1,22 +1,26 @@
 /**
  * Main Entry Point
- * This is the entry point of the ScanSew application that initializes AWS Amplify
- * and renders the root App component within React's StrictMode.
+ * This is the entry point of the ScanSew application that renders the root App component
+ * wrapped in Material UI's ThemeProvider within React's StrictMode.
  */
 
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import App from "./App.jsx";
-import "./index.css";
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import theme from './theme/theme';
+import App from './App';
+import './index.css';
 
-// AWS Amplify Configuration
-import { Amplify } from "aws-amplify";
-import amplifyconfig from "./amplifyconfiguration.json";
-Amplify.configure(amplifyconfig);
-
-// Initialize React application with StrictMode for additional development checks
-createRoot(document.getElementById("root")).render(
+// Initialize React application with StrictMode and Material UI theming
+createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <App />
+      </LocalizationProvider>
+    </ThemeProvider>
   </StrictMode>
 );
