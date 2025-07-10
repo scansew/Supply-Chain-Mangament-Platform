@@ -7,7 +7,7 @@ This plan details the migration of the Scan & Sew App from AWS services (Amplify
 ## 1. Analyze Current Architecture
 
 - **Frontend:** React (Vite), uses Amplify JS for API, Auth, and Storage.
-- **Backend:** AWS AppSync (GraphQL), DynamoDB, Cognito, S3, custom VTL resolvers.
+- ~~**Backend:** AWS AppSync (GraphQL), DynamoDB, Cognito, S3, custom VTL resolvers.~~ [DONE]
 - **Amplify CLI:** For environment/config management.
 
 ---
