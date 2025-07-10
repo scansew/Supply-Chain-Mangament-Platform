@@ -178,6 +178,68 @@ npm test
 
 Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
+## Testing
+
+### Running Tests
+
+The backend includes a comprehensive test suite built with Jest. To run the tests:
+
+```bash
+# Navigate to the backend directory
+cd backend
+
+# Install dependencies (if not already installed)
+npm install
+
+# Run all tests
+npm test
+
+# Run tests with coverage report
+npm test -- --coverage
+
+# Run a specific test file
+npx jest __tests__/auth.test.js
+```
+
+### Test Structure
+
+- `__tests__/` - Contains all test files
+  - `auth.test.js` - Authentication tests (login, registration, token validation)
+  - `company.test.js` - Company management tests
+  - `file.test.js` - File upload and management tests
+  - `smoke.test.js` - Basic API health check tests
+  - `testHelpers.js` - Shared test utilities and setup
+
+### Test Environment
+
+- Tests run against a dedicated test database (`test.db`)
+- The database is automatically reset before each test run
+- Test environment uses a separate port (4001) to avoid conflicts
+- JWT tokens are automatically generated for authenticated tests
+
+### Writing Tests
+
+When adding new features, please include corresponding tests. Follow these patterns:
+
+1. **Test Files**: Place test files next to the code they test with `.test.js` extension
+2. **Test Structure**: Use `describe` blocks to group related tests and `test` or `it` for individual test cases
+3. **Assertions**: Use Jest's built-in assertion library
+4. **Mocking**: Use Jest's mocking capabilities for external services
+
+### Test Coverage
+
+To check test coverage:
+
+```bash
+# Generate coverage report
+npm test -- --coverage
+
+# Open HTML coverage report (after running the above)
+open coverage/lcov-report/index.html
+```
+
+Aim to maintain high test coverage (80%+). The coverage report will highlight untested code paths.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

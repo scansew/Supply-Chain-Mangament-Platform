@@ -1,0 +1,240 @@
+/* App.css */
+
+/* Base styles */
+body {
+  font-family: var(--amplify-fonts-default);
+  color: var(--amplify-colors-font-primary);
+  background-color: var(--amplify-colors-background-primary);
+}
+
+/* Sidebar styles */
+.sidebar {
+  transition: left 0.3s ease-in-out;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  color: var(--amplify-colors-font-primary);
+  text-decoration: none;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+  background-color: var(--amplify-colors-background-secondary);
+  color: var(--amplify-colors-font-interactive);
+}
+
+.sidebar-icon {
+  margin-right: 0.75rem;
+}
+
+/* Hamburger menu button */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--amplify-colors-font-primary);
+  cursor: pointer;
+  margin-left: auto;
+}
+.menu-toggle:hover {
+  background-color: var(--amplify-colors-background-secondary);
+}
+
+/* Responsive Grid Adjustments */
+@media (max-width: 991px) {
+  .amplify-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Show hamburger menu */
+  .menu-toggle {
+    display: block;
+  }
+
+  /* Sidebar styles for mobile/tablet */
+  .sidebar {
+    position: fixed;
+    top: 60px; /* Adjust based on your header height */
+    left: -250px;
+    width: 250px;
+    height: calc(100vh - 60px);
+    z-index: 1000;
+    background-color: var(--amplify-colors-background-primary);
+    overflow-y: auto;
+  }
+
+  /* Show sidebar when open */
+  .sidebar.open {
+    left: 0;
+  }
+
+  /* Ensure main content is below the header */
+  .amplify-grid > .amplify-view:nth-child(3) {
+    margin-top: 60px; /* Adjust based on your header height */
+  }
+}
+
+/* Mobile Styles */
+@media (max-width: 767px) {
+  .amplify-grid {
+    grid-template-rows: auto 1fr auto !important;
+  }
+
+  .amplify-button {
+    width: 100%;
+  }
+
+  .amplify-image {
+    max-width: 120px;
+  }
+}
+
+/* Tablet Styles */
+@media (min-width: 768px) and (max-width: 991px) {
+  .amplify-grid {
+    grid-template-rows: auto 1fr auto !important;
+  }
+}
+
+/* Desktop Styles */
+@media (min-width: 992px) {
+  .amplify-grid {
+    grid-template-columns: 250px 1fr !important;
+  }
+  .main-content {
+    position:absolute; 
+    margin-left: 200px;
+    margin-top: 50px;
+    width: calc(100% - 250px);
+    min-height: 100vh;
+    z-index: 1; /* Add this */
+    background-color: var(--amplify-colors-background-primary); /* Add this */
+  }
+  /* Always show sidebar on desktop */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: var(--amplify-colors-background-primary);
+    display: block !important;
+  }
+
+  /* Hide hamburger menu on desktop */
+  .menu-toggle {
+    display: none !important;
+  }
+}
+
+/* Large Desktop Styles */
+@media (min-width: 1200px) {
+  .amplify-view {
+    padding: 1.5rem !important;
+  }
+
+  .amplify-text {
+    font-size: 1.1rem;
+  }
+}
+
+/* 4K and Larger Screens */
+@media (min-width: 2560px) {
+  .amplify-grid {
+    max-width: 2000px;
+    margin: 0 auto;
+  }
+
+  .amplify-view {
+    padding: 2rem !important;
+  }
+
+  .amplify-text {
+    font-size: 1.25rem;
+  }
+
+  .sidebar-link {
+    padding: 1rem 1.5rem;
+  }
+
+  .amplify-image {
+    max-width: 200px;
+  }
+
+  .amplify-button {
+    font-size: 1.1rem;
+    padding: 0.75rem 1.5rem;
+  }
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--amplify-colors-background-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--amplify-colors-border-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--amplify-colors-border-secondary);
+}
+
+/* Improve table responsiveness */
+.amplify-table {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-width: 100%;
+}
+
+/* Ensure form inputs are full width on mobile */
+@media (max-width: 767px) {
+  .amplify-input,
+  .amplify-select,
+  .amplify-textarea {
+    width: 100% !important;
+  }
+}
+
+/* Improve readability on very large screens */
+@media (min-width: 3840px) {
+  body {
+    font-size: 24px;
+  }
+
+  .amplify-grid {
+    max-width: 3000px;
+  }
+
+  .amplify-view {
+    padding: 3rem !important;
+  }
+
+  .amplify-text {
+    font-size: 1.5rem;
+  }
+
+  .sidebar-link {
+    padding: 1.25rem 2rem;
+  }
+
+  .amplify-image {
+    max-width: 250px;
+  }
+
+  .amplify-button {
+    font-size: 1.25rem;
+    padding: 1rem 2rem;
+  }
+}
